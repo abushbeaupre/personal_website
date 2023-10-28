@@ -3,12 +3,19 @@ project:
   output-dir: docs
 
 website:
-  title: "personal_website"
+  title: "Allen Bush-Beaupré"
   navbar:
+    background: dark
+    foreground: light
+    search: true
     left:
-      - href: index.qmd
-        text: Home
-      - about.qmd
+      - text: "Home"
+        file: index.qmd
+      - talks.qmd
+      - about.qmd 
+    tools:
+      -icon: Source Code
+      url:https://github.com/abushbeaupre/personal_website/tree/main
 
 format:
   html:
