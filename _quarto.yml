@@ -11,11 +11,11 @@ website:
     left:
       - text: "Home"
         file: index.qmd
-      - talks.qmd
-      - about.qmd 
     tools:
-      -icon: Source Code
-      url:https://github.com/abushbeaupre/personal_website/tree/main/
+      - icon: github
+        menu:
+          - text: Source Code
+            url:https://github.com/abushbeaupre/personal_website/tree/main:
 
 format:
   html:
