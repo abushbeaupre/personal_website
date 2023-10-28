@@ -1,5 +1,5 @@
 ---
-title: "personal_website"
+title: "Allen Bush-Beaupré"
 ---
 
 This is a Quarto website.
