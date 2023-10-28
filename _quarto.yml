@@ -15,7 +15,7 @@ website:
       - about.qmd 
     tools:
       -icon: Source Code
-      url:https://github.com/abushbeaupre/personal_website/tree/main
+      url:https://github.com/abushbeaupre/personal_website/tree/main/
 
 format:
   html:
