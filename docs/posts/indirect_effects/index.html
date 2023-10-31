@@ -23,6 +23,69 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1.6em;
   vertical-align: middle;
 }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -144,6 +207,485 @@ ul.task-list li input[type="checkbox"] {
 
 
 
+<p>Start by loading the pertinent packages</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list=</span><span class="fu">ls</span>()) <span class="co"># clear workspace</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse) <span class="co"># data manipulation and plotting</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+✔ ggplot2 3.4.2     ✔ purrr   1.0.1
+✔ tibble  3.2.1     ✔ dplyr   1.1.0
+✔ tidyr   1.3.0     ✔ stringr 1.5.0
+✔ readr   2.1.4     ✔ forcats 1.0.0</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'ggplot2' was built under R version 4.2.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tibble' was built under R version 4.2.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmmTMB) <span class="co"># frequentist glmms</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in checkDepPackageVersion(dep_pkg = "TMB"): Package version inconsistency detected.
+glmmTMB was built with TMB version 1.9.2
+Current TMB version is 1.9.3
+Please re-install glmmTMB from source or restore original 'TMB' package (see '?reinstalling' for more information)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co">#multiple plots</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggdist) <span class="co"># nice dots in logistic regression</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidylog) <span class="co"># log changes done during data wrangling</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'tidylog'
+
+The following objects are masked from 'package:dplyr':
+
+    add_count, add_tally, anti_join, count, distinct, distinct_all,
+    distinct_at, distinct_if, filter, filter_all, filter_at, filter_if,
+    full_join, group_by, group_by_all, group_by_at, group_by_if,
+    inner_join, left_join, mutate, mutate_all, mutate_at, mutate_if,
+    relocate, rename, rename_all, rename_at, rename_if, rename_with,
+    right_join, sample_frac, sample_n, select, select_all, select_at,
+    select_if, semi_join, slice, slice_head, slice_max, slice_min,
+    slice_sample, slice_tail, summarise, summarise_all, summarise_at,
+    summarise_if, summarize, summarize_all, summarize_at, summarize_if,
+    tally, top_frac, top_n, transmute, transmute_all, transmute_at,
+    transmute_if, ungroup
+
+The following objects are masked from 'package:tidyr':
+
+    drop_na, fill, gather, pivot_longer, pivot_wider, replace_na,
+    spread, uncount
+
+The following object is masked from 'package:stats':
+
+    filter</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mgcv) <span class="co"># gamms</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'mgcv' was built under R version 4.2.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: nlme
+
+Attaching package: 'nlme'
+
+The following object is masked from 'package:dplyr':
+
+    collapse
+
+This is mgcv 1.8-42. For overview type 'help("mgcv-package")'.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gratia) <span class="co"># gam predictions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'gratia' was built under R version 4.2.3</code></pre>
+</div>
+</div>
+<p>First, we will simulate data from this DAG:</p>
+<p>INSERT DAG</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">333</span>) <span class="co"># set seed to reproduce the simulations exactly</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">3000</span> <span class="co"># sample size</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="dv">1</span>) <span class="co"># define K as a Z-score</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fu">rpois</span>(n, <span class="fu">exp</span>(<span class="dv">4</span> <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>X)) <span class="co"># Y is a poisson variable whose link is the log function so defining the coefficients using the inverse log (exponential)</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>K <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">3</span> <span class="sc">+</span> <span class="fl">0.03</span><span class="sc">*</span>X <span class="sc">+</span> <span class="fl">0.05</span><span class="sc">*</span>Y)) <span class="co"># K is a Bernoulli variable whose link is the logit so defining the coefficients using the inverse logit (plogis)</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">X =</span> X,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y =</span> Y,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">K =</span> K,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">K_1 =</span> <span class="dv">1</span> <span class="sc">-</span> K</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, we want to model this path analysis</p>
+<p>Model for Y</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>mY_X <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(Y <span class="sc">~</span> X, <span class="at">family =</span> poisson, <span class="at">data =</span> data)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mY_X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: poisson  ( log )
+Formula:          Y ~ X
+Data: data
+
+     AIC      BIC   logLik deviance df.resid 
+ 20576.1  20588.1 -10286.1  20572.1     2998 
+
+
+Conditional model:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept) 3.997055   0.002606    1534   &lt;2e-16 ***
+X           0.499396   0.002281     219   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Model for K</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>mK_XY <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(<span class="fu">cbind</span>(K, K_1) <span class="sc">~</span> X <span class="sc">+</span> Y, <span class="at">family =</span> binomial, <span class="at">data =</span> data)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mK_XY)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: binomial  ( logit )
+Formula:          cbind(K, K_1) ~ X + Y
+Data: data
+
+     AIC      BIC   logLik deviance df.resid 
+  3243.0   3261.0  -1618.5   3237.0     2997 
+
+
+Conditional model:
+             Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept) -2.682855   0.284409  -9.433   &lt;2e-16 ***
+X            0.075036   0.133618   0.562    0.574    
+Y            0.045318   0.004856   9.332   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Notice the p-value for X</p>
+<p>Extract predictions of Y ~ X</p>
+<p>Here, I use a long-winded way to compute the predictions to show how it is done</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create dataframe with values of X for which we want to predict Y</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>new_dat_Y_X <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">X =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="fu">min</span>(data<span class="sc">$</span>X), <span class="at">to =</span> <span class="fu">max</span>(data<span class="sc">$</span>X), <span class="at">length.out =</span> <span class="dv">30</span>)) </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#predict Y but on the link scale (log) to calculate confidence intervals</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>pred_new_dat_Y_X <span class="ot">&lt;-</span> <span class="fu">predict</span>(mY_X, <span class="at">newdata =</span> new_dat_Y_X, <span class="at">type =</span> <span class="st">"link"</span>, <span class="at">se.fit =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co">#extract the inverse link function for the model (exponential in this case) </span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>ilink<span class="ot">&lt;-</span> <span class="fu">family</span>(mY_X)<span class="sc">$</span>linkinv</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co"># bind the dataframes with values of X and the predicted Y values</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>predictions_Y_X <span class="ot">&lt;-</span> <span class="fu">cbind</span>(new_dat_Y_X,<span class="fu">data.frame</span>(pred_new_dat_Y_X)) <span class="sc">%&gt;%</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">#calculate the confidence intervals on the log scale and exponentiate</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CI.up =</span> <span class="fu">ilink</span>(fit <span class="sc">+</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">CI.low =</span> <span class="fu">ilink</span>(fit <span class="sc">-</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">Pred=</span><span class="fu">ilink</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>mutate: new variable 'CI.up' (double) with 30 unique values and 0% NA</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>        new variable 'CI.low' (double) with 30 unique values and 0% NA</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>        new variable 'Pred' (double) with 30 unique values and 0% NA</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>predictions_Y_X</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             X      fit      se.fit      CI.up     CI.low      Pred
+1  -3.50726974 2.245537 0.009488706   9.622799   9.271447   9.44549
+2  -3.26316922 2.367440 0.008949784  10.858866  10.484508  10.67005
+3  -3.01906870 2.489343 0.008413180  12.253763  11.856229  12.05336
+4  -2.77496818 2.611246 0.007879368  13.827920  13.407344  13.61601
+5  -2.53086767 2.733149 0.007348955  15.604402  15.161285  15.38125
+6  -2.28676715 2.855052 0.006822736  17.609255  17.144535  17.37534
+7  -2.04266663 2.976955 0.006301759  19.871895  19.387015  19.62796
+8  -1.79856611 3.098858 0.005787443  22.425558  21.922522  22.17261
+9  -1.55446559 3.220761 0.005281731  25.307810  24.789214  25.04717
+10 -1.31036507 3.342664 0.004787353  28.561138  28.030146  28.29440
+11 -1.06626455 3.464567 0.004308210  32.233646  31.693849  31.96261
+12 -0.82216403 3.586470 0.003849998  36.379872  35.834949  36.10638
+13 -0.57806351 3.708373 0.003421134  41.061790  40.514793  40.78737
+14 -0.33396299 3.830276 0.003034090  46.350049  45.802044  46.07523
+15 -0.08986247 3.952178 0.002706865  52.325505  51.773219  52.04863
+16  0.15423805 4.074081 0.002463414  59.081018  58.513243  58.79645
+17  0.39833857 4.195984 0.002330143  66.723113  66.116428  66.41908
+18  0.64243909 4.317887 0.002326069  75.372792  74.688653  75.02994
+19  0.88653961 4.439790 0.002451836  85.165447  84.350827  84.75716
+20  1.13064013 4.561693 0.002689288  96.251460  95.242106  95.74545
+21  1.37474064 4.683596 0.003012128 108.798750 107.521659 108.15832
+22  1.61884116 4.805499 0.003396090 122.996432 121.369872 122.18045
+23  1.86294168 4.927402 0.003822802 139.058491 136.990182 138.02046
+24  2.10704220 5.049305 0.004279494 157.227326 154.611741 155.91405
+25  2.35114272 5.171208 0.004757541 177.777470 174.492723 176.12744
+26  2.59524324 5.293111 0.005251114 201.019705 196.924139 198.96138
+27  2.83934376 5.415014 0.005756219 227.305717 222.234138 224.75562
+28  3.08344428 5.536917 0.006270072 257.033382 250.792847 253.89394
+29  3.32754480 5.658820 0.006790686 290.652765 283.017807 286.80988
+30  3.57164532 5.780722 0.007316618 328.672913 319.380100 323.99319</code></pre>
+</div>
+</div>
+<p>Plot</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>pY_X <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> predictions_Y_X, <span class="fu">aes</span>(<span class="at">y =</span> Pred, <span class="at">x =</span> X)) <span class="sc">+</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> predictions_Y_X, <span class="fu">aes</span>(<span class="at">ymin =</span> CI.low, <span class="at">ymax =</span> CI.up, <span class="at">x =</span> X)) <span class="sc">+</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> data, <span class="fu">aes</span>(<span class="at">x =</span> X, <span class="at">y =</span> Y), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Effect of X on Y"</span>)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>pY_X</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Now, the conditional (direct) effect of X on K</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>new_dat_K_X <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">X =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="fu">min</span>(data<span class="sc">$</span>X), <span class="at">to =</span> <span class="fu">max</span>(data<span class="sc">$</span>X), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">Y =</span> <span class="fu">mean</span>(data<span class="sc">$</span>Y)) <span class="co"># set y to its mean to </span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>pred_new_dat_K_X <span class="ot">&lt;-</span> <span class="fu">predict</span>(mK_XY, <span class="at">newdata =</span> new_dat_K_X, <span class="at">type =</span> <span class="st">"link"</span>, <span class="at">se.fit =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>ilink<span class="ot">&lt;-</span> <span class="fu">family</span>(mK_XY)<span class="sc">$</span>linkinv</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>predictions_K_X <span class="ot">&lt;-</span> <span class="fu">cbind</span>(new_dat_K_X,<span class="fu">data.frame</span>(pred_new_dat_K_X)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CI.up =</span> <span class="fu">ilink</span>(fit <span class="sc">+</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">CI.low =</span> <span class="fu">ilink</span>(fit <span class="sc">-</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">Pred=</span><span class="fu">ilink</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>mutate: new variable 'CI.up' (double) with 30 unique values and 0% NA</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>        new variable 'CI.low' (double) with 30 unique values and 0% NA</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>        new variable 'Pred' (double) with 30 unique values and 0% NA</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>pK_X <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_dots</span>(<span class="at">data =</span> data,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">y =</span> K,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">x =</span> X,</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">side =</span> <span class="fu">ifelse</span>(K_1 <span class="sc">==</span> <span class="dv">0</span>, <span class="st">"bottom"</span>, <span class="st">"top"</span>)),</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> predictions_K_X, <span class="fu">aes</span>(<span class="at">y =</span> Pred, <span class="at">x =</span> X)) <span class="sc">+</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> predictions_K_X, <span class="fu">aes</span>(<span class="at">ymin =</span> CI.low, <span class="at">ymax =</span> CI.up, <span class="at">x =</span> X)) <span class="sc">+</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Conditional effect of X on K"</span>)</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>pK_X </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>What about the conditional (direct) effect of Y on K ?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>new_dat_K_Y <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Y =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="fu">min</span>(data<span class="sc">$</span>Y), <span class="at">to =</span> <span class="fu">max</span>(data<span class="sc">$</span>Y), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">X =</span> <span class="fu">mean</span>(data<span class="sc">$</span>X)) <span class="co"># set X to its mean</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>pred_new_dat_K_Y <span class="ot">&lt;-</span> <span class="fu">predict</span>(mK_XY, <span class="at">newdata =</span> new_dat_K_Y, <span class="at">type =</span> <span class="st">"link"</span>, <span class="at">se.fit =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>ilink<span class="ot">&lt;-</span> <span class="fu">family</span>(mK_XY)<span class="sc">$</span>linkinv</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>predictions_K_Y <span class="ot">&lt;-</span> <span class="fu">cbind</span>(new_dat_K_Y,<span class="fu">data.frame</span>(pred_new_dat_K_Y)) <span class="sc">%&gt;%</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CI.up =</span> <span class="fu">ilink</span>(fit <span class="sc">+</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">CI.low =</span> <span class="fu">ilink</span>(fit <span class="sc">-</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">Pred=</span><span class="fu">ilink</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>mutate: new variable 'CI.up' (double) with 30 unique values and 0% NA</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>        new variable 'CI.low' (double) with 30 unique values and 0% NA</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>        new variable 'Pred' (double) with 30 unique values and 0% NA</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>pK_Y <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_dots</span>(<span class="at">data =</span> data,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">y =</span> K,</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">x =</span> Y,</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">side =</span> <span class="fu">ifelse</span>(K_1 <span class="sc">==</span> <span class="dv">0</span>, <span class="st">"bottom"</span>, <span class="st">"top"</span>)),</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> predictions_K_Y, <span class="fu">aes</span>(<span class="at">y =</span> Pred, <span class="at">x =</span> Y)) <span class="sc">+</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> predictions_K_Y, <span class="fu">aes</span>(<span class="at">ymin =</span> CI.low, <span class="at">ymax =</span> CI.up, <span class="at">x =</span> Y)) <span class="sc">+</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Conditional effect of Y on K"</span>)</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>pK_Y </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>So this is the direct effect of Y on K. But, remember that Y is caused by X so it may be of interest to see how X affects K indirectly, through Y</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>pY_X</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The first step is to select values of Y that are predicted by X</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>COLS <span class="ot">&lt;-</span> <span class="fu">alpha</span>(<span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"blue"</span>,<span class="st">"red"</span>))(<span class="dv">30</span>),<span class="fl">0.6</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>pY_X <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">data =</span> predictions_Y_X, <span class="fu">aes</span>(<span class="at">y =</span> Pred, <span class="at">x =</span> X, <span class="at">color =</span> X), <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span><span class="fu">scale_color_gradientn</span>(<span class="at">colours =</span> COLS)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The next step is actually quite simple. We generate predictions for K as a function of the predictions of Y ~ X</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>predictions_Y_X</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             X      fit      se.fit      CI.up     CI.low      Pred
+1  -3.50726974 2.245537 0.009488706   9.622799   9.271447   9.44549
+2  -3.26316922 2.367440 0.008949784  10.858866  10.484508  10.67005
+3  -3.01906870 2.489343 0.008413180  12.253763  11.856229  12.05336
+4  -2.77496818 2.611246 0.007879368  13.827920  13.407344  13.61601
+5  -2.53086767 2.733149 0.007348955  15.604402  15.161285  15.38125
+6  -2.28676715 2.855052 0.006822736  17.609255  17.144535  17.37534
+7  -2.04266663 2.976955 0.006301759  19.871895  19.387015  19.62796
+8  -1.79856611 3.098858 0.005787443  22.425558  21.922522  22.17261
+9  -1.55446559 3.220761 0.005281731  25.307810  24.789214  25.04717
+10 -1.31036507 3.342664 0.004787353  28.561138  28.030146  28.29440
+11 -1.06626455 3.464567 0.004308210  32.233646  31.693849  31.96261
+12 -0.82216403 3.586470 0.003849998  36.379872  35.834949  36.10638
+13 -0.57806351 3.708373 0.003421134  41.061790  40.514793  40.78737
+14 -0.33396299 3.830276 0.003034090  46.350049  45.802044  46.07523
+15 -0.08986247 3.952178 0.002706865  52.325505  51.773219  52.04863
+16  0.15423805 4.074081 0.002463414  59.081018  58.513243  58.79645
+17  0.39833857 4.195984 0.002330143  66.723113  66.116428  66.41908
+18  0.64243909 4.317887 0.002326069  75.372792  74.688653  75.02994
+19  0.88653961 4.439790 0.002451836  85.165447  84.350827  84.75716
+20  1.13064013 4.561693 0.002689288  96.251460  95.242106  95.74545
+21  1.37474064 4.683596 0.003012128 108.798750 107.521659 108.15832
+22  1.61884116 4.805499 0.003396090 122.996432 121.369872 122.18045
+23  1.86294168 4.927402 0.003822802 139.058491 136.990182 138.02046
+24  2.10704220 5.049305 0.004279494 157.227326 154.611741 155.91405
+25  2.35114272 5.171208 0.004757541 177.777470 174.492723 176.12744
+26  2.59524324 5.293111 0.005251114 201.019705 196.924139 198.96138
+27  2.83934376 5.415014 0.005756219 227.305717 222.234138 224.75562
+28  3.08344428 5.536917 0.006270072 257.033382 250.792847 253.89394
+29  3.32754480 5.658820 0.006790686 290.652765 283.017807 286.80988
+30  3.57164532 5.780722 0.007316618 328.672913 319.380100 323.99319</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>new_dat_K_YX <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Y =</span> predictions_Y_X<span class="sc">$</span>Pred, <span class="co"># predicted mean Y from X</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">X =</span> <span class="fu">mean</span>(data<span class="sc">$</span>X)) <span class="co"># set X to its mean</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>pred_new_dat_K_YX <span class="ot">&lt;-</span> <span class="fu">predict</span>(mK_XY, <span class="at">newdata =</span> new_dat_K_YX, <span class="at">type =</span> <span class="st">"link"</span>, <span class="at">se.fit =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>ilink<span class="ot">&lt;-</span> <span class="fu">family</span>(mK_XY)<span class="sc">$</span>linkinv</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>predictions_K_YX <span class="ot">&lt;-</span> <span class="fu">cbind</span>(new_dat_K_YX,<span class="fu">data.frame</span>(pred_new_dat_K_YX)) <span class="sc">%&gt;%</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CI.up =</span> <span class="fu">ilink</span>(fit <span class="sc">+</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">CI.low =</span> <span class="fu">ilink</span>(fit <span class="sc">-</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">Pred=</span><span class="fu">ilink</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>mutate: new variable 'CI.up' (double) with 30 unique values and 0% NA</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>        new variable 'CI.low' (double) with 30 unique values and 0% NA</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>        new variable 'Pred' (double) with 30 unique values and 0% NA</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>predictions_K_YX</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Y          X         fit     se.fit     CI.up     CI.low       Pred
+1    9.44549 0.02020759 -2.25328524 0.24159862 0.1443338 0.06140928 0.09506646
+2   10.67005 0.02020759 -2.19779049 0.23574934 0.1498572 0.06538394 0.09994908
+3   12.05336 0.02020759 -2.13510116 0.22914779 0.1563064 0.07016022 0.10573169
+4   13.61601 0.02020759 -2.06428450 0.22169880 0.1638639 0.07594135 0.11261695
+5   15.38125 0.02020759 -1.98428685 0.21329597 0.1727550 0.08299391 0.12086260
+6   17.37534 0.02020759 -1.89391795 0.20382079 0.1832579 0.09167049 0.13079839
+7   19.62796 0.02020759 -1.79183323 0.19314215 0.1957181 0.10244100 0.14284811
+8   22.17261 0.02020759 -1.67651378 0.18111660 0.2105646 0.11593486 0.15755765
+9   25.04717 0.02020759 -1.54624382 0.16759020 0.2283297 0.13299645 0.17562944
+10  28.29440 0.02020759 -1.39908507 0.15240432 0.2496701 0.15475314 0.19796134
+11  31.96261 0.02020759 -1.23284801 0.13541043 0.2753903 0.18268631 0.22568335
+12  36.10638 0.02020759 -1.04505924 0.11650869 0.3064641 0.21867300 0.26017499
+13  40.78737 0.02020759 -0.83292470 0.09575761 0.3440630 0.26490867 0.30302701
+14  46.07523 0.02020759 -0.59328809 0.07373594 0.3896543 0.32348310 0.35588077
+15  52.04863 0.02020759 -0.32258392 0.05298208 0.4455322 0.39497942 0.42004616
+16  58.79645 0.02020759 -0.01678447 0.04313752 0.5169348 0.47468816 0.49580398
+17  66.41908 0.02020759  0.32866019 0.05809884 0.6088626 0.55349113 0.58143335
+18  75.02994 0.02020759  0.71888983 0.09156061 0.7106100 0.63168005 0.67236250
+19  84.75716 0.02020759  1.15971058 0.13508364 0.8060389 0.70990993 0.76128012
+20  95.74545 0.02020759  1.65768129 0.18643869 0.8832013 0.78452972 0.83992650
+21 108.15832 0.02020759  2.22021114 0.24548489 0.9371069 0.85056773 0.90204985
+22 122.18045 0.02020759  2.85566986 0.31275418 0.9697830 0.90401653 0.94561103
+23 138.02046 0.02020759  3.57351228 0.38909161 0.9870820 0.94326162 0.97270858
+24 155.91405 0.02020759  4.38441898 0.47555429 0.9951141 0.96930063 0.98768346
+25 176.12744 0.02020759  5.30045523 0.57338541 0.9983809 0.98488176 0.99503545
+26 198.96138 0.02020759  6.33525049 0.68401522 0.9995364 0.99327102 0.99823044
+27 224.75562 0.02020759  7.50420122 0.80907414 0.9998872 0.99731776 0.99944954
+28 253.89394 0.02020759  8.82469992 0.95041290 0.9999772 0.99905359 0.99985297
+29 286.80988 0.02020759 10.31639395 1.11012786 0.9999962 0.99970861 0.99996691
+30 323.99319 0.02020759 12.00147782 1.29059089 0.9999995 0.99992302 0.99999386</code></pre>
+</div>
+</div>
+<p>Now, we need the values of X that were associated with the predicted values of Y</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>pred_K_YX <span class="ot">&lt;-</span> <span class="fu">select</span>(predictions_K_YX, <span class="fu">c</span>(Y, Pred)) <span class="sc">%&gt;%</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(predictions_Y_X <span class="sc">%&gt;%</span> </span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>              <span class="fu">select</span>(X, Pred) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>              <span class="fu">rename</span>(<span class="at">Y =</span> Pred), </span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">"Y"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>select: dropped 5 variables (X, fit, se.fit, CI.up, CI.low)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>select: dropped 4 variables (fit, se.fit, CI.up, CI.low)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>rename: renamed one variable (Y)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>left_join: added one column (X)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>           &gt; rows only in x    0</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>           &gt; rows only in y  ( 0)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>           &gt; matched rows     30</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>           &gt;                 ====</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>           &gt; rows total       30</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>pred_K_YX</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Y       Pred           X
+1    9.44549 0.09506646 -3.50726974
+2   10.67005 0.09994908 -3.26316922
+3   12.05336 0.10573169 -3.01906870
+4   13.61601 0.11261695 -2.77496818
+5   15.38125 0.12086260 -2.53086767
+6   17.37534 0.13079839 -2.28676715
+7   19.62796 0.14284811 -2.04266663
+8   22.17261 0.15755765 -1.79856611
+9   25.04717 0.17562944 -1.55446559
+10  28.29440 0.19796134 -1.31036507
+11  31.96261 0.22568335 -1.06626455
+12  36.10638 0.26017499 -0.82216403
+13  40.78737 0.30302701 -0.57806351
+14  46.07523 0.35588077 -0.33396299
+15  52.04863 0.42004616 -0.08986247
+16  58.79645 0.49580398  0.15423805
+17  66.41908 0.58143335  0.39833857
+18  75.02994 0.67236250  0.64243909
+19  84.75716 0.76128012  0.88653961
+20  95.74545 0.83992650  1.13064013
+21 108.15832 0.90204985  1.37474064
+22 122.18045 0.94561103  1.61884116
+23 138.02046 0.97270858  1.86294168
+24 155.91405 0.98768346  2.10704220
+25 176.12744 0.99503545  2.35114272
+26 198.96138 0.99823044  2.59524324
+27 224.75562 0.99944954  2.83934376
+28 253.89394 0.99985297  3.08344428
+29 286.80988 0.99996691  3.32754480
+30 323.99319 0.99999386  3.57164532</code></pre>
+</div>
+</div>
+<p>Now, we simply superimpose both graphs of K ~ Y</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>pK_Y </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>pK_Y <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="at">data =</span> pred_K_YX, <span class="fu">aes</span>(<span class="at">x =</span> Y, <span class="at">y =</span> Pred, <span class="at">color =</span> X), <span class="at">linewidth=</span> <span class="dv">2</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 
 
 
