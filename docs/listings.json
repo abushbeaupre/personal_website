@@ -1,6 +1,8 @@
 [
   {
     "listing": "/posts.html",
-    "items": []
+    "items": [
+      "/posts/indirect_effects/index.html"
+    ]
   }
 ]

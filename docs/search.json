@@ -18,6 +18,13 @@
     "href": "posts.html",
     "title": "My Blog",
     "section": "",
-    "text": "No matching items"
+    "text": "data viz\n\n\nindirect effects\n\n\nmethod development\n\n\n\nHow do we quantify and visualize indirect effects in a path analysis when relationships are non-linear? Worse yet; non-monotonous?\n\n\n\nAllen Bush-Beaupré\n\n\nJul 10, 2025\n\n\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/indirect_effects/index.html",
+    "href": "posts/indirect_effects/index.html",
+    "title": "Visualizing indirect effects",
+    "section": "",
+    "text": "BibTeX citation:@online{bush-beaupré2025,\n  author = {Allen Bush-Beaupré},\n  editor = {},\n  title = {Visualizing Indirect Effects},\n  date = {2025-07-10},\n  url = {https://abushbeaupre.github.io/posts/indirect_effects/},\n  langid = {en}\n}\nFor attribution, please cite this work as:\nAllen Bush-Beaupré. 2025. “Visualizing Indirect Effects.”\nJuly 10, 2025. https://abushbeaupre.github.io/posts/indirect_effects/."
   }
 ]

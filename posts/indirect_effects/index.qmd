@@ -5,7 +5,7 @@ author:
   - name: Allen Bush-Beaupré
     url: https://abushbeaupre.github.io/
     orcid: 0000-0001-6989-9278
-date: 31-10-2023
+date: 10-31-2023
 categories: [data viz, indirect effects, method development] # self-defined categories
 citation: 
   url: https://abushbeaupre.github.io/posts/indirect_effects/ 
