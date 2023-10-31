@@ -1,0 +1,14 @@
+---
+title: "Visualizing indirect effects"
+description: "How do we quantify and visualize indirect effects in a path analysis when relationships are non-linear? Worse yet; non-monotonous?"
+author:
+  - name: Allen Bush-Beaupré
+    url: https://abushbeaupre.github.io/
+    orcid: 0000-0001-6989-9278
+date: 31-10-2023
+categories: [data viz, indirect effects, method development] # self-defined categories
+citation: 
+  url: https://abushbeaupre.github.io/posts/indirect_effects/ 
+image: Y_X_anim.gif
+draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
+---
