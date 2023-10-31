@@ -12,3 +12,203 @@ citation:
 image: Y_X_anim.gif
 draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
 ---
+
+Start by loading the pertinent packages
+
+```{r}
+rm(list=ls()) # clear workspace
+library(tidyverse) # data manipulation and plotting
+library(glmmTMB) # frequentist glmms
+library(patchwork) #multiple plots
+library(ggdist) # nice dots in logistic regression
+library(tidylog) # log changes done during data wrangling
+library(mgcv) # gamms
+library(gratia) # gam predictions
+```
+
+First, we will simulate data from this DAG:
+
+INSERT DAG
+
+```{r}
+set.seed(333) # set seed to reproduce the simulations exactly
+n <- 3000 # sample size
+X <- rnorm(n, 0, 1) # define K as a Z-score
+Y <- rpois(n, exp(4 + 0.5*X)) # Y is a poisson variable whose link is the log function so defining the coefficients using the inverse log (exponential)
+K <- rbinom(n, size = 1, prob = plogis(-3 + 0.03*X + 0.05*Y)) # K is a Bernoulli variable whose link is the logit so defining the coefficients using the inverse logit (plogis)
+
+data <- tibble(
+  X = X,
+  Y = Y,
+  K = K,
+  K_1 = 1 - K
+)
+```
+
+Now, we want to model this path analysis
+
+Model for Y
+
+```{r}
+mY_X <- glmmTMB(Y ~ X, family = poisson, data = data)
+summary(mY_X)
+```
+
+Model for K
+
+```{r}
+mK_XY <- glmmTMB(cbind(K, K_1) ~ X + Y, family = binomial, data = data)
+summary(mK_XY)
+```
+
+Notice the p-value for X
+
+Extract predictions of Y \~ X
+
+Here, I use a long-winded way to compute the predictions to show how it is done
+
+```{r}
+#create dataframe with values of X for which we want to predict Y
+new_dat_Y_X <- tibble(X = seq(from = min(data$X), to = max(data$X), length.out = 30)) 
+
+#predict Y but on the link scale (log) to calculate confidence intervals
+pred_new_dat_Y_X <- predict(mY_X, newdata = new_dat_Y_X, type = "link", se.fit = TRUE)
+
+#extract the inverse link function for the model (exponential in this case) 
+ilink<- family(mY_X)$linkinv
+# bind the dataframes with values of X and the predicted Y values
+predictions_Y_X <- cbind(new_dat_Y_X,data.frame(pred_new_dat_Y_X)) %>%
+  #calculate the confidence intervals on the log scale and exponentiate
+  mutate(CI.up = ilink(fit + (1.96*se.fit)),
+         CI.low = ilink(fit - (1.96*se.fit)),
+         Pred=ilink(fit))
+
+predictions_Y_X
+```
+
+Plot
+
+```{r}
+pY_X <- ggplot() +
+  geom_line(data = predictions_Y_X, aes(y = Pred, x = X)) +
+  geom_ribbon(data = predictions_Y_X, aes(ymin = CI.low, ymax = CI.up, x = X)) +
+  geom_point(data = data, aes(x = X, y = Y), alpha = 0.2) +
+  theme_classic() +
+  labs(title = "Effect of X on Y")
+
+pY_X
+```
+
+Now, the conditional (direct) effect of X on K
+
+```{r}
+new_dat_K_X <- tibble(X = seq(from = min(data$X), to = max(data$X), length.out = 30),
+                      Y = mean(data$Y)) # set y to its mean to 
+
+pred_new_dat_K_X <- predict(mK_XY, newdata = new_dat_K_X, type = "link", se.fit = TRUE)
+
+ilink<- family(mK_XY)$linkinv
+predictions_K_X <- cbind(new_dat_K_X,data.frame(pred_new_dat_K_X)) %>%
+  mutate(CI.up = ilink(fit + (1.96*se.fit)),
+         CI.low = ilink(fit - (1.96*se.fit)),
+         Pred=ilink(fit))
+
+
+pK_X <- ggplot() +
+  stat_dots(data = data,
+            aes(y = K,
+                x = X,
+                side = ifelse(K_1 == 0, "bottom", "top")),
+            size = 2)+
+  geom_line(data = predictions_K_X, aes(y = Pred, x = X)) +
+  geom_ribbon(data = predictions_K_X, aes(ymin = CI.low, ymax = CI.up, x = X)) +
+  
+  theme_classic() +
+  labs(title = "Conditional effect of X on K")
+
+pK_X 
+```
+
+What about the conditional (direct) effect of Y on K ?
+
+```{r}
+new_dat_K_Y <- tibble(Y = seq(from = min(data$Y), to = max(data$Y), length.out = 30),
+                      X = mean(data$X)) # set X to its mean
+
+pred_new_dat_K_Y <- predict(mK_XY, newdata = new_dat_K_Y, type = "link", se.fit = TRUE)
+
+ilink<- family(mK_XY)$linkinv
+predictions_K_Y <- cbind(new_dat_K_Y,data.frame(pred_new_dat_K_Y)) %>%
+  mutate(CI.up = ilink(fit + (1.96*se.fit)),
+         CI.low = ilink(fit - (1.96*se.fit)),
+         Pred=ilink(fit))
+
+pK_Y <- ggplot() +
+  stat_dots(data = data,
+            aes(y = K,
+                x = Y,
+                side = ifelse(K_1 == 0, "bottom", "top")),
+            size = 2)+
+  geom_line(data = predictions_K_Y, aes(y = Pred, x = Y)) +
+  geom_ribbon(data = predictions_K_Y, aes(ymin = CI.low, ymax = CI.up, x = Y)) +
+  theme_classic() +
+  labs(title = "Conditional effect of Y on K")
+
+pK_Y 
+```
+
+So this is the direct effect of Y on K. But, remember that Y is caused by X so it may be of interest to see how X affects K indirectly, through Y
+
+```{r}
+pY_X
+```
+
+The first step is to select values of Y that are predicted by X
+
+```{r}
+COLS <- alpha(colorRampPalette(c("blue","red"))(30),0.6)
+pY_X + geom_point(data = predictions_Y_X, aes(y = Pred, x = X, color = X), size = 4) +scale_color_gradientn(colours = COLS)
+```
+
+The next step is actually quite simple. We generate predictions for K as a function of the predictions of Y \~ X
+
+```{r}
+predictions_Y_X
+```
+
+```{r}
+new_dat_K_YX <- tibble(Y = predictions_Y_X$Pred, # predicted mean Y from X
+                      X = mean(data$X)) # set X to its mean
+
+pred_new_dat_K_YX <- predict(mK_XY, newdata = new_dat_K_YX, type = "link", se.fit = TRUE)
+
+ilink<- family(mK_XY)$linkinv
+predictions_K_YX <- cbind(new_dat_K_YX,data.frame(pred_new_dat_K_YX)) %>%
+  mutate(CI.up = ilink(fit + (1.96*se.fit)),
+         CI.low = ilink(fit - (1.96*se.fit)),
+         Pred=ilink(fit))
+
+predictions_K_YX
+```
+
+Now, we need the values of X that were associated with the predicted values of Y
+
+```{r}
+pred_K_YX <- select(predictions_K_YX, c(Y, Pred)) %>%
+  left_join(predictions_Y_X %>% 
+              select(X, Pred) %>% 
+              rename(Y = Pred), 
+            by = "Y")
+
+pred_K_YX
+```
+
+Now, we simply superimpose both graphs of K \~ Y
+
+```{r}
+pK_Y 
+```
+
+```{r}
+pK_Y + geom_line(data = pred_K_YX, aes(x = Y, y = Pred, color = X), linewidth= 2) 
+```
