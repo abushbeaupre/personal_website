@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Allen Bush-Beaupré",
     "section": "",
-    "text": "Welcome to my personal website!\nA bit about me:\nI am a research professional based in Sherbrooke, QC, CAN. I currently work for Marc Bélisle at Université de Sherbrooke and for Jade Savage at Bishop’s University. My work can be summarized as trying to apply statistical methods to research questions pertaining to agricultural entomology.\nMy work for Jade Savage focuses on Delia flies (D. antiqua, D. radicum, D. platura & D. florilega) for the Delia Project."
+    "text": "A bit about me:\nI am a research professional based in Sherbrooke, QC, CAN. I currently work for Marc Bélisle at Université de Sherbrooke and for Jade Savage at Bishop’s University. My work can be summarized as trying to apply statistical methods to research questions pertaining to agricultural entomology.\nMy work for Jade Savage focuses on Delia flies (D. antiqua, D. radicum, D. platura & D. florilega) for the Delia Project."
   },
   {
     "objectID": "about.html",
@@ -12,5 +12,12 @@
     "title": "About",
     "section": "",
     "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "posts.html",
+    "href": "posts.html",
+    "title": "My Blog",
+    "section": "",
+    "text": "No matching items"
   }
 ]
