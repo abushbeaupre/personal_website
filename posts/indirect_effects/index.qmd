@@ -11,11 +11,46 @@ citation:
   url: https://abushbeaupre.github.io/posts/indirect_effects/ 
 image: Y_X_anim.gif
 draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
+format: 
+  html: 
+    code-fold: TRUE
 ---
+
+When fitting a model (ex. glm) in a causal inference context, we are either estimating the direct or total effect of a given variable. For example, in a DAG such as this one:
+
+![](images/raw_DAG.png)
+
+We can estimate the direct effect of X on K by fitting a model such as
+
+`lm(K ~ X + Y)`
+
+In this case, we estimate the *direct* effect of X on K as we are controlling for Y. Such is the nature of (generalized) linear models.
+
+If we want to estimate the total effect of X on K, we simply fit the model
+
+`lm(K ~ X)`
+
+In this case, as we are ignoring Y, we estimate the direct effect of X + its indirect effect through Y (the total effect).
+
+But what if we are interested in looking at the *indirect* effects?
+
+As François Briau once told me, the study of Ecology ***is*** the study of direct and indirect effects. We just don't really do it formally.
+
+Luckily, Bill Shipley has spent quite a bit of brain power in quantifying direct, indirect and total effects which is what we call Path Analysis.
+
+[![The great Bill Shipley](images/Screenshot (1).png)](https://www.youtube.com/watch?v=upmPlBSoNRI&ab_channel=CarnegieMellonUniversityDepartmentofPhilosophy)
+
+Very briefly, to calculate indirect effects in along a path (ex. TSF -\> Sphagnum cover -\> forest floor thickness), one must multiply the (standardized) coefficients along that path. In this case, 0.073 \* 0.164 = 0.011972
+
+![N. Fenton et al. / Forest Ecology and Management 213 (2005) 151--159](example_DAG.png){width="698"}
+
+But what does that number represent? When all relationships are linear, that value represents a slope. When the relationship(s) is/are not linear (ex. Poisson and logistic regressions), the value represents the slope on the link scale (log or logit or other). On the response scale, the slope is not constant through the entire relationship (we will see later). So how do we interpret such indirect effects if they are not on the scale of the variable we measured?
 
 Start by loading the pertinent packages
 
 ```{r}
+#| output: false
+#| warning: false
 rm(list=ls()) # clear workspace
 library(tidyverse) # data manipulation and plotting
 library(glmmTMB) # frequentist glmms
@@ -28,7 +63,19 @@ library(gratia) # gam predictions
 
 First, we will simulate data from this DAG:
 
-INSERT DAG
+![](images/raw_DAG-01.png)
+
+But these are just letters - BORING
+
+The DAG could also be
+
+![](ecoevo_teaser.png)
+
+or
+
+![](DAG_WAZO.png)
+
+You don\`t have to think too hard to see this type of relationship in your own work.
 
 ```{r}
 set.seed(333) # set seed to reproduce the simulations exactly
@@ -43,6 +90,8 @@ data <- tibble(
   K = K,
   K_1 = 1 - K
 )
+
+head(data)
 ```
 
 Now, we want to model this path analysis
@@ -68,6 +117,7 @@ Extract predictions of Y \~ X
 Here, I use a long-winded way to compute the predictions to show how it is done
 
 ```{r}
+#| message: false
 #create dataframe with values of X for which we want to predict Y
 new_dat_Y_X <- tibble(X = seq(from = min(data$X), to = max(data$X), length.out = 30)) 
 
@@ -82,8 +132,6 @@ predictions_Y_X <- cbind(new_dat_Y_X,data.frame(pred_new_dat_Y_X)) %>%
   mutate(CI.up = ilink(fit + (1.96*se.fit)),
          CI.low = ilink(fit - (1.96*se.fit)),
          Pred=ilink(fit))
-
-predictions_Y_X
 ```
 
 Plot
@@ -102,6 +150,7 @@ pY_X
 Now, the conditional (direct) effect of X on K
 
 ```{r}
+#| message: false
 new_dat_K_X <- tibble(X = seq(from = min(data$X), to = max(data$X), length.out = 30),
                       Y = mean(data$Y)) # set y to its mean to 
 
@@ -132,6 +181,7 @@ pK_X
 What about the conditional (direct) effect of Y on K ?
 
 ```{r}
+#| message: false
 new_dat_K_Y <- tibble(Y = seq(from = min(data$Y), to = max(data$Y), length.out = 30),
                       X = mean(data$X)) # set X to its mean
 
@@ -173,13 +223,16 @@ pY_X + geom_point(data = predictions_Y_X, aes(y = Pred, x = X, color = X), size 
 The next step is actually quite simple. We generate predictions for K as a function of the predictions of Y \~ X
 
 ```{r}
-predictions_Y_X
-```
-
-```{r}
+#| output: true
+#| code-fold: false
 new_dat_K_YX <- tibble(Y = predictions_Y_X$Pred, # predicted mean Y from X
                       X = mean(data$X)) # set X to its mean
 
+```
+
+```{r}
+#| output: false
+#| message: false
 pred_new_dat_K_YX <- predict(mK_XY, newdata = new_dat_K_YX, type = "link", se.fit = TRUE)
 
 ilink<- family(mK_XY)$linkinv
@@ -187,13 +240,13 @@ predictions_K_YX <- cbind(new_dat_K_YX,data.frame(pred_new_dat_K_YX)) %>%
   mutate(CI.up = ilink(fit + (1.96*se.fit)),
          CI.low = ilink(fit - (1.96*se.fit)),
          Pred=ilink(fit))
-
-predictions_K_YX
 ```
 
 Now, we need the values of X that were associated with the predicted values of Y
 
 ```{r}
+#| message: false
+#| output: false
 pred_K_YX <- select(predictions_K_YX, c(Y, Pred)) %>%
   left_join(predictions_Y_X %>% 
               select(X, Pred) %>% 
@@ -210,5 +263,14 @@ pK_Y
 ```
 
 ```{r}
-pK_Y + geom_line(data = pred_K_YX, aes(x = Y, y = Pred, color = X), linewidth= 2) 
+pK_Y + geom_line(data = pred_K_YX, aes(x = Y, y = Pred, color = X), linewidth= 2) +
+  labs(title = "Indirect effect of X on K through Y")
 ```
+
+We could push this even further and look at indirect effects through a non-monotonous relationship
+
+![](images/ecoevo_teaser.png)
+
+And what about interactions?
+
+![](images/ecoevo_teaser_interact.png)
