@@ -264,7 +264,7 @@ pK_Y
 
 ```{r}
 pK_Y + geom_line(data = pred_K_YX, aes(x = Y, y = Pred, color = X), linewidth= 2) +
-  labs(title = "Indirect effect of X on K through Y")
+  labs(title = "Indirect effect of X on K through Y") + scale_color_gradientn(colours = COLS)
 ```
 
 We could push this even further and look at indirect effects through a non-monotonous relationship
@@ -272,5 +272,225 @@ We could push this even further and look at indirect effects through a non-monot
 ![](images/ecoevo_teaser.png)
 
 And what about interactions?
+
+Simulate data
+
+```{r}
+ 
+n <- 3000
+#interacting variables
+X1 <- rnorm(n = n, mean = 0, sd = 1)
+X2 <- rpois(n = n, lambda = 3)
+#mediator
+Y <- rpois(n = n, lambda = exp(0 + 0.4*X1 + 0.3*X2 + 0.1*X1*X2))
+#outcome
+K <- rbinom(n = n, size = 1, prob = plogis(-2 + 0.1*X1 + 0.2*X2 + 0.5*X1*X2 - 0.05*Y))
+
+data <- tibble(
+  X1 = X1,
+  X2 = X2,
+  Y = Y,
+  K = K,
+  K_1 = K - 1
+)
+
+head(data)
+```
+
+Models
+
+```{r}
+mY_X <- glmmTMB(Y ~  X1 + X2 + X1*X2, family = poisson, data = data)
+
+mK_XY <- glmmTMB(K ~ X1 + X2 + X1*X2 + Y, family = binomial, data = data)
+```
+
+Predictions
+
+Y \~ X
+
+```{r}
+#| message: false
+new_data_YX <- expand_grid(X1 = c(-1, 0, 1),
+                           X2 = seq(from = min(data$X2), to = max(data$X2), length.out = 30))
+
+
+pred_new_dat_Y_X <- predict(mY_X, newdata = new_data_YX, type = "link", se.fit = TRUE) # predict on link scale
+
+ilink<- family(mY_X)$linkinv # extract inverse link (exponential in this case)
+
+#calculate confidence intervals on link scale and back transform
+predictions_Y_X <- cbind(new_data_YX,data.frame(pred_new_dat_Y_X)) %>%
+  mutate(CI.up = ilink(fit + (1.96*se.fit)),
+         CI.low = ilink(fit - (1.96*se.fit)),
+         Pred=ilink(fit))
+
+ggplot() +
+  geom_ribbon(data = predictions_Y_X, aes(ymin = CI.low, ymax = CI.up, x = X2, fill = as.factor(X1)), alpha = 0.2) +
+  geom_line(data = predictions_Y_X, aes(y = Pred, x = X2, color = as.factor(X1))) +
+  labs(y = "Y",
+       title = "Interacting effect of X1 & X2 on Y") +
+  theme_classic()
+```
+
+K \~ X \| Y
+
+```{r}
+#| message: false
+new_data_KX <- expand_grid(X1 = c(-1, 0, 1),
+                           X2 = seq(from = min(data$X2), to = max(data$X2), length.out = 30),
+                           Y = mean(data$Y))
+
+
+pred_new_dat_K_X <- predict(mK_XY, newdata = new_data_KX, type = "link", se.fit = TRUE) # predict on link scale
+
+ilink<- family(mK_XY)$linkinv # extract inverse link (inverse logit in this case)
+
+#calculate confidence intervals on link scale and back transform
+predictions_K_X <- cbind(new_data_KX,data.frame(pred_new_dat_K_X)) %>%
+  mutate(CI.up = ilink(fit + (1.96*se.fit)),
+         CI.low = ilink(fit - (1.96*se.fit)),
+         Pred=ilink(fit))
+
+pK_X <- ggplot() +
+  geom_ribbon(data = predictions_K_X, aes(ymin = CI.low, ymax = CI.up, x = X2, fill = as.factor(X1)), alpha = 0.2) +
+  geom_line(data = predictions_K_X, aes(y = Pred, x = X2, color = as.factor(X1)))+
+  labs(y = "K",
+       title = "Interacting effect of X1 & X2 on K",
+       fill = "X1",
+       color = "X1") +
+  theme_classic()+theme(legend.position = c(0.1, 0.5))
+
+pK_X
+```
+
+K \~ Y \| X
+
+```{r}
+#| message: false
+new_data_KY <- expand_grid(X1 = mean(data$X1),
+                           X2 = mean(data$X2),
+                           Y = seq(from = min(data$Y), to = max(data$Y), length.out = 30))
+
+
+pred_new_dat_K_Y <- predict(mK_XY, newdata = new_data_KY, type = "link", se.fit = TRUE) # predict on link scale
+
+ilink<- family(mK_XY)$linkinv # extract inverse link (inverse logit in this case)
+
+#calculate confidence intervals on link scale and back transform
+predictions_K_Y <- cbind(new_data_KY,data.frame(pred_new_dat_K_Y)) %>%
+  mutate(CI.up = ilink(fit + (1.96*se.fit)),
+         CI.low = ilink(fit - (1.96*se.fit)),
+         Pred=ilink(fit))
+
+ggplot() +
+  geom_ribbon(data = predictions_K_Y, aes(ymin = CI.low, ymax = CI.up, x = Y), alpha = 0.2) +
+  geom_line(data = predictions_K_Y, aes(y = Pred, x = Y))+
+  labs(y = "K",
+       title = "Effect of Y on K") +
+  theme_classic()
+```
+
+K \~ E(Y\|X)
+
+```{r}
+pY_X <- ggplot() +
+  geom_ribbon(data = predictions_Y_X, aes(ymin = CI.low, ymax = CI.up, x = X2, fill = as.factor(X1)), alpha = 0.2) +
+  geom_line(data = predictions_Y_X, aes(y = Pred, x = X2, color = as.factor(X1))) +
+  geom_point(data = predictions_Y_X, aes(y = Pred, x = X2, color = as.factor(X1))) +
+  labs(y = "Y",
+       title = "Interacting effect of X1 & X2 on Y",
+       color = "X1",
+       fill = "X1") +
+  theme_classic() +theme(legend.position = c(0.2, 0.5))
+
+pY_X
+```
+
+need to predict K for the different predicted values of Y \~ X
+
+```{r}
+#| message: false
+new_data_KYX <- tibble(
+  Y = predictions_Y_X$Pred,
+  X1 = mean(data$X1),
+  X2 = mean(data$X2)
+)
+
+pred_new_dat_K_YX <- predict(mK_XY, newdata = new_data_KYX, type = "link", se.fit = TRUE) # predict on link scale
+
+ilink<- family(mK_XY)$linkinv # extract inverse link (inverse logit in this case)
+
+#calculate confidence intervals on link scale and back transform
+predictions_K_YX <- cbind(new_data_KYX,data.frame(pred_new_dat_K_YX)) %>%
+  mutate(CI.up = ilink(fit + (1.96*se.fit)),
+         CI.low = ilink(fit - (1.96*se.fit)),
+         Pred=ilink(fit)) %>%
+  select(-c(X1, X2)) %>% #remove X1 and X2 that are set to their means as we don't need them
+  mutate(X1 = predictions_Y_X$X1, 
+         X2 = predictions_Y_X$X2)  # add the values of X1 and X2 that were used to predict Y
+  
+COLS <- alpha(colorRampPalette(c("blue","red"))(30),0.6)
+ggplot() +
+  geom_ribbon(data = predictions_K_YX, aes(ymin = CI.low, ymax = CI.up, x = Y, fill = as.factor(X1)), alpha = 0.2) +
+  geom_line(data = predictions_K_YX, aes(y = Pred, x = Y,  color = X2))+
+  scale_color_gradientn(colours = COLS)+
+  labs(y = "K",
+       title = "Effect of X1*X2 on K through Y",
+       fill = "X1") +
+  theme_classic() +
+  facet_wrap(~as.factor(X1))
+```
+
+Make it "pretty"
+
+```{r}
+facet_labels_X1 <- as_labeller(
+  c(
+    `-1` = "X1 = -1",
+    `0` = "X1 = 0",
+    `1` = "X1 = 1"
+  ))
+pK_XY <- ggplot() +
+  geom_ribbon(data = predictions_K_YX, aes(ymin = CI.low, ymax = CI.up, x = Y, fill = as.factor(X1)), alpha = 0.2) +
+  geom_line(data = predictions_K_YX, aes(y = Pred, x = Y,  color = X2), linewidth = 2)+
+  scale_color_gradientn(colours = COLS)+
+  labs(
+       title = "Effect of X1*X2 on K through Y") +
+  guides(fill = "none") +
+  theme_classic() +
+  facet_wrap(~as.factor(X1), labeller = facet_labels_X1)+
+  theme(legend.position = c(0.2, 0.5),
+        axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank())
+
+pK_XY
+```
+
+pK_Y
+
+```{r}
+pK_Y <- ggplot() +
+  geom_ribbon(data = predictions_K_Y, aes(ymin = CI.low, ymax = CI.up, x = Y), alpha = 0.2) +
+  geom_line(data = predictions_K_Y, aes(y = Pred, x = Y))+
+  labs(y = "K",
+       title = "Effect of Y on K") +
+  coord_cartesian(xlim = c(0, 100)) +
+  theme_classic()
+
+pK_Y
+```
+
+patchwork
+
+```{r}
+patch_K_Y <- pK_Y + pK_XY + plot_annotation(caption = "X1 is a strong mediator of the indirect effect of X2 on K through Y")
+
+patch_K_Y
+```
+
+Bring it all together
 
 ![](images/ecoevo_teaser_interact.png)

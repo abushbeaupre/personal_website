@@ -194,6 +194,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
+<p>When fitting a model (ex. glm) in a causal inference context, we are either estimating the direct or total effect of a given variable. For example, in a DAG such as this one:</p>
+<p><img src="images/raw_DAG.png" class="img-fluid"></p>
+<p>We can estimate the direct effect of X on K by fitting a model such as</p>
+<p><code>lm(K ~ X + Y)</code></p>
+<p>In this case, we estimate the <em>direct</em> effect of X on K as we are controlling for Y. Such is the nature of (generalized) linear models.</p>
+<p>If we want to estimate the total effect of X on K, we simply fit the model</p>
+<p><code>lm(K ~ X)</code></p>
+<p>In this case, as we are ignoring Y, we estimate the direct effect of X + its indirect effect through Y (the total effect).</p>
+<p>But what if we are interested in looking at the <em>indirect</em> effects?</p>
+<p>As François Briau once told me, the study of Ecology <strong><em>is</em></strong> the study of direct and indirect effects. We just don’t really do it formally.</p>
+<p>Luckily, Bill Shipley has spent quite a bit of brain power in quantifying direct, indirect and total effects which is what we call Path Analysis.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://www.youtube.com/watch?v=upmPlBSoNRI&amp;ab_channel=CarnegieMellonUniversityDepartmentofPhilosophy"><img src="images/Screenshot (1).png" class="img-fluid figure-img"></a></p>
+<figcaption class="figure-caption">The great Bill Shipley</figcaption>
+</figure>
+</div>
+<p>Very briefly, to calculate indirect effects in along a path (ex. TSF -&gt; Sphagnum cover -&gt; forest floor thickness), one must multiply the (standardized) coefficients along that path. In this case, 0.073 * 0.164 = 0.011972</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="example_DAG.png" class="img-fluid figure-img" width="698"></p>
+<figcaption class="figure-caption">N. Fenton et al.&nbsp;/ Forest Ecology and Management 213 (2005) 151–159</figcaption>
+</figure>
+</div>
+<p>But what does that number represent? When all relationships are linear, that value represents a slope. When the relationship(s) is/are not linear (ex. Poisson and logistic regressions), the value represents the slope on the link scale (log or logit or other). On the response scale, the slope is not constant through the entire relationship (we will see later). So how do we interpret such indirect effects if they are not on the scale of the variable we measured?</p>
 <p>Start by loading the pertinent packages</p>
 <div class="cell">
 <details>
@@ -209,7 +234,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>First, we will simulate data from this DAG:</p>
-<p>INSERT DAG</p>
+<p><img src="images/raw_DAG-01.png" class="img-fluid"></p>
+<p>But these are just letters - BORING</p>
+<p>The DAG could also be</p>
+<p><img src="ecoevo_teaser.png" class="img-fluid"></p>
+<p>or</p>
+<p><img src="DAG_WAZO.png" class="img-fluid"></p>
+<p>You don`t have to think too hard to see this type of relationship in your own work.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -460,12 +491,274 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>pK_Y <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="at">data =</span> pred_K_YX, <span class="fu">aes</span>(<span class="at">x =</span> Y, <span class="at">y =</span> Pred, <span class="at">color =</span> X), <span class="at">linewidth=</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Indirect effect of X on K through Y"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Indirect effect of X on K through Y"</span>) <span class="sc">+</span> <span class="fu">scale_color_gradientn</span>(<span class="at">colours =</span> COLS)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="index_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>We could push this even further and look at indirect effects through a non-monotonous relationship</p>
+<p><img src="images/ecoevo_teaser.png" class="img-fluid"></p>
+<p>And what about interactions?</p>
+<p>Simulate data</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">3000</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#interacting variables</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>X1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">n =</span> n, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>X2 <span class="ot">&lt;-</span> <span class="fu">rpois</span>(<span class="at">n =</span> n, <span class="at">lambda =</span> <span class="dv">3</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#mediator</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fu">rpois</span>(<span class="at">n =</span> n, <span class="at">lambda =</span> <span class="fu">exp</span>(<span class="dv">0</span> <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>X1 <span class="sc">+</span> <span class="fl">0.3</span><span class="sc">*</span>X2 <span class="sc">+</span> <span class="fl">0.1</span><span class="sc">*</span>X1<span class="sc">*</span>X2))</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co">#outcome</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>K <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="at">n =</span> n, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.1</span><span class="sc">*</span>X1 <span class="sc">+</span> <span class="fl">0.2</span><span class="sc">*</span>X2 <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>X1<span class="sc">*</span>X2 <span class="sc">-</span> <span class="fl">0.05</span><span class="sc">*</span>Y))</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">X1 =</span> X1,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">X2 =</span> X2,</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y =</span> Y,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">K =</span> K,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">K_1 =</span> K <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+      X1    X2     Y     K   K_1
+   &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+1  1.49      4    12     1     0
+2  0.582     4     6     0    -1
+3  1.30      1     3     0    -1
+4 -2.01      1     0     0    -1
+5  1.64      3     7     1     0
+6  0.260     2     3     1     0</code></pre>
+</div>
+</div>
+<p>Models</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>mY_X <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(Y <span class="sc">~</span>  X1 <span class="sc">+</span> X2 <span class="sc">+</span> X1<span class="sc">*</span>X2, <span class="at">family =</span> poisson, <span class="at">data =</span> data)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>mK_XY <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(K <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X1<span class="sc">*</span>X2 <span class="sc">+</span> Y, <span class="at">family =</span> binomial, <span class="at">data =</span> data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Predictions</p>
+<p>Y ~ X</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>new_data_YX <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(<span class="at">X1 =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">X2 =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="fu">min</span>(data<span class="sc">$</span>X2), <span class="at">to =</span> <span class="fu">max</span>(data<span class="sc">$</span>X2), <span class="at">length.out =</span> <span class="dv">30</span>))</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>pred_new_dat_Y_X <span class="ot">&lt;-</span> <span class="fu">predict</span>(mY_X, <span class="at">newdata =</span> new_data_YX, <span class="at">type =</span> <span class="st">"link"</span>, <span class="at">se.fit =</span> <span class="cn">TRUE</span>) <span class="co"># predict on link scale</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>ilink<span class="ot">&lt;-</span> <span class="fu">family</span>(mY_X)<span class="sc">$</span>linkinv <span class="co"># extract inverse link (exponential in this case)</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate confidence intervals on link scale and back transform</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>predictions_Y_X <span class="ot">&lt;-</span> <span class="fu">cbind</span>(new_data_YX,<span class="fu">data.frame</span>(pred_new_dat_Y_X)) <span class="sc">%&gt;%</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CI.up =</span> <span class="fu">ilink</span>(fit <span class="sc">+</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">CI.low =</span> <span class="fu">ilink</span>(fit <span class="sc">-</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">Pred=</span><span class="fu">ilink</span>(fit))</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> predictions_Y_X, <span class="fu">aes</span>(<span class="at">ymin =</span> CI.low, <span class="at">ymax =</span> CI.up, <span class="at">x =</span> X2, <span class="at">fill =</span> <span class="fu">as.factor</span>(X1)), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> predictions_Y_X, <span class="fu">aes</span>(<span class="at">y =</span> Pred, <span class="at">x =</span> X2, <span class="at">color =</span> <span class="fu">as.factor</span>(X1))) <span class="sc">+</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Y"</span>,</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Interacting effect of X1 &amp; X2 on Y"</span>) <span class="sc">+</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>K ~ X | Y</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>new_data_KX <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(<span class="at">X1 =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">X2 =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="fu">min</span>(data<span class="sc">$</span>X2), <span class="at">to =</span> <span class="fu">max</span>(data<span class="sc">$</span>X2), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">Y =</span> <span class="fu">mean</span>(data<span class="sc">$</span>Y))</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>pred_new_dat_K_X <span class="ot">&lt;-</span> <span class="fu">predict</span>(mK_XY, <span class="at">newdata =</span> new_data_KX, <span class="at">type =</span> <span class="st">"link"</span>, <span class="at">se.fit =</span> <span class="cn">TRUE</span>) <span class="co"># predict on link scale</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>ilink<span class="ot">&lt;-</span> <span class="fu">family</span>(mK_XY)<span class="sc">$</span>linkinv <span class="co"># extract inverse link (inverse logit in this case)</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate confidence intervals on link scale and back transform</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>predictions_K_X <span class="ot">&lt;-</span> <span class="fu">cbind</span>(new_data_KX,<span class="fu">data.frame</span>(pred_new_dat_K_X)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CI.up =</span> <span class="fu">ilink</span>(fit <span class="sc">+</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">CI.low =</span> <span class="fu">ilink</span>(fit <span class="sc">-</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">Pred=</span><span class="fu">ilink</span>(fit))</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>pK_X <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> predictions_K_X, <span class="fu">aes</span>(<span class="at">ymin =</span> CI.low, <span class="at">ymax =</span> CI.up, <span class="at">x =</span> X2, <span class="at">fill =</span> <span class="fu">as.factor</span>(X1)), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> predictions_K_X, <span class="fu">aes</span>(<span class="at">y =</span> Pred, <span class="at">x =</span> X2, <span class="at">color =</span> <span class="fu">as.factor</span>(X1)))<span class="sc">+</span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"K"</span>,</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Interacting effect of X1 &amp; X2 on K"</span>,</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"X1"</span>,</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"X1"</span>) <span class="sc">+</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()<span class="sc">+</span><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>))</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>pK_X</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>K ~ Y | X</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>new_data_KY <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(<span class="at">X1 =</span> <span class="fu">mean</span>(data<span class="sc">$</span>X1),</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">X2 =</span> <span class="fu">mean</span>(data<span class="sc">$</span>X2),</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">Y =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="fu">min</span>(data<span class="sc">$</span>Y), <span class="at">to =</span> <span class="fu">max</span>(data<span class="sc">$</span>Y), <span class="at">length.out =</span> <span class="dv">30</span>))</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>pred_new_dat_K_Y <span class="ot">&lt;-</span> <span class="fu">predict</span>(mK_XY, <span class="at">newdata =</span> new_data_KY, <span class="at">type =</span> <span class="st">"link"</span>, <span class="at">se.fit =</span> <span class="cn">TRUE</span>) <span class="co"># predict on link scale</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>ilink<span class="ot">&lt;-</span> <span class="fu">family</span>(mK_XY)<span class="sc">$</span>linkinv <span class="co"># extract inverse link (inverse logit in this case)</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate confidence intervals on link scale and back transform</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>predictions_K_Y <span class="ot">&lt;-</span> <span class="fu">cbind</span>(new_data_KY,<span class="fu">data.frame</span>(pred_new_dat_K_Y)) <span class="sc">%&gt;%</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CI.up =</span> <span class="fu">ilink</span>(fit <span class="sc">+</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">CI.low =</span> <span class="fu">ilink</span>(fit <span class="sc">-</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">Pred=</span><span class="fu">ilink</span>(fit))</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> predictions_K_Y, <span class="fu">aes</span>(<span class="at">ymin =</span> CI.low, <span class="at">ymax =</span> CI.up, <span class="at">x =</span> Y), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> predictions_K_Y, <span class="fu">aes</span>(<span class="at">y =</span> Pred, <span class="at">x =</span> Y))<span class="sc">+</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"K"</span>,</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Effect of Y on K"</span>) <span class="sc">+</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>K ~ E(Y|X)</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>pY_X <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> predictions_Y_X, <span class="fu">aes</span>(<span class="at">ymin =</span> CI.low, <span class="at">ymax =</span> CI.up, <span class="at">x =</span> X2, <span class="at">fill =</span> <span class="fu">as.factor</span>(X1)), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> predictions_Y_X, <span class="fu">aes</span>(<span class="at">y =</span> Pred, <span class="at">x =</span> X2, <span class="at">color =</span> <span class="fu">as.factor</span>(X1))) <span class="sc">+</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> predictions_Y_X, <span class="fu">aes</span>(<span class="at">y =</span> Pred, <span class="at">x =</span> X2, <span class="at">color =</span> <span class="fu">as.factor</span>(X1))) <span class="sc">+</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Y"</span>,</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Interacting effect of X1 &amp; X2 on Y"</span>,</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"X1"</span>,</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"X1"</span>) <span class="sc">+</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.5</span>))</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>pY_X</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>need to predict K for the different predicted values of Y ~ X</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>new_data_KYX <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y =</span> predictions_Y_X<span class="sc">$</span>Pred,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">X1 =</span> <span class="fu">mean</span>(data<span class="sc">$</span>X1),</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">X2 =</span> <span class="fu">mean</span>(data<span class="sc">$</span>X2)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>pred_new_dat_K_YX <span class="ot">&lt;-</span> <span class="fu">predict</span>(mK_XY, <span class="at">newdata =</span> new_data_KYX, <span class="at">type =</span> <span class="st">"link"</span>, <span class="at">se.fit =</span> <span class="cn">TRUE</span>) <span class="co"># predict on link scale</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>ilink<span class="ot">&lt;-</span> <span class="fu">family</span>(mK_XY)<span class="sc">$</span>linkinv <span class="co"># extract inverse link (inverse logit in this case)</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate confidence intervals on link scale and back transform</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>predictions_K_YX <span class="ot">&lt;-</span> <span class="fu">cbind</span>(new_data_KYX,<span class="fu">data.frame</span>(pred_new_dat_K_YX)) <span class="sc">%&gt;%</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CI.up =</span> <span class="fu">ilink</span>(fit <span class="sc">+</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">CI.low =</span> <span class="fu">ilink</span>(fit <span class="sc">-</span> (<span class="fl">1.96</span><span class="sc">*</span>se.fit)),</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">Pred=</span><span class="fu">ilink</span>(fit)) <span class="sc">%&gt;%</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(X1, X2)) <span class="sc">%&gt;%</span> <span class="co">#remove X1 and X2 that are set to their means as we don't need them</span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">X1 =</span> predictions_Y_X<span class="sc">$</span>X1, </span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">X2 =</span> predictions_Y_X<span class="sc">$</span>X2)  <span class="co"># add the values of X1 and X2 that were used to predict Y</span></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>COLS <span class="ot">&lt;-</span> <span class="fu">alpha</span>(<span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"blue"</span>,<span class="st">"red"</span>))(<span class="dv">30</span>),<span class="fl">0.6</span>)</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> predictions_K_YX, <span class="fu">aes</span>(<span class="at">ymin =</span> CI.low, <span class="at">ymax =</span> CI.up, <span class="at">x =</span> Y, <span class="at">fill =</span> <span class="fu">as.factor</span>(X1)), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> predictions_K_YX, <span class="fu">aes</span>(<span class="at">y =</span> Pred, <span class="at">x =</span> Y,  <span class="at">color =</span> X2))<span class="sc">+</span></span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradientn</span>(<span class="at">colours =</span> COLS)<span class="sc">+</span></span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"K"</span>,</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Effect of X1*X2 on K through Y"</span>,</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"X1"</span>) <span class="sc">+</span></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span><span class="fu">as.factor</span>(X1))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Make it “pretty”</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>facet_labels_X1 <span class="ot">&lt;-</span> <span class="fu">as_labeller</span>(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">-1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"X1 = -1"</span>,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">0</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"X1 = 0"</span>,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"X1 = 1"</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>pK_XY <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> predictions_K_YX, <span class="fu">aes</span>(<span class="at">ymin =</span> CI.low, <span class="at">ymax =</span> CI.up, <span class="at">x =</span> Y, <span class="at">fill =</span> <span class="fu">as.factor</span>(X1)), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> predictions_K_YX, <span class="fu">aes</span>(<span class="at">y =</span> Pred, <span class="at">x =</span> Y,  <span class="at">color =</span> X2), <span class="at">linewidth =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradientn</span>(<span class="at">colours =</span> COLS)<span class="sc">+</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Effect of X1*X2 on K through Y"</span>) <span class="sc">+</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span><span class="fu">as.factor</span>(X1), <span class="at">labeller =</span> facet_labels_X1)<span class="sc">+</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.5</span>),</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.line.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>pK_XY</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>pK_Y</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>pK_Y <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> predictions_K_Y, <span class="fu">aes</span>(<span class="at">ymin =</span> CI.low, <span class="at">ymax =</span> CI.up, <span class="at">x =</span> Y), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> predictions_K_Y, <span class="fu">aes</span>(<span class="at">y =</span> Pred, <span class="at">x =</span> Y))<span class="sc">+</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"K"</span>,</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Effect of Y on K"</span>) <span class="sc">+</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">100</span>)) <span class="sc">+</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>pK_Y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>patchwork</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>patch_K_Y <span class="ot">&lt;-</span> pK_Y <span class="sc">+</span> pK_XY <span class="sc">+</span> <span class="fu">plot_annotation</span>(<span class="at">caption =</span> <span class="st">"X1 is a strong mediator of the indirect effect of X2 on K through Y"</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>patch_K_Y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Bring it all together</p>
+<p><img src="images/ecoevo_teaser_interact.png" class="img-fluid"></p>
 
 
 
