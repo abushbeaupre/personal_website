@@ -331,12 +331,21 @@ function updateTOC(lang) {
   tocLinks.forEach((link, index) => {
     const href = link.getAttribute('href');
     console.log('Link', index, 'href:', href);
-    if (!href || !href.startsWith('#')) {
-      console.log('Skipping link', index, '- invalid href');
+    if (!href) {
+      console.log('Skipping link', index, '- no href');
       return;
     }
     
-    const targetId = href.substring(1);
+    // Extract the hash from the URL (works for both #anchor and full URLs)
+    let targetId;
+    if (href.includes('#')) {
+      targetId = href.split('#')[1];
+    } else {
+      console.log('Skipping link', index, '- no hash in href');
+      return;
+    }
+    
+    console.log('Extracted targetId:', targetId);
     const targetElement = document.getElementById(targetId);
     console.log('Looking for element with id:', targetId, 'found:', !!targetElement);
     
