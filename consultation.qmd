@@ -166,14 +166,59 @@ function setLanguage(lang) {
     }
   });
   
-  // Add/remove body class for CSS-based TOC filtering
-  if (lang === 'fr') {
-    document.body.classList.add('lang-fr');
-    document.body.classList.remove('lang-en');
-  } else {
-    document.body.classList.add('lang-en');
-    document.body.classList.remove('lang-fr');
-  }
+  // Update TOC - wait a bit for it to render, then filter multiple times
+  setTimeout(() => filterTOC(lang), 100);
+  setTimeout(() => filterTOC(lang), 500);
+  setTimeout(() => filterTOC(lang), 1000);
+}
+
+function filterTOC(lang) {
+  // Get all TOC list items
+  const tocItems = document.querySelectorAll('#TOC li');
+  
+  tocItems.forEach(li => {
+    const link = li.querySelector('a');
+    if (!link) return;
+    
+    const href = link.getAttribute('href') || '';
+    const text = link.textContent.toLowerCase();
+    
+    // French section identifiers
+    const frenchSections = [
+      'réserver-une-consultation',
+      'comment-je-peux-aider',
+      'avant-votre-consultation', 
+      'planifier-votre-rencontre',
+      'partager-vos-fichiers',
+      'contact-alternatif',
+      'bienvenue'
+    ];
+    
+    const isFrench = frenchSections.some(section => href.includes(section));
+    
+    if (lang === 'en' && isFrench) {
+      li.style.display = 'none';
+    } else if (lang === 'fr' && !isFrench) {
+      // Hide English items when French is selected
+      const englishSections = [
+        'book-a-consultation',
+        'what-i-can-help-with',
+        'before-your-consultation',
+        'schedule-your-meeting',
+        'share-your-files',
+        'alternative-contact',
+        'welcome'
+      ];
+      const isEnglish = englishSections.some(section => href.includes(section));
+      if (isEnglish) {
+        li.style.display = 'none';
+      } else {
+        li.style.display = '';
+      }
+    } else {
+      li.style.display = '';
+    }
+  });
 }
 </script>
 ```

@@ -31,39 +31,3 @@
 .lang-fr {
   display: none;
 }
-
-/* Hide French TOC items by default */
-#TOC a[href*="réserver-une-consultation"],
-#TOC a[href*="comment-je-peux-aider"],
-#TOC a[href*="avant-votre-consultation"],
-#TOC a[href*="planifier-votre-rencontre"],
-#TOC a[href*="partager-vos-fichiers"],
-#TOC a[href*="contact-alternatif"],
-#TOC a[href*="bienvenue"],
-#TOC a[href*="un-peu-à-propos-de-moi"] {
-  display: none !important;
-}
-
-/* Show French TOC items when body has lang-fr class */
-body.lang-fr #TOC a[href*="réserver-une-consultation"],
-body.lang-fr #TOC a[href*="comment-je-peux-aider"],
-body.lang-fr #TOC a[href*="avant-votre-consultation"],
-body.lang-fr #TOC a[href*="planifier-votre-rencontre"],
-body.lang-fr #TOC a[href*="partager-vos-fichiers"],
-body.lang-fr #TOC a[href*="contact-alternatif"],
-body.lang-fr #TOC a[href*="bienvenue"],
-body.lang-fr #TOC a[href*="un-peu-à-propos-de-moi"] {
-  display: block !important;
-}
-
-/* Hide English TOC items when body has lang-fr class */
-body.lang-fr #TOC a[href*="book-a-consultation"]:not([href*="réserver"]),
-body.lang-fr #TOC a[href*="what-i-can-help-with"],
-body.lang-fr #TOC a[href*="before-your-consultation"],
-body.lang-fr #TOC a[href*="schedule-your-meeting"],
-body.lang-fr #TOC a[href*="share-your-files"],
-body.lang-fr #TOC a[href*="alternative-contact"]:not([href*="alternatif"]),
-body.lang-fr #TOC a[href*="welcome"],
-body.lang-fr #TOC a[href*="a-bit-about-me"] {
-  display: none !important;
-}
