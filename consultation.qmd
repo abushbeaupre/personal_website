@@ -2,10 +2,12 @@
 title: "Consultations CREUS"
 ---
 
-::: {style="text-align: right; margin-bottom: 1rem;"}
-**English** | [Français](consultation_fr.qmd)
-:::
+<div class="lang-toggle">
+  <button class="lang-toggle-btn active" data-lang="en">English</button>
+  <button class="lang-toggle-btn" data-lang="fr">Français</button>
+</div>
 
+::: {.lang-en}
 ## Book a Consultation
 
 I provide statistical consulting services for graduate students and researchers in the Ecology department. Whether you need help with study design, data analysis, or interpreting results, I'm here to assist.
@@ -25,23 +27,58 @@ Please prepare:
 -   Information about your data (sample size, variables, study design)
 -   Specific questions or challenges you're facing
 -   Any relevant code or output (if applicable)
+:::
+
+::: {.lang-fr}
+## Réserver une consultation
+
+J'offre des services de consultation statistique aux étudiants diplômés et aux chercheurs du département d'Écologie. Que vous ayez besoin d'aide pour la conception d'étude, l'analyse de données ou l'interprétation des résultats, je suis là pour vous aider.
+
+### Comment je peux aider
+
+-   **Conception d'étude**: Analyse de puissance, stratégies d'échantillonnage, plan expérimental
+-   **Analyse de données**: GLM/GLMM, analyse de cheminement, statistiques multivariées, méthodes bayésiennes
+-   **Programmation R**: Manipulation de données, visualisation, flux de travail reproductibles
+-   **Interprétation des résultats**: Comprendre les sorties de modèle, tailles d'effet, diagnostics
+
+### Avant votre consultation
+
+Veuillez préparer:
+
+-   Une brève description de votre question de recherche
+-   Informations sur vos données (taille d'échantillon, variables, plan d'étude)
+-   Questions spécifiques ou défis auxquels vous faites face
+-   Tout code ou sortie pertinent (le cas échéant)
+:::
 
 ------------------------------------------------------------------------
 
+::: {.lang-en}
 ## Schedule Your Meeting
 
 Click the button below to open the booking calendar in a new window. You'll be able to answer a few questions about your needs and schedule a time that works for you. The intake questions will help me prepare for our meeting.
+:::
+
+::: {.lang-fr}
+## Planifier votre rencontre
+
+Cliquez sur le bouton ci-dessous pour ouvrir le calendrier de réservation dans une nouvelle fenêtre. Vous pourrez répondre à quelques questions sur vos besoins et planifier un moment qui vous convient. Les questions d'admission m'aideront à préparer notre rencontre.
+:::
 
 ::: {style="text-align: center; padding: 3rem; background-color: #f8f9fa; border-radius: 8px; margin: 2rem 0;"}
-<a href='https://outlook.office.com/book/Consultationsstatistiquesrencontreinitiale@USherbrooke.onmicrosoft.com/' target="_blank" rel="noopener noreferrer" style='display: inline-block; padding: 15px 40px; background-color: #0078d4; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 1.2em; box-shadow: 0 2px 8px rgba(0,120,212,0.3);'>📅 Book Your Consultation</a>
+<a href='https://outlook.office.com/book/Consultationsstatistiquesrencontreinitiale@USherbrooke.onmicrosoft.com/' target="_blank" rel="noopener noreferrer" style='display: inline-block; padding: 15px 40px; background-color: #0078d4; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 1.2em; box-shadow: 0 2px 8px rgba(0,120,212,0.3);'><span class="lang-en">📅 Book Your Consultation</span><span class="lang-fr">📅 Réserver votre consultation</span></a>
 
-<p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;">
+<p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;" class="lang-en">
 The booking page will open in a new window
+</p>
+<p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;" class="lang-fr">
+La page de réservation s'ouvrira dans une nouvelle fenêtre
 </p>
 :::
 
 ------------------------------------------------------------------------
 
+::: {.lang-en}
 ## Share Your Files
 
 If you have data files, code, or documents you'd like me to review before our meeting, you can upload them securely using the button below. Files will be saved directly to my Dropbox.
@@ -53,17 +90,43 @@ If you have data files, code, or documents you'd like me to review before our me
 -   Output files or error messages
 -   Research proposals or study designs
 -   Any other relevant documents
+:::
+
+::: {.lang-fr}
+## Partager vos fichiers
+
+Si vous avez des fichiers de données, du code ou des documents que vous aimeriez que je révise avant notre rencontre, vous pouvez les télécharger en toute sécurité en utilisant le bouton ci-dessous. Les fichiers seront sauvegardés directement dans mon Dropbox.
+
+**Quoi partager:**
+
+-   Fichiers de données (.csv, .xlsx, .txt, .rds, etc.)
+-   Scripts R ou code d'analyse
+-   Fichiers de sortie ou messages d'erreur
+-   Propositions de recherche ou plans d'étude
+-   Tout autre document pertinent
+:::
 
 ::: {style="text-align: center; padding: 3rem; background-color: #e8f4f8; border-radius: 8px; margin: 2rem 0;"}
-<a href='https://www.dropbox.com/request/qyN8JJ6VWFYd64E9fbTd' target="_blank" rel="noopener noreferrer" style='display: inline-block; padding: 15px 40px; background-color: #0061ff; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 1.2em; box-shadow: 0 2px 8px rgba(0,97,255,0.3);'>📤 Upload Files to Dropbox</a>
+<a href='https://www.dropbox.com/request/qyN8JJ6VWFYd64E9fbTd' target="_blank" rel="noopener noreferrer" style='display: inline-block; padding: 15px 40px; background-color: #0061ff; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 1.2em; box-shadow: 0 2px 8px rgba(0,97,255,0.3);'><span class="lang-en">📤 Upload Files to Dropbox</span><span class="lang-fr">📤 Télécharger des fichiers sur Dropbox</span></a>
 
-<p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;">
+<p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;" class="lang-en">
 No Dropbox account required • Files are uploaded securely
+</p>
+<p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;" class="lang-fr">
+Aucun compte Dropbox requis • Les fichiers sont téléchargés en toute sécurité
 </p>
 :::
 
 ------------------------------------------------------------------------
 
+::: {.lang-en}
 ### Alternative Contact
 
 If you prefer to email me directly to discuss your needs before scheduling, you can reach me at allen.bush-beaupre@usherbrooke.ca
+:::
+
+::: {.lang-fr}
+### Contact alternatif
+
+Si vous préférez m'envoyer un courriel directement pour discuter de vos besoins avant de planifier une rencontre, vous pouvez me joindre à allen.bush-beaupre@usherbrooke.ca
+:::

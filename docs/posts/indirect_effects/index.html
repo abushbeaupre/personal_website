@@ -845,6 +845,38 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 Bush-Beaupré, Allen. 2023. <span>“Visualizing Indirect Effects.”</span>
 October 31, 2023. <a href="https://abushbeaupre.github.io/posts/indirect_effects/">https://abushbeaupre.github.io/posts/indirect_effects/</a>.
 </div></div></section></div></main> <!-- /main -->
+<script>
+// Language toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  let currentLang = localStorage.getItem('language') || 'en';
+  setLanguage(currentLang);
+  
+  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const lang = this.dataset.lang;
+      setLanguage(lang);
+      localStorage.setItem('language', lang);
+    });
+  });
+});
+
+function setLanguage(lang) {
+  document.querySelectorAll('.lang-en, .lang-fr').forEach(el => {
+    el.style.display = 'none';
+  });
+  
+  document.querySelectorAll('.lang-' + lang).forEach(el => {
+    el.style.display = 'block';
+  });
+  
+  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.lang === lang) {
+      btn.classList.add('active');
+    }
+  });
+}
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
