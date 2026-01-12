@@ -39,10 +39,8 @@ Mon travail pour Jade Savage se concentre sur les mouches *Delia* (*D. antiqua*,
 <script>
 // Language toggle functionality
 document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(function() {
-    let currentLang = localStorage.getItem('language') || 'en';
-    setLanguage(currentLang);
-  }, 100);
+  let currentLang = localStorage.getItem('language') || 'en';
+  setLanguage(currentLang);
   
   document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -72,36 +70,14 @@ function setLanguage(lang) {
     }
   });
   
-  // Update table of contents if present
-  updateTOC(lang);
-}
-
-function updateTOC(lang) {
-  const tocLinks = document.querySelectorAll('nav[role="doc-toc"] a, #TOC a, .sidebar-navigation a');
-  
-  tocLinks.forEach((link) => {
-    const href = link.getAttribute('href');
-    if (!href || !href.includes('#')) return;
-    
-    const targetId = href.split('#')[1];
-    const targetElement = document.getElementById(targetId);
-    
-    if (targetElement) {
-      const hasLangClass = targetElement.classList.contains('lang-en') || 
-                          targetElement.classList.contains('lang-fr');
-      
-      if (hasLangClass) {
-        const li = link.closest('li');
-        if (li) {
-          if (targetElement.classList.contains('lang-' + lang)) {
-            li.style.display = '';
-          } else {
-            li.style.display = 'none';
-          }
-        }
-      }
-    }
-  });
+  // Add/remove body class for CSS-based TOC filtering
+  if (lang === 'fr') {
+    document.body.classList.add('lang-fr');
+    document.body.classList.remove('lang-en');
+  } else {
+    document.body.classList.add('lang-en');
+    document.body.classList.remove('lang-fr');
+  }
 }
 </script>
 ```

@@ -281,32 +281,11 @@ Aucun compte Dropbox requis • Les fichiers sont téléchargés en toute sécur
 // Language toggle functionality
 document.addEventListener('DOMContentLoaded', function() {
   let currentLang = localStorage.getItem('language') || 'en';
-  
-  // Function to initialize language
-  function initLanguage() {
-    setLanguage(currentLang);
-  }
-  
-  // Try to set language immediately
-  initLanguage();
-  
-  // Also try after a delay
-  setTimeout(initLanguage, 300);
-  
-  // Watch for TOC changes and reapply filter
-  const observer = new MutationObserver(function() {
-    updateTOC(currentLang);
-  });
-  
-  const tocElement = document.getElementById('TOC');
-  if (tocElement) {
-    observer.observe(tocElement, { childList: true, subtree: true });
-  }
+  setLanguage(currentLang);
   
   document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const lang = this.dataset.lang;
-      currentLang = lang;
       setLanguage(lang);
       localStorage.setItem('language', lang);
     });
@@ -332,40 +311,14 @@ function setLanguage(lang) {
     }
   });
   
-  // Update table of contents
-  updateTOC(lang);
-}
-
-function updateTOC(lang) {
-  // Get all TOC links
-  const tocLinks = document.querySelectorAll('nav[role="doc-toc"] a, #TOC a, .sidebar-navigation a');
-  
-  tocLinks.forEach((link) => {
-    const href = link.getAttribute('href');
-    if (!href || !href.includes('#')) return;
-    
-    // Extract the hash from the URL (works for both #anchor and full URLs)
-    const targetId = href.split('#')[1];
-    const targetElement = document.getElementById(targetId);
-    
-    if (targetElement) {
-      // Check if target element has a language class
-      const hasLangClass = targetElement.classList.contains('lang-en') || 
-                          targetElement.classList.contains('lang-fr');
-      
-      if (hasLangClass) {
-        const li = link.closest('li');
-        if (li) {
-          // Show/hide based on current language
-          if (targetElement.classList.contains('lang-' + lang)) {
-            li.style.display = '';
-          } else {
-            li.style.display = 'none';
-          }
-        }
-      }
-    }
-  });
+  // Add/remove body class for CSS-based TOC filtering
+  if (lang === 'fr') {
+    document.body.classList.add('lang-fr');
+    document.body.classList.remove('lang-en');
+  } else {
+    document.body.classList.add('lang-en');
+    document.body.classList.remove('lang-fr');
+  }
 }
 </script>
 
