@@ -36,6 +36,26 @@ Click the button below to open the booking calendar in a new window. You'll be a
 
 ------------------------------------------------------------------------
 
+## Share Your Files
+
+If you have data files, code, or documents you'd like me to review before our meeting, you can upload them securely using the button below. Files will be saved directly to my Dropbox.
+
+**What to share:**
+
+- Data files (.csv, .xlsx, .txt, .rds, etc.)
+- R scripts or analysis code
+- Output files or error messages
+- Research proposals or study designs
+- Any other relevant documents
+
+::: {style="text-align: center; padding: 3rem; background-color: #e8f4f8; border-radius: 8px; margin: 2rem 0;"}
+<a href='https://www.dropbox.com/request/qyN8JJ6VWFYd64E9fbTd' target="_blank" rel="noopener noreferrer" style='display: inline-block; padding: 15px 40px; background-color: #0061ff; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 1.2em; box-shadow: 0 2px 8px rgba(0,97,255,0.3);'>📤 Upload Files to Dropbox</a>
+
+<p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;">No Dropbox account required • Files are uploaded securely</p>
+:::
+
+------------------------------------------------------------------------
+
 ### Alternative Contact
 
 If you prefer to email me directly to discuss your needs before scheduling, you can reach me at allen.bush-beaupre\@usherbrooke.ca

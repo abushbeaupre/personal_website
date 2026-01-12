@@ -46,6 +46,13 @@
     "href": "consultation.html#schedule-your-meeting",
     "title": "Statistical Consultation",
     "section": "Schedule Your Meeting",
-    "text": "Schedule Your Meeting\nClick the button below to open the booking calendar in a new window. You’ll be able to answer a few questions about your needs and schedule a time that works for you. The intake questions will help me prepare for our meeting.\n\n📅 Book Your Consultation\n\nThe booking page will open in a new window\n\n\n\n\nAlternative Contact\nIf you prefer to email me directly to discuss your needs before scheduling, you can reach me at allen.bush-beaupre@usherbrooke.ca"
+    "text": "Schedule Your Meeting\nClick the button below to open the booking calendar in a new window. You’ll be able to answer a few questions about your needs and schedule a time that works for you. The intake questions will help me prepare for our meeting.\n\n📅 Book Your Consultation\n\nThe booking page will open in a new window"
+  },
+  {
+    "objectID": "consultation.html#share-your-files",
+    "href": "consultation.html#share-your-files",
+    "title": "Statistical Consultation",
+    "section": "Share Your Files",
+    "text": "Share Your Files\nIf you have data files, code, or documents you’d like me to review before our meeting, you can upload them securely using the button below. Files will be saved directly to my Dropbox.\nWhat to share:\n\nData files (.csv, .xlsx, .txt, .rds, etc.)\nR scripts or analysis code\nOutput files or error messages\nResearch proposals or study designs\nAny other relevant documents\n\n\n📤 Upload Files to Dropbox\n\nNo Dropbox account required • Files are uploaded securely\n\n\n\n\nAlternative Contact\nIf you prefer to email me directly to discuss your needs before scheduling, you can reach me at allen.bush-beaupre@usherbrooke.ca"
   }
 ]
