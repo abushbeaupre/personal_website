@@ -38,7 +38,7 @@ As François Briau once told me, the study of Ecology ***is*** the study of dire
 
 Luckily, Bill Shipley has spent quite a bit of brain power in quantifying direct, indirect and total effects which is what we call Path Analysis.
 
-[![The great Bill Shipley](images/Screenshot (1).png)](https://www.youtube.com/watch?v=upmPlBSoNRI&ab_channel=CarnegieMellonUniversityDepartmentofPhilosophy)
+[![The great Bill Shipley](images/Screenshot%20(1).png)](https://www.youtube.com/watch?v=upmPlBSoNRI&ab_channel=CarnegieMellonUniversityDepartmentofPhilosophy)
 
 Very briefly, to calculate indirect effects in along a path (ex. TSF -\> Sphagnum cover -\> forest floor thickness), one must multiply the (standardized) coefficients along that path. In this case, 0.073 \* 0.164 = 0.011972
 

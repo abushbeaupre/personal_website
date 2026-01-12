@@ -1,0 +1,69 @@
+---
+title: "Statistical Consultation"
+---
+
+## Book a Consultation
+
+I provide statistical consulting services for graduate students and researchers in the Ecology department. Whether you need help with study design, data analysis, or interpreting results, I'm here to assist.
+
+### What I Can Help With
+
+-   **Study Design**: Power analysis, sampling strategies, experimental design
+-   **Data Analysis**: GLM/GLMM, path analysis, multivariate statistics, Bayesian methods
+-   **R Programming**: Data wrangling, visualization, reproducible workflows
+-   **Results Interpretation**: Understanding model outputs, effect sizes, diagnostics
+
+### Before Your Consultation
+
+Please prepare:
+
+-   A brief description of your research question
+-   Information about your data (sample size, variables, study design)
+-   Specific questions or challenges you're facing
+-   Any relevant code or output (if applicable)
+
+------------------------------------------------------------------------
+
+## Schedule Your Meeting
+
+Use the booking form below to answer a few questions about your needs and schedule a time that works for you. The intake questions will help me prepare for our meeting.
+
+\<a href='https://outlook.office.com/book/Consultationsstatistiquesrencontreinitiale\@USherbrooke.onmicrosoft.com/'\>Schedule online\</a\>
+
+::: {style="text-align: center; padding: 2rem; background-color: #f8f9fa; border-radius: 8px; margin: 2rem 0;"}
+### Setup Instructions for Microsoft Bookings:
+
+1.  Go to [Microsoft Bookings](https://outlook.office.com/bookings/)
+2.  Create a new booking page (or use existing)
+3.  Set up a "Statistical Consultation" service with:
+    -   Duration: 30-60 minutes
+    -   Buffer time if needed
+    -   Custom questions about their research needs
+4.  Get your booking page link or embed code:
+    -   Click "Booking page" → "Publish page"
+    -   Copy the **Publish link** or **Embed code**
+5.  Replace this section with your embed code
+
+**Example embed code format:**
+
+``` html
+<iframe src="YOUR_BOOKINGS_URL" 
+        width="100%" 
+        height="800" 
+        frameborder="0" 
+        style="border:0">
+</iframe>
+```
+
+Or simply add a direct link:
+
+``` markdown
+[**Click here to schedule a consultation**](YOUR_BOOKINGS_URL){.btn .btn-primary}
+```
+:::
+
+------------------------------------------------------------------------
+
+### Alternative Contact
+
+If you prefer to email me directly to discuss your needs before scheduling, you can reach me at allen.bush-beaupre\@usherbrooke.ca
