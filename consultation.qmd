@@ -8,18 +8,18 @@ title: "Consultations CREUS"
 </div>
 
 ::: {.lang-en}
-## Book a Consultation
+## Book a Consultation {.lang-en}
 
 I provide statistical consulting services for graduate students and researchers in the Ecology department. Whether you need help with study design, data analysis, or interpreting results, I'm here to assist.
 
-### What I Can Help With
+### What I Can Help With {.lang-en}
 
 -   **Study Design**: Power analysis, sampling strategies, experimental design
 -   **Data Analysis**: GLM/GLMM, path analysis, multivariate statistics, Bayesian methods
 -   **R Programming**: Data wrangling, visualization, reproducible workflows
 -   **Results Interpretation**: Understanding model outputs, effect sizes, diagnostics
 
-### Before Your Consultation
+### Before Your Consultation {.lang-en}
 
 Please prepare:
 
@@ -30,18 +30,18 @@ Please prepare:
 :::
 
 ::: {.lang-fr}
-## Réserver une consultation
+## Réserver une consultation {.lang-fr}
 
 J'offre des services de consultation statistique aux étudiants diplômés et aux chercheurs du département d'Écologie. Que vous ayez besoin d'aide pour la conception d'étude, l'analyse de données ou l'interprétation des résultats, je suis là pour vous aider.
 
-### Comment je peux aider
+### Comment je peux aider {.lang-fr}
 
 -   **Conception d'étude**: Analyse de puissance, stratégies d'échantillonnage, plan expérimental
 -   **Analyse de données**: GLM/GLMM, analyse de cheminement, statistiques multivariées, méthodes bayésiennes
 -   **Programmation R**: Manipulation de données, visualisation, flux de travail reproductibles
 -   **Interprétation des résultats**: Comprendre les sorties de modèle, tailles d'effet, diagnostics
 
-### Avant votre consultation
+### Avant votre consultation {.lang-fr}
 
 Veuillez préparer:
 
@@ -54,13 +54,13 @@ Veuillez préparer:
 ------------------------------------------------------------------------
 
 ::: {.lang-en}
-## Schedule Your Meeting
+## Schedule Your Meeting {.lang-en}
 
 Click the button below to open the booking calendar in a new window. You'll be able to answer a few questions about your needs and schedule a time that works for you. The intake questions will help me prepare for our meeting.
 :::
 
 ::: {.lang-fr}
-## Planifier votre rencontre
+## Planifier votre rencontre {.lang-fr}
 
 Cliquez sur le bouton ci-dessous pour ouvrir le calendrier de réservation dans une nouvelle fenêtre. Vous pourrez répondre à quelques questions sur vos besoins et planifier un moment qui vous convient. Les questions d'admission m'aideront à préparer notre rencontre.
 :::
@@ -79,7 +79,7 @@ La page de réservation s'ouvrira dans une nouvelle fenêtre
 ------------------------------------------------------------------------
 
 ::: {.lang-en}
-## Share Your Files
+## Share Your Files {.lang-en}
 
 If you have data files, code, or documents you'd like me to review before our meeting, you can upload them securely using the button below. Files will be saved directly to my Dropbox.
 
@@ -93,7 +93,7 @@ If you have data files, code, or documents you'd like me to review before our me
 :::
 
 ::: {.lang-fr}
-## Partager vos fichiers
+## Partager vos fichiers {.lang-fr}
 
 Si vous avez des fichiers de données, du code ou des documents que vous aimeriez que je révise avant notre rencontre, vous pouvez les télécharger en toute sécurité en utilisant le bouton ci-dessous. Les fichiers seront sauvegardés directement dans mon Dropbox.
 
@@ -120,13 +120,13 @@ Aucun compte Dropbox requis • Les fichiers sont téléchargés en toute sécur
 ------------------------------------------------------------------------
 
 ::: {.lang-en}
-### Alternative Contact
+### Alternative Contact {.lang-en}
 
 If you prefer to email me directly to discuss your needs before scheduling, you can reach me at allen.bush-beaupre@usherbrooke.ca
 :::
 
 ::: {.lang-fr}
-### Contact alternatif
+### Contact alternatif {.lang-fr}
 
 Si vous préférez m'envoyer un courriel directement pour discuter de vos besoins avant de planifier une rencontre, vous pouvez me joindre à allen.bush-beaupre@usherbrooke.ca
 :::
