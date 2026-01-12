@@ -11,12 +11,8 @@ website:
     left:
       - text: "Home"
         file: index.qmd
-      - text: "Accueil"
-        file: index_fr.qmd
-      - text: "Statistical Consultation"
+      - text: "Consultations CREUS"
         file: consultation.qmd
-      - text: "Consultation statistique"
-        file: consultation_fr.qmd
       - posts.qmd
     tools:
       - icon: github

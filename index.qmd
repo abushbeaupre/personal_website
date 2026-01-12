@@ -2,10 +2,6 @@
 title: "Allen Bush-Beaupré"
 ---
 
-::: {style="text-align: right; margin-bottom: 1rem;"}
-**English** | [Français](index_fr.qmd)
-:::
-
 Welcome to my personal website!
 
 A bit about me:
