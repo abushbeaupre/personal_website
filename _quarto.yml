@@ -13,6 +13,8 @@ website:
         file: index.qmd
       - consultation.qmd
       - posts.qmd
+    right:
+      - text: "<span class='lang-btn' data-lang='en'>EN</span> | <span class='lang-btn' data-lang='fr'>FR</span>"
     tools:
       - icon: github
         menu:
@@ -24,6 +26,7 @@ format:
     theme: cosmo
     css: styles.css
     toc: true
+    include-after-body: language-toggle.js
 
 editor: visual
 

@@ -1,1 +1,24 @@
 /* css styles */
+
+/* Language toggle buttons */
+.lang-btn {
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all 0.3s;
+  font-weight: normal;
+}
+
+.lang-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.lang-btn.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: bold;
+}
+
+/* Hide French content by default */
+.lang-fr {
+  display: none;
+}

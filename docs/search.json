@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Allen Bush-Beaupré",
     "section": "",
-    "text": "Welcome to my personal website!\nA bit about me:\nI am a research professional based in Sherbrooke, QC, CAN. I currently work for Marc Bélisle at Université de Sherbrooke and for Jade Savage at Bishop’s University. My work can be summarized as trying to apply statistical methods to research questions pertaining to agricultural entomology.\nMy work for Jade Savage focuses on Delia flies (D. antiqua, D. radicum, D. platura & D. florilega) for the Delia Project."
+    "text": "Welcome to my personal website!\nA bit about me:\nI am a research professional based in Sherbrooke, QC, CAN. I currently work for Marc Bélisle at Université de Sherbrooke and for Jade Savage at Bishop’s University. My work can be summarized as trying to apply statistical methods to research questions pertaining to agricultural entomology.\nMy work for Jade Savage focuses on Delia flies (D. antiqua, D. radicum, D. platura & D. florilega) for the Delia Project.\n\n\nBienvenue sur mon site web personnel!\nUn peu à propos de moi:\nJe suis un professionnel de recherche basé à Sherbrooke, QC, CAN. Je travaille actuellement pour Marc Bélisle à l’Université de Sherbrooke et pour Jade Savage à l’Université Bishop’s. Mon travail peut se résumer à l’application de méthodes statistiques aux questions de recherche en entomologie agricole.\nMon travail pour Jade Savage se concentre sur les mouches Delia (D. antiqua, D. radicum, D. platura & D. florilega) pour le Projet Delia."
   },
   {
     "objectID": "posts/indirect_effects/index.html",
@@ -42,17 +42,38 @@
     "text": "I provide statistical consulting services for graduate students and researchers in the Ecology department. Whether you need help with study design, data analysis, or interpreting results, I’m here to assist.\n\n\n\nStudy Design: Power analysis, sampling strategies, experimental design\nData Analysis: GLM/GLMM, path analysis, multivariate statistics, Bayesian methods\nR Programming: Data wrangling, visualization, reproducible workflows\nResults Interpretation: Understanding model outputs, effect sizes, diagnostics\n\n\n\n\nPlease prepare:\n\nA brief description of your research question\nInformation about your data (sample size, variables, study design)\nSpecific questions or challenges you’re facing\nAny relevant code or output (if applicable)"
   },
   {
+    "objectID": "consultation.html#réserver-une-consultation",
+    "href": "consultation.html#réserver-une-consultation",
+    "title": "Statistical Consultation",
+    "section": "Réserver une consultation",
+    "text": "Réserver une consultation\nJ’offre des services de consultation statistique aux étudiants diplômés et aux chercheurs du département d’Écologie. Que vous ayez besoin d’aide pour la conception d’étude, l’analyse de données ou l’interprétation des résultats, je suis là pour vous aider.\n\nComment je peux aider\n\nConception d’étude: Analyse de puissance, stratégies d’échantillonnage, plan expérimental\nAnalyse de données: GLM/GLMM, analyse de cheminement, statistiques multivariées, méthodes bayésiennes\nProgrammation R: Manipulation de données, visualisation, flux de travail reproductibles\nInterprétation des résultats: Comprendre les sorties de modèle, tailles d’effet, diagnostics\n\n\n\nAvant votre consultation\nVeuillez préparer:\n\nUne brève description de votre question de recherche\nInformations sur vos données (taille d’échantillon, variables, plan d’étude)\nQuestions spécifiques ou défis auxquels vous faites face\nTout code ou sortie pertinent (le cas échéant)"
+  },
+  {
     "objectID": "consultation.html#schedule-your-meeting",
     "href": "consultation.html#schedule-your-meeting",
     "title": "Statistical Consultation",
     "section": "Schedule Your Meeting",
-    "text": "Schedule Your Meeting\nClick the button below to open the booking calendar in a new window. You’ll be able to answer a few questions about your needs and schedule a time that works for you. The intake questions will help me prepare for our meeting.\n\n📅 Book Your Consultation\n\nThe booking page will open in a new window"
+    "text": "Schedule Your Meeting\nClick the button below to open the booking calendar in a new window. You’ll be able to answer a few questions about your needs and schedule a time that works for you. The intake questions will help me prepare for our meeting."
+  },
+  {
+    "objectID": "consultation.html#planifier-votre-rencontre",
+    "href": "consultation.html#planifier-votre-rencontre",
+    "title": "Statistical Consultation",
+    "section": "Planifier votre rencontre",
+    "text": "Planifier votre rencontre\nCliquez sur le bouton ci-dessous pour ouvrir le calendrier de réservation dans une nouvelle fenêtre. Vous pourrez répondre à quelques questions sur vos besoins et planifier un moment qui vous convient. Les questions d’admission m’aideront à préparer notre rencontre."
   },
   {
     "objectID": "consultation.html#share-your-files",
     "href": "consultation.html#share-your-files",
     "title": "Statistical Consultation",
     "section": "Share Your Files",
-    "text": "Share Your Files\nIf you have data files, code, or documents you’d like me to review before our meeting, you can upload them securely using the button below. Files will be saved directly to my Dropbox.\nWhat to share:\n\nData files (.csv, .xlsx, .txt, .rds, etc.)\nR scripts or analysis code\nOutput files or error messages\nResearch proposals or study designs\nAny other relevant documents\n\n\n📤 Upload Files to Dropbox\n\nNo Dropbox account required • Files are uploaded securely\n\n\n\n\nAlternative Contact\nIf you prefer to email me directly to discuss your needs before scheduling, you can reach me at allen.bush-beaupre@usherbrooke.ca"
+    "text": "Share Your Files\nIf you have data files, code, or documents you’d like me to review before our meeting, you can upload them securely using the button below. Files will be saved directly to my Dropbox.\nWhat to share:\n\nData files (.csv, .xlsx, .txt, .rds, etc.)\nR scripts or analysis code\nOutput files or error messages\nResearch proposals or study designs\nAny other relevant documents"
+  },
+  {
+    "objectID": "consultation.html#partager-vos-fichiers",
+    "href": "consultation.html#partager-vos-fichiers",
+    "title": "Statistical Consultation",
+    "section": "Partager vos fichiers",
+    "text": "Partager vos fichiers\nSi vous avez des fichiers de données, du code ou des documents que vous aimeriez que je révise avant notre rencontre, vous pouvez les télécharger en toute sécurité en utilisant le bouton ci-dessous. Les fichiers seront sauvegardés directement dans mon Dropbox.\nQuoi partager:\n\nFichiers de données (.csv, .xlsx, .txt, .rds, etc.)\nScripts R ou code d’analyse\nFichiers de sortie ou messages d’erreur\nPropositions de recherche ou plans d’étude\nTout autre document pertinent"
   }
 ]
