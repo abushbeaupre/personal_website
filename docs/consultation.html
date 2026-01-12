@@ -280,15 +280,33 @@ Aucun compte Dropbox requis • Les fichiers sont téléchargés en toute sécur
 <script>
 // Language toggle functionality
 document.addEventListener('DOMContentLoaded', function() {
-  // Wait a bit for Quarto to finish rendering the TOC
-  setTimeout(function() {
-    let currentLang = localStorage.getItem('language') || 'en';
+  let currentLang = localStorage.getItem('language') || 'en';
+  
+  // Function to initialize language
+  function initLanguage() {
     setLanguage(currentLang);
-  }, 200);
+  }
+  
+  // Try to set language immediately
+  initLanguage();
+  
+  // Also try after a delay
+  setTimeout(initLanguage, 300);
+  
+  // Watch for TOC changes and reapply filter
+  const observer = new MutationObserver(function() {
+    updateTOC(currentLang);
+  });
+  
+  const tocElement = document.getElementById('TOC');
+  if (tocElement) {
+    observer.observe(tocElement, { childList: true, subtree: true });
+  }
   
   document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const lang = this.dataset.lang;
+      currentLang = lang;
       setLanguage(lang);
       localStorage.setItem('language', lang);
     });
