@@ -122,13 +122,13 @@ Aucun compte Dropbox requis • Les fichiers sont téléchargés en toute sécur
 ::: {.lang-en}
 ### Alternative Contact {.lang-en}
 
-If you prefer to email me directly to discuss your needs before scheduling, you can reach me at allen.bush-beaupre@usherbrooke.ca
+If you prefer to email me directly to discuss your needs before scheduling, you can reach me at [allen.bush-beaupre@usherbrooke.ca](mailto:allen.bush-beaupre@usherbrooke.ca)
 :::
 
 ::: {.lang-fr}
 ### Contact alternatif {.lang-fr}
 
-Si vous préférez m'envoyer un courriel directement pour discuter de vos besoins avant de planifier une rencontre, vous pouvez me joindre à allen.bush-beaupre@usherbrooke.ca
+Si vous préférez m'envoyer un courriel directement pour discuter de vos besoins avant de planifier une rencontre, vous pouvez me joindre à [allen.bush-beaupre@usherbrooke.ca](mailto:allen.bush-beaupre@usherbrooke.ca)
 :::
 
 ```{=html}
