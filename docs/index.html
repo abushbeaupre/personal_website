@@ -93,8 +93,16 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./index_fr.html"> 
+<span class="menu-text">Accueil</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="./consultation.html"> 
 <span class="menu-text">Statistical Consultation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./consultation_fr.html"> 
+<span class="menu-text">Consultation statistique</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./posts.html"> 
@@ -146,21 +154,13 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<div class="language-toggle-container">
-<p><button class="lang-btn active" data-lang="en">English</button> <button class="lang-btn" data-lang="fr">Français</button></p>
+<div style="text-align: right; margin-bottom: 1rem;">
+<p><strong>English</strong> | <a href="./index_fr.html">Français</a></p>
 </div>
-<div class="lang-en">
 <p>Welcome to my personal website!</p>
 <p>A bit about me:</p>
 <p>I am a research professional based in Sherbrooke, QC, CAN. I currently work for Marc Bélisle at Université de Sherbrooke and for Jade Savage at Bishop’s University. My work can be summarized as trying to apply statistical methods to research questions pertaining to agricultural entomology.</p>
 <p>My work for Jade Savage focuses on <em>Delia</em> flies (<em>D. antiqua</em>, <em>D. radicum</em>, <em>D. platura</em> &amp; <em>D. florilega</em>) for the Delia Project.</p>
-</div>
-<div class="lang-fr">
-<p>Bienvenue sur mon site web personnel!</p>
-<p>Un peu à propos de moi:</p>
-<p>Je suis un professionnel de recherche basé à Sherbrooke, QC, CAN. Je travaille actuellement pour Marc Bélisle à l’Université de Sherbrooke et pour Jade Savage à l’Université Bishop’s. Mon travail peut se résumer à l’application de méthodes statistiques aux questions de recherche en entomologie agricole.</p>
-<p>Mon travail pour Jade Savage se concentre sur les mouches <em>Delia</em> (<em>D. antiqua</em>, <em>D. radicum</em>, <em>D. platura</em> &amp; <em>D. florilega</em>) pour le Projet Delia.</p>
-</div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/Delia_project.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="245"></p>
@@ -170,45 +170,6 @@ ul.task-list li input[type="checkbox"] {
 
 
 </main> <!-- /main -->
-<script>
-// Language toggle functionality
-document.addEventListener('DOMContentLoaded', function() {
-  // Get saved language preference or default to English
-  let currentLang = localStorage.getItem('language') || 'en';
-  
-  // Apply language on page load
-  setLanguage(currentLang);
-  
-  // Add click handlers to language buttons
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const lang = this.dataset.lang;
-      setLanguage(lang);
-      localStorage.setItem('language', lang);
-    });
-  });
-});
-
-function setLanguage(lang) {
-  // Hide all language content
-  document.querySelectorAll('[class*="lang-"]').forEach(el => {
-    el.style.display = 'none';
-  });
-  
-  // Show selected language content
-  document.querySelectorAll('.lang-' + lang).forEach(el => {
-    el.style.display = 'block';
-  });
-  
-  // Update active button state
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  document.querySelectorAll('[data-lang="' + lang + '"]').forEach(btn => {
-    btn.classList.add('active');
-  });
-}
-</script>
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

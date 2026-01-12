@@ -2,12 +2,10 @@
 title: "Allen Bush-Beaupré"
 ---
 
-<div class="language-toggle-container">
-  <button class="lang-btn active" data-lang="en">English</button>
-  <button class="lang-btn" data-lang="fr">Français</button>
-</div>
+::: {style="text-align: right; margin-bottom: 1rem;"}
+**English** | [Français](index_fr.qmd)
+:::
 
-::: {.lang-en}
 Welcome to my personal website!
 
 A bit about me:
@@ -15,16 +13,5 @@ A bit about me:
 I am a research professional based in Sherbrooke, QC, CAN. I currently work for Marc Bélisle at Université de Sherbrooke and for Jade Savage at Bishop's University. My work can be summarized as trying to apply statistical methods to research questions pertaining to agricultural entomology.
 
 My work for Jade Savage focuses on *Delia* flies (*D. antiqua*, *D. radicum*, *D. platura* & *D. florilega*) for the Delia Project.
-:::
-
-::: {.lang-fr}
-Bienvenue sur mon site web personnel!
-
-Un peu à propos de moi:
-
-Je suis un professionnel de recherche basé à Sherbrooke, QC, CAN. Je travaille actuellement pour Marc Bélisle à l'Université de Sherbrooke et pour Jade Savage à l'Université Bishop's. Mon travail peut se résumer à l'application de méthodes statistiques aux questions de recherche en entomologie agricole.
-
-Mon travail pour Jade Savage se concentre sur les mouches *Delia* (*D. antiqua*, *D. radicum*, *D. platura* & *D. florilega*) pour le Projet Delia.
-:::
 
 ![](images/Delia_project.png){fig-align="center" width="245"}

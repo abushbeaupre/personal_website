@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>My Blog – Allen Bush-Beaupré</title>
+<title>Consultation statistique – Allen Bush-Beaupré</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -68,65 +66,7 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-author','listing-date','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -161,11 +101,11 @@ window.Quarto = {
 <span class="menu-text">Statistical Consultation</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./consultation_fr.html"> 
+    <a class="nav-link active" href="./consultation_fr.html" aria-current="page"> 
 <span class="menu-text">Consultation statistique</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./posts.html" aria-current="page"> 
+    <a class="nav-link" href="./posts.html"> 
 <span class="menu-text">My Blog</span></a>
   </li>  
 </ul>
@@ -190,14 +130,29 @@ window.Quarto = {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="data viz">data viz <span class="quarto-category-count">(1)</span></div><div class="category" data-category="indirect effects">indirect effects <span class="quarto-category-count">(1)</span></div><div class="category" data-category="method development">method development <span class="quarto-category-count">(1)</span></div></div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#réserver-une-consultation" id="toc-réserver-une-consultation" class="nav-link active" data-scroll-target="#réserver-une-consultation">Réserver une consultation</a>
+  <ul class="collapse">
+  <li><a href="#comment-je-peux-aider" id="toc-comment-je-peux-aider" class="nav-link" data-scroll-target="#comment-je-peux-aider">Comment je peux aider</a></li>
+  <li><a href="#avant-votre-consultation" id="toc-avant-votre-consultation" class="nav-link" data-scroll-target="#avant-votre-consultation">Avant votre consultation</a></li>
+  </ul></li>
+  <li><a href="#planifier-votre-rencontre" id="toc-planifier-votre-rencontre" class="nav-link" data-scroll-target="#planifier-votre-rencontre">Planifier votre rencontre</a></li>
+  <li><a href="#partager-vos-fichiers" id="toc-partager-vos-fichiers" class="nav-link" data-scroll-target="#partager-vos-fichiers">Partager vos fichiers</a>
+  <ul class="collapse">
+  <li><a href="#contact-alternatif" id="toc-contact-alternatif" class="nav-link" data-scroll-target="#contact-alternatif">Contact alternatif</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">My Blog</h1>
+<h1 class="title">Consultation statistique</h1>
 </div>
 
 
@@ -214,53 +169,71 @@ window.Quarto = {
 </header>
 
 
+<div style="text-align: right; margin-bottom: 1rem;">
+<p><a href="./consultation.html">English</a> | <strong>Français</strong></p>
+</div>
+<section id="réserver-une-consultation" class="level2">
+<h2 class="anchored" data-anchor-id="réserver-une-consultation">Réserver une consultation</h2>
+<p>J’offre des services de consultation statistique aux étudiants diplômés et aux chercheurs du département d’Écologie. Que vous ayez besoin d’aide pour la conception d’étude, l’analyse de données ou l’interprétation des résultats, je suis là pour vous aider.</p>
+<section id="comment-je-peux-aider" class="level3">
+<h3 class="anchored" data-anchor-id="comment-je-peux-aider">Comment je peux aider</h3>
+<ul>
+<li><strong>Conception d’étude</strong>: Analyse de puissance, stratégies d’échantillonnage, plan expérimental</li>
+<li><strong>Analyse de données</strong>: GLM/GLMM, analyse de cheminement, statistiques multivariées, méthodes bayésiennes</li>
+<li><strong>Programmation R</strong>: Manipulation de données, visualisation, flux de travail reproductibles</li>
+<li><strong>Interprétation des résultats</strong>: Comprendre les sorties de modèle, tailles d’effet, diagnostics</li>
+</ul>
+</section>
+<section id="avant-votre-consultation" class="level3">
+<h3 class="anchored" data-anchor-id="avant-votre-consultation">Avant votre consultation</h3>
+<p>Veuillez préparer:</p>
+<ul>
+<li>Une brève description de votre question de recherche</li>
+<li>Informations sur vos données (taille d’échantillon, variables, plan d’étude)</li>
+<li>Questions spécifiques ou défis auxquels vous faites face</li>
+<li>Tout code ou sortie pertinent (le cas échéant)</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="planifier-votre-rencontre" class="level2">
+<h2 class="anchored" data-anchor-id="planifier-votre-rencontre">Planifier votre rencontre</h2>
+<p>Cliquez sur le bouton ci-dessous pour ouvrir le calendrier de réservation dans une nouvelle fenêtre. Vous pourrez répondre à quelques questions sur vos besoins et planifier un moment qui vous convient. Les questions d’admission m’aideront à préparer notre rencontre.</p>
+<div style="text-align: center; padding: 3rem; background-color: #f8f9fa; border-radius: 8px; margin: 2rem 0;">
+<p><a href="https://outlook.office.com/book/Consultationsstatistiquesrencontreinitiale@USherbrooke.onmicrosoft.com/" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 15px 40px; background-color: #0078d4; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 1.2em; box-shadow: 0 2px 8px rgba(0,120,212,0.3);">📅 Réserver votre consultation</a></p>
+<p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;">
+</p><p>La page de réservation s’ouvrira dans une nouvelle fenêtre</p>
+<p></p>
+</div>
+<hr>
+</section>
+<section id="partager-vos-fichiers" class="level2">
+<h2 class="anchored" data-anchor-id="partager-vos-fichiers">Partager vos fichiers</h2>
+<p>Si vous avez des fichiers de données, du code ou des documents que vous aimeriez que je révise avant notre rencontre, vous pouvez les télécharger en toute sécurité en utilisant le bouton ci-dessous. Les fichiers seront sauvegardés directement dans mon Dropbox.</p>
+<p><strong>Quoi partager:</strong></p>
+<ul>
+<li>Fichiers de données (.csv, .xlsx, .txt, .rds, etc.)</li>
+<li>Scripts R ou code d’analyse</li>
+<li>Fichiers de sortie ou messages d’erreur</li>
+<li>Propositions de recherche ou plans d’étude</li>
+<li>Tout autre document pertinent</li>
+</ul>
+<div style="text-align: center; padding: 3rem; background-color: #e8f4f8; border-radius: 8px; margin: 2rem 0;">
+<p><a href="https://www.dropbox.com/request/qyN8JJ6VWFYd64E9fbTd" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 15px 40px; background-color: #0061ff; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 1.2em; box-shadow: 0 2px 8px rgba(0,97,255,0.3);">📤 Télécharger des fichiers sur Dropbox</a></p>
+<p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;">
+</p><p>Aucun compte Dropbox requis • Les fichiers sont téléchargés en toute sécurité</p>
+<p></p>
+</div>
+<hr>
+<section id="contact-alternatif" class="level3">
+<h3 class="anchored" data-anchor-id="contact-alternatif">Contact alternatif</h3>
+<p>Si vous préférez m’envoyer un courriel directement pour discuter de vos besoins avant de planifier une rencontre, vous pouvez me joindre à allen.bush-beaupre@usherbrooke.ca</p>
 
 
+</section>
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
-<div class="list grid quarto-listing-cols-3">
-<div class="g-col-1" data-index="0" data-categories="data viz,indirect effects,method development" data-listing-date-sort="1698710400000" data-listing-file-modified-sort="1768232404611" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2667">
-<a href="./posts/indirect_effects/index.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<p class="card-img-top">
-<img loading="lazy" src="./posts/indirect_effects/Y_X_anim.gif" class="thumbnail-image card-img" style="height: 150px;">
-</p>
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Visualizing indirect effects
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('data viz'); return false;">
-data viz
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('indirect effects'); return false;">
-indirect effects
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('method development'); return false;">
-method development
-</div>
-</div>
-<div class="card-text listing-description">
-How do we quantify and visualize indirect effects in a path analysis when relationships are non-linear? Worse yet; non-monotonous?
-</div>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Allen Bush-Beaupré
-</div>
-<div class="listing-date">
-Oct 31, 2023
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

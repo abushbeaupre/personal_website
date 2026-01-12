@@ -11,7 +11,12 @@ website:
     left:
       - text: "Home"
         file: index.qmd
-      - consultation.qmd
+      - text: "Accueil"
+        file: index_fr.qmd
+      - text: "Statistical Consultation"
+        file: consultation.qmd
+      - text: "Consultation statistique"
+        file: consultation_fr.qmd
       - posts.qmd
     tools:
       - icon: github
@@ -24,7 +29,6 @@ format:
     theme: cosmo
     css: styles.css
     toc: true
-    include-after-body: language-toggle.js
 
 editor: visual
 
