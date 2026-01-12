@@ -121,8 +121,21 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#welcome" id="toc-welcome" class="nav-link active" data-scroll-target="#welcome">Welcome</a>
+  <ul class="collapse">
+  <li><a href="#a-bit-about-me" id="toc-a-bit-about-me" class="nav-link" data-scroll-target="#a-bit-about-me">A bit about me</a></li>
+  </ul></li>
+  <li><a href="#bienvenue" id="toc-bienvenue" class="nav-link" data-scroll-target="#bienvenue">Bienvenue</a>
+  <ul class="collapse">
+  <li><a href="#un-peu-à-propos-de-moi" id="toc-un-peu-à-propos-de-moi" class="nav-link" data-scroll-target="#un-peu-à-propos-de-moi">Un peu à propos de moi</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -146,8 +159,14 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<div class="lang-toggle">
+<p><button class="lang-toggle-btn active" data-lang="en">English</button> <button class="lang-toggle-btn" data-lang="fr">Français</button></p>
+</div>
+<section id="welcome" class="level2 lang-en">
+<h2 class="lang-en anchored" data-anchor-id="welcome">Welcome</h2>
 <p>Welcome to my personal website!</p>
-<p>A bit about me:</p>
+<section id="a-bit-about-me" class="level3 lang-en">
+<h3 class="lang-en anchored" data-anchor-id="a-bit-about-me">A bit about me</h3>
 <p>I am a research professional based in Sherbrooke, QC, CAN. I currently work for Marc Bélisle at Université de Sherbrooke and for Jade Savage at Bishop’s University. My work can be summarized as trying to apply statistical methods to research questions pertaining to agricultural entomology.</p>
 <p>My work for Jade Savage focuses on <em>Delia</em> flies (<em>D. antiqua</em>, <em>D. radicum</em>, <em>D. platura</em> &amp; <em>D. florilega</em>) for the Delia Project.</p>
 <div class="quarto-figure quarto-figure-center">
@@ -155,6 +174,90 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="images/Delia_project.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="245"></p>
 </figure>
 </div>
+</section>
+</section>
+<section id="bienvenue" class="level2 lang-fr">
+<h2 class="lang-fr anchored" data-anchor-id="bienvenue">Bienvenue</h2>
+<p>Bienvenue sur mon site web personnel !</p>
+<section id="un-peu-à-propos-de-moi" class="level3 lang-fr">
+<h3 class="lang-fr anchored" data-anchor-id="un-peu-à-propos-de-moi">Un peu à propos de moi</h3>
+<p>Je suis un professionnel de recherche basé à Sherbrooke, QC, CAN. Je travaille actuellement pour Marc Bélisle à l’Université de Sherbrooke et pour Jade Savage à l’Université Bishop’s. Mon travail peut se résumer à l’application de méthodes statistiques aux questions de recherche en entomologie agricole.</p>
+<p>Mon travail pour Jade Savage se concentre sur les mouches <em>Delia</em> (<em>D. antiqua</em>, <em>D. radicum</em>, <em>D. platura</em> &amp; <em>D. florilega</em>) dans le cadre du projet Delia.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/Delia_project.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="245"></p>
+</figure>
+</div>
+</section>
+</section>
+<script>
+// Language toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    let currentLang = localStorage.getItem('language') || 'en';
+    setLanguage(currentLang);
+  }, 100);
+  
+  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const lang = this.dataset.lang;
+      setLanguage(lang);
+      localStorage.setItem('language', lang);
+    });
+  });
+});
+
+function setLanguage(lang) {
+  // Hide all language content
+  document.querySelectorAll('.lang-en, .lang-fr').forEach(el => {
+    el.style.display = 'none';
+  });
+  
+  // Show selected language content
+  document.querySelectorAll('.lang-' + lang).forEach(el => {
+    el.style.display = 'block';
+  });
+  
+  // Update active button state
+  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.lang === lang) {
+      btn.classList.add('active');
+    }
+  });
+  
+  // Update table of contents if present
+  updateTOC(lang);
+}
+
+function updateTOC(lang) {
+  const tocLinks = document.querySelectorAll('nav[role="doc-toc"] a, #TOC a, .sidebar-navigation a');
+  
+  tocLinks.forEach((link) => {
+    const href = link.getAttribute('href');
+    if (!href || !href.includes('#')) return;
+    
+    const targetId = href.split('#')[1];
+    const targetElement = document.getElementById(targetId);
+    
+    if (targetElement) {
+      const hasLangClass = targetElement.classList.contains('lang-en') || 
+                          targetElement.classList.contains('lang-fr');
+      
+      if (hasLangClass) {
+        const li = link.closest('li');
+        if (li) {
+          if (targetElement.classList.contains('lang-' + lang)) {
+            li.style.display = '';
+          } else {
+            li.style.display = 'none';
+          }
+        }
+      }
+    }
+  });
+}
+</script>
 
 
 
