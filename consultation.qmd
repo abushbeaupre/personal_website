@@ -183,38 +183,39 @@ function filterTOC(lang) {
     const href = link.getAttribute('href') || '';
     const text = link.textContent.toLowerCase();
     
-    // French section identifiers
+    // French section identifiers (including accented characters)
     const frenchSections = [
       'réserver-une-consultation',
+      'réserver',
       'comment-je-peux-aider',
       'avant-votre-consultation', 
       'planifier-votre-rencontre',
+      'planifier',
       'partager-vos-fichiers',
+      'partager',
       'contact-alternatif',
+      'alternatif',
       'bienvenue'
     ];
     
-    const isFrench = frenchSections.some(section => href.includes(section));
+    // English section identifiers
+    const englishSections = [
+      'book-a-consultation',
+      'what-i-can-help-with',
+      'before-your-consultation',
+      'schedule-your-meeting',
+      'share-your-files',
+      'alternative-contact',
+      'welcome'
+    ];
+    
+    const isFrench = frenchSections.some(section => href.includes(section) || text.includes(section));
+    const isEnglish = englishSections.some(section => href.includes(section));
     
     if (lang === 'en' && isFrench) {
       li.style.display = 'none';
-    } else if (lang === 'fr' && !isFrench) {
-      // Hide English items when French is selected
-      const englishSections = [
-        'book-a-consultation',
-        'what-i-can-help-with',
-        'before-your-consultation',
-        'schedule-your-meeting',
-        'share-your-files',
-        'alternative-contact',
-        'welcome'
-      ];
-      const isEnglish = englishSections.some(section => href.includes(section));
-      if (isEnglish) {
-        li.style.display = 'none';
-      } else {
-        li.style.display = '';
-      }
+    } else if (lang === 'fr' && isEnglish) {
+      li.style.display = 'none';
     } else {
       li.style.display = '';
     }
