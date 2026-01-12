@@ -130,3 +130,78 @@ If you prefer to email me directly to discuss your needs before scheduling, you 
 
 Si vous préférez m'envoyer un courriel directement pour discuter de vos besoins avant de planifier une rencontre, vous pouvez me joindre à allen.bush-beaupre@usherbrooke.ca
 :::
+
+```{=html}
+<script>
+// Language toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  // Wait a bit for Quarto to finish rendering the TOC
+  setTimeout(function() {
+    let currentLang = localStorage.getItem('language') || 'en';
+    setLanguage(currentLang);
+  }, 100);
+  
+  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const lang = this.dataset.lang;
+      setLanguage(lang);
+      localStorage.setItem('language', lang);
+    });
+  });
+});
+
+function setLanguage(lang) {
+  // Hide all language content
+  document.querySelectorAll('.lang-en, .lang-fr').forEach(el => {
+    el.style.display = 'none';
+  });
+  
+  // Show selected language content
+  document.querySelectorAll('.lang-' + lang).forEach(el => {
+    el.style.display = 'block';
+  });
+  
+  // Update active button state
+  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.lang === lang) {
+      btn.classList.add('active');
+    }
+  });
+  
+  // Update table of contents
+  updateTOC(lang);
+}
+
+function updateTOC(lang) {
+  // Get all TOC links - try multiple selectors
+  const tocLinks = document.querySelectorAll('nav[role="doc-toc"] a, #TOC a, .sidebar-navigation a');
+  
+  tocLinks.forEach(link => {
+    const href = link.getAttribute('href');
+    if (!href || !href.startsWith('#')) return;
+    
+    const targetId = href.substring(1);
+    const targetElement = document.getElementById(targetId);
+    
+    if (targetElement) {
+      // Check if target element has a language class
+      const hasLangClass = targetElement.classList.contains('lang-en') || 
+                          targetElement.classList.contains('lang-fr');
+      
+      if (hasLangClass) {
+        const li = link.closest('li');
+        if (li) {
+          // Show/hide based on current language
+          if (targetElement.classList.contains('lang-' + lang)) {
+            li.style.display = '';
+          } else {
+            li.style.display = 'none';
+          }
+        }
+      }
+    }
+  });
+}
+</script>
+```
