@@ -1,3 +1,4 @@
+<script>
 // Language toggle functionality
 document.addEventListener('DOMContentLoaded', function() {
   // Get saved language preference or default to English
@@ -35,3 +36,4 @@ function setLanguage(lang) {
     btn.classList.add('active');
   });
 }
+</script>
