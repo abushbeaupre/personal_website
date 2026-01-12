@@ -194,8 +194,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>
 // Language toggle functionality
 document.addEventListener('DOMContentLoaded', function() {
-  let currentLang = localStorage.getItem('language') || 'en';
-  setLanguage(currentLang);
+  // Wait a bit for Quarto to finish rendering the TOC
+  setTimeout(function() {
+    let currentLang = localStorage.getItem('language') || 'en';
+    setLanguage(currentLang);
+  }, 100);
   
   document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -230,22 +233,24 @@ function setLanguage(lang) {
 }
 
 function updateTOC(lang) {
-  // Get all TOC links
-  const tocLinks = document.querySelectorAll('#TOC nav ul li a');
+  // Get all TOC links - try multiple selectors
+  const tocLinks = document.querySelectorAll('nav[role="doc-toc"] a, #TOC a, .sidebar-navigation a');
   
   tocLinks.forEach(link => {
-    const li = link.parentElement;
-    const targetId = link.getAttribute('href')?.substring(1);
+    const href = link.getAttribute('href');
+    if (!href || !href.startsWith('#')) return;
     
-    if (targetId) {
-      const targetElement = document.getElementById(targetId);
+    const targetId = href.substring(1);
+    const targetElement = document.getElementById(targetId);
+    
+    if (targetElement) {
+      // Check if target element has a language class
+      const hasLangClass = targetElement.classList.contains('lang-en') || 
+                          targetElement.classList.contains('lang-fr');
       
-      if (targetElement) {
-        // Check if target element has a language class
-        const hasLangClass = targetElement.classList.contains('lang-en') || 
-                            targetElement.classList.contains('lang-fr');
-        
-        if (hasLangClass) {
+      if (hasLangClass) {
+        const li = link.closest('li');
+        if (li) {
           // Show/hide based on current language
           if (targetElement.classList.contains('lang-' + lang)) {
             li.style.display = '';
