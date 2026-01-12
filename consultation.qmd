@@ -183,12 +183,17 @@ function updateTOC(lang) {
   const tocLinks = document.querySelectorAll('nav[role="doc-toc"] a, #TOC a, .sidebar-navigation a');
   console.log('Found TOC links:', tocLinks.length);
   
-  tocLinks.forEach(link => {
+  tocLinks.forEach((link, index) => {
     const href = link.getAttribute('href');
-    if (!href || !href.startsWith('#')) return;
+    console.log('Link', index, 'href:', href);
+    if (!href || !href.startsWith('#')) {
+      console.log('Skipping link', index, '- invalid href');
+      return;
+    }
     
     const targetId = href.substring(1);
     const targetElement = document.getElementById(targetId);
+    console.log('Looking for element with id:', targetId, 'found:', !!targetElement);
     
     if (targetElement) {
       // Check if target element has a language class
