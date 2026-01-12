@@ -2,15 +2,14 @@
 title: "Consultations CREUS"
 ---
 
-<div class="lang-toggle">
-  <button class="lang-toggle-btn active" data-lang="en">English</button>
-  <button class="lang-toggle-btn" data-lang="fr">Français</button>
-</div>
+::: lang-toggle
+<button class="lang-toggle-btn active" data-lang="en">English</button> <button class="lang-toggle-btn" data-lang="fr">Français</button>
+:::
 
-::: {.lang-en}
+::: lang-en
 ## Book a Consultation {.lang-en}
 
-I provide statistical consulting services for graduate students and researchers in the Ecology department. Whether you need help with study design, data analysis, or interpreting results, I'm here to assist.
+I provide statistical consulting services for graduate students and researchers members of the Centre de Recherche en Écologie de l'Université de Sherbrooke ([CREUS](https://creus-recherche.weebly.com/)). Whether you need help with study design, data analysis, or interpreting results, I'm here to assist.
 
 ### What I Can Help With {.lang-en}
 
@@ -29,15 +28,15 @@ Please prepare:
 -   Any relevant code or output (if applicable)
 :::
 
-::: {.lang-fr}
+::: lang-fr
 ## Réserver une consultation {.lang-fr}
 
-J'offre des services de consultation statistique aux étudiants diplômés et aux chercheurs du département d'Écologie. Que vous ayez besoin d'aide pour la conception d'étude, l'analyse de données ou l'interprétation des résultats, je suis là pour vous aider.
+J'offre des services de consultation statistique aux étudiants diplômés et aux chercheurs membres du members of the Centre de Recherche en Écologie de l'Université de Sherbrooke ([CREUS](https://creus-recherche.weebly.com/)). Que vous ayez besoin d'aide pour la conception d'étude, l'analyse de données ou l'interprétation des résultats, je suis là pour vous aider.
 
 ### Comment je peux aider {.lang-fr}
 
 -   **Conception d'étude**: Analyse de puissance, stratégies d'échantillonnage, plan expérimental
--   **Analyse de données**: GLM/GLMM, analyse de cheminement, statistiques multivariées, méthodes bayésiennes
+-   **Analyse de données**: GLM/GLMM, GAM/GAMM, analyses de pistes, méthodes bayésiennes
 -   **Programmation R**: Manipulation de données, visualisation, flux de travail reproductibles
 -   **Interprétation des résultats**: Comprendre les sorties de modèle, tailles d'effet, diagnostics
 
@@ -53,32 +52,37 @@ Veuillez préparer:
 
 ------------------------------------------------------------------------
 
-::: {.lang-en}
+::: lang-en
 ## Schedule Your Meeting {.lang-en}
 
 Click the button below to open the booking calendar in a new window. You'll be able to answer a few questions about your needs and schedule a time that works for you. The intake questions will help me prepare for our meeting.
 :::
 
-::: {.lang-fr}
+::: lang-fr
 ## Planifier votre rencontre {.lang-fr}
 
 Cliquez sur le bouton ci-dessous pour ouvrir le calendrier de réservation dans une nouvelle fenêtre. Vous pourrez répondre à quelques questions sur vos besoins et planifier un moment qui vous convient. Les questions d'admission m'aideront à préparer notre rencontre.
 :::
 
 ::: {style="text-align: center; padding: 3rem; background-color: #f8f9fa; border-radius: 8px; margin: 2rem 0;"}
-<a href='https://outlook.office.com/book/Consultationsstatistiquesrencontreinitiale@USherbrooke.onmicrosoft.com/' target="_blank" rel="noopener noreferrer" style='display: inline-block; padding: 15px 40px; background-color: #0078d4; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 1.2em; box-shadow: 0 2px 8px rgba(0,120,212,0.3);'><span class="lang-en">📅 Book Your Consultation</span><span class="lang-fr">📅 Réserver votre consultation</span></a>
+<a href='https://outlook.office.com/book/Consultationsstatistiquesrencontreinitiale@USherbrooke.onmicrosoft.com/' target="_blank" rel="noopener noreferrer" style='display: inline-block; padding: 15px 40px; background-color: #0078d4; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 1.2em; box-shadow: 0 2px 8px rgba(0,120,212,0.3);'>[📅 Book Your Consultation]{.lang-en}[📅 Réserver votre consultation]{.lang-fr}</a>
 
 <p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;" class="lang-en">
+
 The booking page will open in a new window
+
 </p>
+
 <p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;" class="lang-fr">
+
 La page de réservation s'ouvrira dans une nouvelle fenêtre
+
 </p>
 :::
 
 ------------------------------------------------------------------------
 
-::: {.lang-en}
+::: lang-en
 ## Share Your Files {.lang-en}
 
 If you have data files, code, or documents you'd like me to review before our meeting, you can upload them securely using the button below. Files will be saved directly to my Dropbox.
@@ -92,7 +96,7 @@ If you have data files, code, or documents you'd like me to review before our me
 -   Any other relevant documents
 :::
 
-::: {.lang-fr}
+::: lang-fr
 ## Partager vos fichiers {.lang-fr}
 
 Si vous avez des fichiers de données, du code ou des documents que vous aimeriez que je révise avant notre rencontre, vous pouvez les télécharger en toute sécurité en utilisant le bouton ci-dessous. Les fichiers seront sauvegardés directement dans mon Dropbox.
@@ -107,28 +111,215 @@ Si vous avez des fichiers de données, du code ou des documents que vous aimerie
 :::
 
 ::: {style="text-align: center; padding: 3rem; background-color: #e8f4f8; border-radius: 8px; margin: 2rem 0;"}
-<a href='https://www.dropbox.com/request/qyN8JJ6VWFYd64E9fbTd' target="_blank" rel="noopener noreferrer" style='display: inline-block; padding: 15px 40px; background-color: #0061ff; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 1.2em; box-shadow: 0 2px 8px rgba(0,97,255,0.3);'><span class="lang-en">📤 Upload Files to Dropbox</span><span class="lang-fr">📤 Télécharger des fichiers sur Dropbox</span></a>
+<a href='https://www.dropbox.com/request/qyN8JJ6VWFYd64E9fbTd' target="_blank" rel="noopener noreferrer" style='display: inline-block; padding: 15px 40px; background-color: #0061ff; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 1.2em; box-shadow: 0 2px 8px rgba(0,97,255,0.3);'>[📤 Upload Files to Dropbox]{.lang-en}[📤 Télécharger des fichiers sur Dropbox]{.lang-fr}</a>
 
 <p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;" class="lang-en">
+
 No Dropbox account required • Files are uploaded securely
+
 </p>
+
 <p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;" class="lang-fr">
+
 Aucun compte Dropbox requis • Les fichiers sont téléchargés en toute sécurité
+
 </p>
 :::
 
 ------------------------------------------------------------------------
 
 ::: {.lang-en}
-### Alternative Contact {.lang-en}
+## Sharing Your Code With Me {.lang-en}
 
-If you prefer to email me directly to discuss your needs before scheduling, you can reach me at [allen.bush-beaupre@usherbrooke.ca](mailto:allen.bush-beaupre@usherbrooke.ca)
+### How to Structure Your Code
+
+A well-organized document helps me understand your research question, data, and analysis quickly, allowing me to provide better feedback.
+
+**Key Elements of Good Code Structure:**
+
+1. **Clear introduction** stating your research question
+2. **Load packages** at the beginning
+3. **Data exploration** before analysis
+4. **Commented code** explaining your thinking
+5. **Interpret results** in plain language
+
+### What are Quarto and R Markdown?
+
+**Quarto** and **R Markdown** are document formats that combine text (like a Word document) with executable R code. They're perfect for reproducible analyses because:
+
+- Your code and explanations live in the same document
+- You can re-run analyses with one click
+- Outputs (plots, tables, statistics) are automatically updated
+- You can share as HTML, PDF, or Word documents
+
+#### Quarto vs R Markdown - Which Should I Use?
+
+Both work great! The main differences:
+
+- **R Markdown (.Rmd)**: The older, well-established format - requires `rmarkdown` package
+- **Quarto (.qmd)**: The newer format - works with R, Python, Julia, and more - doesn't require extra R packages
+
+**For consultations, either format is fine!** Use whichever you're comfortable with.
+
+#### How to Create a Quarto/R Markdown Document
+
+**In RStudio:**
+
+1. File → New File → Quarto Document (or R Markdown)
+2. Give it a title and author
+3. Choose HTML as output format
+4. Click "Create"
+
+#### How to Render to HTML
+
+Once you've written your document, you need to "render" it to create the HTML output:
+
+**Method 1: Click the Render/Knit button**
+- Quarto: Click the **"Render"** button at the top of the editor
+- R Markdown: Click the **"Knit"** button at the top of the editor
+
+**Method 2: Use the console**
+```r
+# For Quarto documents (.qmd)
+quarto::quarto_render("your_file.qmd")
+
+# For R Markdown documents (.Rmd)
+rmarkdown::render("your_file.Rmd")
+```
+
+#### What to Send Me
+
+When sharing your analysis for consultation, please send me **both**:
+
+1. **The source file** (.qmd or .Rmd) - so I can see your code
+2. **The rendered HTML** (.html) - so I can view your results without running the code
+
+This way, I can review your outputs and dive into your code if needed!
+
+### Tips for Your Code
+
+✅ **DO:**
+
+- Start with a clear research question
+- Load all packages at the top
+- Comment your code liberally
+- Visualize before analyzing
+- Check model assumptions
+- Interpret results in plain language
+
+❌ **DON'T:**
+
+- Run analyses without exploring the data first
+- Forget to check model diagnostics
+- Leave code without comments
+- Skip interpretation of statistical outputs
+- Send code that doesn't run!
+
+For a complete example of well-structured code, see the [Code Structure Tutorial](code_structure_tutorial.html).
 :::
 
 ::: {.lang-fr}
+## Partager votre code avec moi {.lang-fr}
+
+### Comment structurer votre code
+
+Un document bien organisé m'aide à comprendre rapidement votre question de recherche, vos données et votre analyse, ce qui me permet de fournir de meilleurs commentaires.
+
+**Éléments clés d'une bonne structure de code :**
+
+1. **Introduction claire** énonçant votre question de recherche
+2. **Charger les packages** au début
+3. **Exploration des données** avant l'analyse
+4. **Code commenté** expliquant votre raisonnement
+5. **Interpréter les résultats** en langage simple
+
+### Qu'est-ce que Quarto et R Markdown?
+
+**Quarto** et **R Markdown** sont des formats de documents qui combinent du texte (comme un document Word) avec du code R exécutable. Ils sont parfaits pour les analyses reproductibles car :
+
+- Votre code et vos explications sont dans le même document
+- Vous pouvez relancer les analyses en un clic
+- Les résultats (graphiques, tableaux, statistiques) sont automatiquement mis à jour
+- Vous pouvez partager au format HTML, PDF ou Word
+
+#### Quarto vs R Markdown - Lequel utiliser?
+
+Les deux fonctionnent très bien! Les principales différences :
+
+- **R Markdown (.Rmd)**: Le format plus ancien et bien établi - nécessite le package `rmarkdown`
+- **Quarto (.qmd)**: Le format plus récent - fonctionne avec R, Python, Julia, et plus - ne nécessite pas de packages R supplémentaires
+
+**Pour les consultations, les deux formats conviennent!** Utilisez celui avec lequel vous êtes à l'aise.
+
+#### Comment créer un document Quarto/R Markdown
+
+**Dans RStudio:**
+
+1. File → New File → Quarto Document (ou R Markdown)
+2. Donnez-lui un titre et un auteur
+3. Choisissez HTML comme format de sortie
+4. Cliquez sur "Create"
+
+#### Comment générer en HTML
+
+Une fois que vous avez écrit votre document, vous devez le "rendre" pour créer la sortie HTML :
+
+**Méthode 1: Cliquez sur le bouton Render/Knit**
+- Quarto: Cliquez sur le bouton **"Render"** en haut de l'éditeur
+- R Markdown: Cliquez sur le bouton **"Knit"** en haut de l'éditeur
+
+**Méthode 2: Utilisez la console**
+```r
+# Pour les documents Quarto (.qmd)
+quarto::quarto_render("votre_fichier.qmd")
+
+# Pour les documents R Markdown (.Rmd)
+rmarkdown::render("votre_fichier.Rmd")
+```
+
+#### Quoi m'envoyer
+
+Lors du partage de votre analyse pour consultation, veuillez m'envoyer **les deux** :
+
+1. **Le fichier source** (.qmd ou .Rmd) - pour que je puisse voir votre code
+2. **Le HTML rendu** (.html) - pour que je puisse voir vos résultats sans exécuter le code
+
+De cette façon, je peux examiner vos résultats et explorer votre code si nécessaire!
+
+### Conseils pour votre code
+
+✅ **À FAIRE:**
+
+- Commencer avec une question de recherche claire
+- Charger tous les packages en haut
+- Commenter votre code abondamment
+- Visualiser avant d'analyser
+- Vérifier les hypothèses du modèle
+- Interpréter les résultats en langage simple
+
+❌ **À NE PAS FAIRE:**
+
+- Exécuter des analyses sans explorer les données d'abord
+- Oublier de vérifier les diagnostics du modèle
+- Laisser du code sans commentaires
+- Ignorer l'interprétation des résultats statistiques
+- Envoyer du code qui ne fonctionne pas!
+
+Pour un exemple complet de code bien structuré, consultez le [Tutoriel sur la structure du code](code_structure_tutorial.html).
+:::
+
+------------------------------------------------------------------------
+
+::: lang-en
+### Alternative Contact {.lang-en}
+
+If you prefer to email me directly to discuss your needs before scheduling, you can reach me at [allen.bush-beaupre\@usherbrooke.ca](mailto:allen.bush-beaupre@usherbrooke.ca)
+:::
+
+::: lang-fr
 ### Contact alternatif {.lang-fr}
 
-Si vous préférez m'envoyer un courriel directement pour discuter de vos besoins avant de planifier une rencontre, vous pouvez me joindre à [allen.bush-beaupre@usherbrooke.ca](mailto:allen.bush-beaupre@usherbrooke.ca)
+Si vous préférez m'envoyer un courriel directement pour discuter de vos besoins avant de planifier une rencontre, vous pouvez me joindre à [allen.bush-beaupre\@usherbrooke.ca](mailto:allen.bush-beaupre@usherbrooke.ca)
 :::
 
 ```{=html}

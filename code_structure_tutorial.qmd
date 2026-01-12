@@ -1,0 +1,259 @@
+---
+title: "How to Structure Your Code for Statistical Consultations"
+author: "Allen Bush-Beaupré"
+format: html
+editor: visual
+---
+
+## Introduction
+
+This document provides a template for structuring your R code when sharing analyses for statistical consultation. A well-organized document helps me understand your research question, data, and analysis quickly, allowing me to provide better feedback.
+
+### Key Elements of Good Code Structure:
+
+1.  **Clear introduction** stating your research question
+2.  **Load packages** at the beginning
+3.  **Data exploration** before analysis
+4.  **Commented code** explaining your thinking
+5.  **Interpret results** in plain language
+
+---
+
+## What are Quarto and R Markdown?
+
+**Quarto** and **R Markdown** are document formats that combine text (like a Word document) with executable R code. They're perfect for reproducible analyses because:
+
+- Your code and explanations live in the same document
+- You can re-run analyses with one click
+- Outputs (plots, tables, statistics) are automatically updated
+- You can share as HTML, PDF, or Word documents
+
+### Quarto vs R Markdown - Which Should I Use?
+
+Both work great! The main differences:
+
+- **R Markdown (.Rmd)**: The older, well-established format - requires `rmarkdown` package
+- **Quarto (.qmd)**: The newer format - works with R, Python, Julia, and more - doesn't require extra R packages
+
+**For consultations, either format is fine!** Use whichever you're comfortable with.
+
+### How to Create a Quarto/R Markdown Document
+
+**In RStudio:**
+
+1. File → New File → Quarto Document (or R Markdown)
+2. Give it a title and author
+3. Choose HTML as output format
+4. Click "Create"
+
+### How to Render to HTML
+
+Once you've written your document, you need to "render" it to create the HTML output:
+
+**Method 1: Click the Render/Knit button**
+- Quarto: Click the **"Render"** button at the top of the editor
+- R Markdown: Click the **"Knit"** button at the top of the editor
+
+**Method 2: Use the console**
+```r
+# For Quarto documents (.qmd)
+quarto::quarto_render("your_file.qmd")
+
+# For R Markdown documents (.Rmd)
+rmarkdown::render("your_file.Rmd")
+```
+
+**Method 3: Use the terminal**
+```bash
+# For Quarto documents
+quarto render your_file.qmd
+```
+
+### What to Send Me
+
+When sharing your analysis for consultation, please send me **both**:
+
+1. **The source file** (.qmd or .Rmd) - so I can see your code
+2. **The rendered HTML** (.html) - so I can view your results without running the code
+
+This way, I can review your outputs and dive into your code if needed!
+
+### Basic Document Structure
+
+Here's a minimal template to get you started:
+
+````markdown
+---
+title: "My Analysis Title"
+author: "Your Name"
+date: "2026-01-12"
+format: html
+---
+
+## Introduction
+
+What is your research question?
+
+## Load Packages
+
+```{{r}}
+library(tidyverse)
+```
+
+## Load Data
+
+```{{r}}
+my_data <- read_csv("data.csv")
+```
+
+## Analysis
+
+```{{r}}
+# Your analysis code here
+```
+
+## Results
+
+What do your results mean?
+````
+
+---
+
+## Example: Fiddler Crab Analysis
+
+Let's explore whether fiddler crabs follow **Bergmann's Rule** - the pattern where organisms at higher latitudes are larger than those at lower latitudes.
+
+### Research Question
+
+**Do Atlantic marsh fiddler crabs (*Minuca pugnax*) show larger body sizes at higher latitudes along the US Atlantic coast?**
+
+### Load Required Packages
+
+```{r setup, message=FALSE, warning=FALSE}
+library(lterdatasampler)  # Contains the pie_crab dataset
+library(tidyverse)         # For data manipulation and visualization
+library(broom)            # For tidy model outputs
+```
+
+### Load and Explore the Data
+
+```{r data-overview}
+# View the first few rows
+head(pie_crab)
+
+# Check structure
+str(pie_crab)
+
+# Summary statistics
+summary(pie_crab)
+```
+
+### Data Exploration: Visualize Relationships
+
+**Before running statistical tests, always visualize your data!**
+
+#### Relationship between latitude and water temperature
+
+```{r explore-temp}
+ggplot(data = pie_crab, aes(x = water_temp, y = latitude)) +
+  geom_point() +
+  labs(x = "Water Temperature (°C)",
+       y = "Latitude",
+       title = "Water temperature decreases at higher latitudes") +
+  theme_minimal()
+```
+
+#### Crab size distribution by latitude
+
+```{r explore-size}
+ggplot(data = pie_crab, aes(x = size, y = latitude, group = latitude)) +
+  geom_boxplot(aes(color = latitude)) +
+  labs(x = "Carapace Width (mm)",
+       y = "Latitude",
+       title = "Fiddler crab size appears to increase with latitude") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+**Observation:** The boxplots suggest that crab size increases at higher latitudes, consistent with Bergmann's Rule.
+
+### Statistical Analysis
+
+#### Simple Linear Regression
+
+Testing if latitude predicts crab size:
+
+```{r model}
+# Fit the model
+crab_model <- lm(size ~ latitude, data = pie_crab)
+
+# View results
+summary(crab_model)
+
+# Tidy output (optional but nice!)
+tidy(crab_model)
+```
+
+#### Model Diagnostics
+
+**Always check your model assumptions!**
+
+```{r diagnostics, fig.height=6}
+par(mfrow = c(2, 2))  # 2x2 plot layout
+plot(crab_model)
+```
+
+### Results Interpretation
+
+```{r results}
+# Extract key statistics
+model_stats <- glance(crab_model)
+coef_stats <- tidy(crab_model)
+
+# Print in plain language
+cat("Model Results:\n")
+cat("- Slope:", round(coef_stats$estimate[2], 3), "mm per degree latitude\n")
+cat("- P-value:", format(coef_stats$p.value[2], scientific = TRUE), "\n")
+cat("- R-squared:", round(model_stats$r.squared, 3), "\n")
+```
+
+**Interpretation:** For each 1-degree increase in latitude, crab carapace width increases by approximately 0.49 mm on average (p \< 0.001). Latitude explains about 35% of the variation in crab size. This supports Bergmann's Rule for this species.
+
+### Conclusions
+
+1.  **Fiddler crabs show larger body sizes at higher latitudes** along the US Atlantic coast
+2.  The relationship is statistically significant (p \< 0.001)
+3.  However, latitude only explains \~35% of size variation - other factors likely matter
+4.  Model diagnostics look reasonable (residuals appear normally distributed)
+
+### Next Steps (Optional)
+
+If I were to extend this analysis, I would:
+
+-   Test for non-linear relationships (e.g., quadratic terms)
+-   Include water temperature as a predictor
+-   Check for site-level effects (mixed models)
+-   Examine if the temperature-size rule applies
+
+------------------------------------------------------------------------
+
+## Tips for Your Own Code
+
+✅ **DO:**
+
+-   Start with a clear research question
+-   Load all packages at the top
+-   Comment your code liberally
+-   Visualize before analyzing
+-   Check model assumptions
+-   Interpret results in plain language
+
+❌ **DON'T:**
+
+-   Run analyses without exploring the data first
+-   Forget to check model diagnostics
+-   Leave code without comments
+-   Skip interpretation of statistical outputs
+-   Send code that doesn't run!
+
+------------------------------------------------------------------------
