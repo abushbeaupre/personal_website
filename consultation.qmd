@@ -2,6 +2,11 @@
 title: "Statistical Consultation"
 ---
 
+<div class="language-toggle-container">
+  <button class="lang-btn active" data-lang="en">English</button>
+  <button class="lang-btn" data-lang="fr">Français</button>
+</div>
+
 ::: {.lang-en}
 ## Book a Consultation
 

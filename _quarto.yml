@@ -13,8 +13,6 @@ website:
         file: index.qmd
       - consultation.qmd
       - posts.qmd
-    right:
-      - text: "<span class='lang-btn' data-lang='en'>EN</span> | <span class='lang-btn' data-lang='fr'>FR</span>"
     tools:
       - icon: github
         menu:

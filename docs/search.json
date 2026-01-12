@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Allen Bush-Beaupré",
     "section": "",
-    "text": "Welcome to my personal website!\nA bit about me:\nI am a research professional based in Sherbrooke, QC, CAN. I currently work for Marc Bélisle at Université de Sherbrooke and for Jade Savage at Bishop’s University. My work can be summarized as trying to apply statistical methods to research questions pertaining to agricultural entomology.\nMy work for Jade Savage focuses on Delia flies (D. antiqua, D. radicum, D. platura & D. florilega) for the Delia Project.\n\n\nBienvenue sur mon site web personnel!\nUn peu à propos de moi:\nJe suis un professionnel de recherche basé à Sherbrooke, QC, CAN. Je travaille actuellement pour Marc Bélisle à l’Université de Sherbrooke et pour Jade Savage à l’Université Bishop’s. Mon travail peut se résumer à l’application de méthodes statistiques aux questions de recherche en entomologie agricole.\nMon travail pour Jade Savage se concentre sur les mouches Delia (D. antiqua, D. radicum, D. platura & D. florilega) pour le Projet Delia."
+    "text": "English Français\n\n\nWelcome to my personal website!\nA bit about me:\nI am a research professional based in Sherbrooke, QC, CAN. I currently work for Marc Bélisle at Université de Sherbrooke and for Jade Savage at Bishop’s University. My work can be summarized as trying to apply statistical methods to research questions pertaining to agricultural entomology.\nMy work for Jade Savage focuses on Delia flies (D. antiqua, D. radicum, D. platura & D. florilega) for the Delia Project.\n\n\nBienvenue sur mon site web personnel!\nUn peu à propos de moi:\nJe suis un professionnel de recherche basé à Sherbrooke, QC, CAN. Je travaille actuellement pour Marc Bélisle à l’Université de Sherbrooke et pour Jade Savage à l’Université Bishop’s. Mon travail peut se résumer à l’application de méthodes statistiques aux questions de recherche en entomologie agricole.\nMon travail pour Jade Savage se concentre sur les mouches Delia (D. antiqua, D. radicum, D. platura & D. florilega) pour le Projet Delia."
   },
   {
     "objectID": "posts/indirect_effects/index.html",
@@ -32,14 +32,14 @@
     "href": "consultation.html",
     "title": "Statistical Consultation",
     "section": "",
-    "text": "I provide statistical consulting services for graduate students and researchers in the Ecology department. Whether you need help with study design, data analysis, or interpreting results, I’m here to assist.\n\n\n\nStudy Design: Power analysis, sampling strategies, experimental design\nData Analysis: GLM/GLMM, path analysis, multivariate statistics, Bayesian methods\nR Programming: Data wrangling, visualization, reproducible workflows\nResults Interpretation: Understanding model outputs, effect sizes, diagnostics\n\n\n\n\nPlease prepare:\n\nA brief description of your research question\nInformation about your data (sample size, variables, study design)\nSpecific questions or challenges you’re facing\nAny relevant code or output (if applicable)"
+    "text": "English Français"
   },
   {
     "objectID": "consultation.html#book-a-consultation",
     "href": "consultation.html#book-a-consultation",
     "title": "Statistical Consultation",
-    "section": "",
-    "text": "I provide statistical consulting services for graduate students and researchers in the Ecology department. Whether you need help with study design, data analysis, or interpreting results, I’m here to assist.\n\n\n\nStudy Design: Power analysis, sampling strategies, experimental design\nData Analysis: GLM/GLMM, path analysis, multivariate statistics, Bayesian methods\nR Programming: Data wrangling, visualization, reproducible workflows\nResults Interpretation: Understanding model outputs, effect sizes, diagnostics\n\n\n\n\nPlease prepare:\n\nA brief description of your research question\nInformation about your data (sample size, variables, study design)\nSpecific questions or challenges you’re facing\nAny relevant code or output (if applicable)"
+    "section": "Book a Consultation",
+    "text": "Book a Consultation\nI provide statistical consulting services for graduate students and researchers in the Ecology department. Whether you need help with study design, data analysis, or interpreting results, I’m here to assist.\n\nWhat I Can Help With\n\nStudy Design: Power analysis, sampling strategies, experimental design\nData Analysis: GLM/GLMM, path analysis, multivariate statistics, Bayesian methods\nR Programming: Data wrangling, visualization, reproducible workflows\nResults Interpretation: Understanding model outputs, effect sizes, diagnostics\n\n\n\nBefore Your Consultation\nPlease prepare:\n\nA brief description of your research question\nInformation about your data (sample size, variables, study design)\nSpecific questions or challenges you’re facing\nAny relevant code or output (if applicable)"
   },
   {
     "objectID": "consultation.html#réserver-une-consultation",

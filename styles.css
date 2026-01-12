@@ -1,20 +1,38 @@
 /* css styles */
 
-/* Language toggle buttons */
+/* Language toggle floating button */
+.language-toggle-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 1000;
+  background-color: white;
+  border-radius: 25px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  padding: 5px;
+  display: flex;
+  gap: 5px;
+}
+
 .lang-btn {
   cursor: pointer;
-  padding: 5px 10px;
-  border-radius: 4px;
+  padding: 8px 16px;
+  border-radius: 20px;
   transition: all 0.3s;
-  font-weight: normal;
+  font-weight: 500;
+  border: none;
+  background-color: transparent;
+  color: #666;
 }
 
 .lang-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #f0f0f0;
+  color: #333;
 }
 
 .lang-btn.active {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: #0078d4;
+  color: white;
   font-weight: bold;
 }
 
