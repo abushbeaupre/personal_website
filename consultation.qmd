@@ -2,7 +2,7 @@
 title: "Consultations CREUS"
 ---
 
-![](logo-cre-us_orig.jpg){fig-align="center" width="300"}
+[![](logo-cre-us_orig.jpg){fig-align="center" width="500"}](https://creus-recherche.weebly.com/)
 
 ::: lang-toggle
 <button class="lang-toggle-btn active" data-lang="en">English</button> <button class="lang-toggle-btn" data-lang="fr">Français</button>
