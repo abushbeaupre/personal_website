@@ -9,11 +9,17 @@ English
 
 </button>
 
-<button class="lang-toggle-btn" data-lang="fr">Français</button>
+<button class="lang-toggle-btn" data-lang="fr">
+
+Français
+
+</button>
 :::
 
 :::: lang-en
 ::: lang-en
+## Welcome
+
 I am a research scientist at [Université de Sherbrooke](https://www.usherbrooke.ca/) and [Bishop's University](https://www.ubishops.ca/), Sherbrooke, QC, CAN. During my MSc (2020-22), I developed an interest for quantitative methods that I now have the privilege to use in the different roles that I occupy.
 
 My study agricultural entomology with a focus on integrated pest management through a better understanding of insects' ecology. My work in [Jade Savage](https://qcbs.ca/member/?profile=57)'s lab (Bishop's University) is on the Delia project, studying root maggots (*Delia spp.* (Diptera : Anthomyiidae)) in partnership with [PRISME/Phytodata](https://prisme.ca/) and their [sterile fly program](https://prisme.ca/achat-de-mouches-steriles/). My work in [Marc Bélisle](https://www.cef-cfr.ca/pmwiki.php?n=Membres.MarcBelisle)'s lab (Université de Sherbrooke) is about applying statistical methods to the different projects going on in the lab (Tree Swallows and their ectoparasites, plant and insect phenology, butterfly inventories, pesticide contamination levels). My main project for this role, however, is on a project involving integrated pest management in lettuce crops ([click here](https://www.youtube.com/watch?v=xSJ8RlIjBXE&list=PLp-PVpJeuCjQq1MFk6Oh3_65q8jhgn3xr)to see our recent scientific mission in Europe).
