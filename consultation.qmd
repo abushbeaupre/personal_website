@@ -89,6 +89,15 @@ La page de réservation s'ouvrira dans une nouvelle fenêtre
 
 If you have data files, code, or documents you'd like me to review before our meeting, you can upload them securely using the button below. Files will be saved directly to my Dropbox.
 
+**File naming convention:**
+
+Please name your files using this format: **NAME_analysis_DATE**
+
+Examples:
+- `JohnSmith_analysis_2026-01-13.qmd`
+- `MarieDupont_analysis_2026-01-13.Rmd`
+- `JohnSmith_data_2026-01-13.csv`
+
 **What to share:**
 
 -   Data files (.csv, .xlsx, .txt, .rds, etc.)
@@ -102,6 +111,15 @@ If you have data files, code, or documents you'd like me to review before our me
 ## Partager vos fichiers {.lang-fr}
 
 Si vous avez des fichiers de données, du code ou des documents que vous aimeriez que je révise avant notre rencontre, vous pouvez les télécharger en toute sécurité en utilisant le bouton ci-dessous. Les fichiers seront sauvegardés directement dans mon Dropbox.
+
+**Convention de nommage des fichiers:**
+
+Veuillez nommer vos fichiers selon ce format: **NOM_analyse_DATE**
+
+Exemples:
+- `JohnSmith_analyse_2026-01-13.qmd`
+- `MarieDupont_analyse_2026-01-13.Rmd`
+- `JohnSmith_donnees_2026-01-13.csv`
 
 **Quoi partager:**
 
