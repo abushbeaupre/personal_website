@@ -119,3 +119,19 @@ h2 {
 .lang-fr {
   display: none;
 }
+
+/* Consultation page boxes - black text on light backgrounds */
+div[style*="background-color: #f8f9fa"],
+div[style*="background-color: #e8f4f8"] {
+  color: #000000 !important;
+}
+
+div[style*="background-color: #f8f9fa"] *,
+div[style*="background-color: #e8f4f8"] * {
+  color: #000000 !important;
+}
+
+div[style*="background-color: #f8f9fa"] p,
+div[style*="background-color: #e8f4f8"] p {
+  color: #666666 !important;
+}
