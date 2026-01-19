@@ -5,7 +5,12 @@ project:
 website:
   title: "Allen Bush-Beaupré"
   site-url: "https://www.allenbushbeaupre.com"
-  description: "Personal website of Allen Bush-Beaupré, PhD student in ecological statistics and agricultural entomology at Université de Sherbrooke"
+  description: "Personal website of Allen Bush-Beaupré, Research Scientist in ecological statistics and agricultural entomology at Université de Sherbrooke"
+  open-graph:
+    locale: en_US
+    site-name: "Allen Bush-Beaupré"
+    description: "Research Scientist in ecological statistics and agricultural entomology at Université de Sherbrooke. Research in integrated pest management, statistical modeling, and reproducible science."
+
   navbar:
     background: dark
     foreground: light
@@ -29,6 +34,10 @@ format:
     theme: cosmo
     css: styles.css
     toc: true
+    html-math-method: mathjax
+    author-meta: "Allen Bush-Beaupré"
+    keywords: "Allen Bush-Beaupré, ecological statistics, agricultural entomology, integrated pest management, Bayesian statistics, statistical consulting, GLMM, R programming, Université de Sherbrooke, CREUS"
+    lang: en
 
 editor: visual
 
