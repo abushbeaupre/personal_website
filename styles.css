@@ -18,7 +18,17 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   letter-spacing: 0.01em;
   line-height: 1.7;
-  color: var(--text-color);
+  color: #ffffff !important;
+}
+
+/* Force white text on all elements */
+body, p, div, span, li, td, th, dd, dt {
+  color: #ffffff !important;
+}
+
+/* Headers white text */
+h1, h2, h3, h4, h5, h6 {
+  color: #ffffff !important;
 }
 
 /* Accent color for links */
