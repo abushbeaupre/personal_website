@@ -215,25 +215,6 @@ When sharing your analysis for consultation, please send me **both**:
 
 This way, I can review your outputs and dive into your code if needed!
 
-### Tips for Your Code
-
-✅ **DO:**
-
--   Start with a clear research question
--   Load all packages at the top
--   Comment your code liberally
--   Visualize before analyzing
--   Check model assumptions
--   Interpret results in plain language
-
-❌ **DON'T:**
-
--   Run analyses without exploring the data first
--   Forget to check model diagnostics
--   Leave code without comments
--   Skip interpretation of statistical outputs
--   Send code that doesn't run!
-
 For a complete example of well-structured code, see the [Code Structure Tutorial](code_structure_tutorial.html).
 :::
 
