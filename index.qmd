@@ -9,7 +9,11 @@ English
 
 </button>
 
-<button class="lang-toggle-btn" data-lang="fr">Français</button>
+<button class="lang-toggle-btn" data-lang="fr">
+
+Français
+
+</button>
 :::
 
 :::: lang-en
@@ -33,6 +37,27 @@ J'étudie l'entomologie agricole avec un focus sur la lutte intégrée par une m
 
 Depuis 2026, je suis également chargé d'assister les membres du Centre de Recherche en Écologie de l'Université de Sherbrooke ([CREUS](https://creus-recherche.weebly.com/)) avec leurs analyses statistiques. Durant ces consultations, j'apprendrai inévitablement de nouvelles méthodes et créerai divers tutoriels. Ceux-ci seront disponibles sur [mon blog](posts.html). Si vous êtes membre du CREUS et souhaitez réserver une consultation avec moi, veuillez suivre les instructions sur la page [Consultations CREUS](consultation.html).
 :::
+
+------------------------------------------------------------------------
+
+::: {style="margin-top: 5rem;"}
+:::
+
+:::: lang-en
+::: lang-en
+## Use of Large Language Models
+
+I use large language models as a programming assistant to create this website and the templates for the tutorials and blog posts. All scientific material associated to my name is Human Generated, however.
+:::
+::::
+
+::: lang-fr
+## Utilisation des grands modèles de langage {.lang-fr}
+
+J'utilise les grands modèles de langage comme assistant de programmation pour créer ce site Web et les gabarits pour les tutoriels et les articles de blog. Tout le matériel scientifique associé à mon nom est cependant généré par un humain.
+:::
+
+------------------------------------------------------------------------
 
 ```{=html}
 <script>
