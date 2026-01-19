@@ -256,12 +256,15 @@ function filterTOC(lang) {
     if (!link) return;
     
     const href = link.getAttribute('href') || '';
+    const text = link.textContent || '';
     
-    const frenchSections = ['bienvenue', 'utilisation-des-grands-modèles-de-langage'];
-    const englishSections = ['welcome', 'use-of-large-language-models'];
+    const frenchSections = ['bienvenue', 'utilisation-des-grands-mod'];
+    const englishSections = ['welcome', 'use-of-large-language'];
     
-    const isFrench = frenchSections.some(section => href.includes(section));
-    const isEnglish = englishSections.some(section => href.includes(section));
+    const isFrench = frenchSections.some(section => href.includes(section)) || 
+                     text.toLowerCase().includes('utilisation des grands');
+    const isEnglish = englishSections.some(section => href.includes(section)) ||
+                      text.toLowerCase().includes('use of large language');
     
     if (lang === 'en' && isFrench) {
       li.style.display = 'none';
