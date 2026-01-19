@@ -4,6 +4,8 @@ project:
 
 website:
   title: "Allen Bush-Beaupré"
+  site-url: "https://www.allenbushbeaupre.com"
+  description: "Personal website of Allen Bush-Beaupré, PhD student in ecological statistics and agricultural entomology at Université de Sherbrooke"
   navbar:
     background: dark
     foreground: light
