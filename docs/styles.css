@@ -18,42 +18,45 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   letter-spacing: 0.01em;
   line-height: 1.7;
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
-/* Force white text on all elements */
-body, p, div, span, li, td, th, dd, dt {
-  color: #ffffff !important;
+/* Main content area white text - but allow inline styles to override */
+#quarto-content {
+  color: #ffffff;
 }
 
-/* Exception: Light background boxes on consultation page get black text */
-body div[style*="background-color: #f8f9fa"],
-body div[style*="background-color: #e8f4f8"] {
-  color: #000000 !important;
-}
-
-body div[style*="background-color: #f8f9fa"] p,
-body div[style*="background-color: #f8f9fa"] span,
-body div[style*="background-color: #f8f9fa"] a,
-body div[style*="background-color: #e8f4f8"] p,
-body div[style*="background-color: #e8f4f8"] span,
-body div[style*="background-color: #e8f4f8"] a {
-  color: #000000 !important;
-}
-
-body div[style*="background-color: #f8f9fa"] p[style*="color"],
-body div[style*="background-color: #e8f4f8"] p[style*="color"] {
-  color: #666666 !important;
-}
-
-body div[style*="background-color: #f8f9fa"] a[style*="background-color: #0078d4"],
-body div[style*="background-color: #e8f4f8"] a[style*="background-color: #0061ff"] {
-  color: white !important;
+#quarto-content p,
+#quarto-content div,
+#quarto-content span,
+#quarto-content li,
+#quarto-content td,
+#quarto-content th,
+#quarto-content dd,
+#quarto-content dt {
+  color: inherit;
 }
 
 /* Headers white text */
 h1, h2, h3, h4, h5, h6 {
   color: #ffffff !important;
+}
+
+/* Light background boxes: override to force dark text */
+div[style*="background-color: #f8f9fa"],
+div[style*="background-color: #e8f4f8"] {
+  color: #000000 !important;
+}
+
+div[style*="background-color: #f8f9fa"] *:not(a[style*="background-color"]),
+div[style*="background-color: #e8f4f8"] *:not(a[style*="background-color"]) {
+  color: inherit !important;
+}
+
+/* Blue button text stays white */
+a[style*="background-color: #0078d4"],
+a[style*="background-color: #0061ff"] {
+  color: white !important;
 }
 
 /* Accent color for links */
