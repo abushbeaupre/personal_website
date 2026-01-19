@@ -89,7 +89,7 @@ code {
   background: var(--card-bg);
   padding: 0.2em 0.4em;
   border-radius: 3px;
-  color: var(--tech-green);
+  color: #000000;
 }
 
 /* Headers with minimal styling */
