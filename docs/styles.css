@@ -127,20 +127,23 @@ h2 {
 
 .lang-toggle-btn {
   cursor: pointer;
-  padding: 4px 10px;
+  padding: 3px 8px;
   margin: 0 2px;
   border: 1px solid #8b0000;
   background: #8b0000;
   color: #ffffff;
   border-radius: 3px;
-  font-size: 0.75em;
+  font-size: 0.7em;
   font-family: monospace;
   transition: all 0.2s;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  width: 85px;
+  width: 80px;
   display: inline-block;
   text-align: center;
+  line-height: 1.2;
+  height: 24px;
+  vertical-align: middle;
 }
 
 .lang-toggle-btn:hover {
