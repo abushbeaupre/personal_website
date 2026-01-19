@@ -5,7 +5,13 @@ title: "Consultations CREUS"
 [![](logo-cre-us_orig.jpg){fig-align="center" width="500"}](https://creus-recherche.weebly.com/)
 
 ::: lang-toggle
-<button class="lang-toggle-btn active" data-lang="en">English</button> <button class="lang-toggle-btn" data-lang="fr">Français</button>
+<button class="lang-toggle-btn active" data-lang="en">
+
+English
+
+</button>
+
+<button class="lang-toggle-btn" data-lang="fr">Français</button>
 :::
 
 ::: lang-en
@@ -93,10 +99,7 @@ If you have data files, code, or documents you'd like me to review before our me
 
 Please name your files using this format: **NAME_analysis_DATE**
 
-Examples:
-- `JohnSmith_analysis_2026-01-13.qmd`
-- `MarieDupont_analysis_2026-01-13.Rmd`
-- `JohnSmith_data_2026-01-13.csv`
+Examples: - `JohnSmith_analysis_2026-01-13.qmd` - `MarieDupont_analysis_2026-01-13.Rmd` - `JohnSmith_data_2026-01-13.csv`
 
 **What to share:**
 
@@ -116,10 +119,7 @@ Si vous avez des fichiers de données, du code ou des documents que vous aimerie
 
 Veuillez nommer vos fichiers selon ce format: **NOM_analyse_DATE**
 
-Exemples:
-- `JohnSmith_analyse_2026-01-13.qmd`
-- `MarieDupont_analyse_2026-01-13.Rmd`
-- `JohnSmith_donnees_2026-01-13.csv`
+Exemples: - `JohnSmith_analyse_2026-01-13.qmd` - `MarieDupont_analyse_2026-01-13.Rmd` - `JohnSmith_donnees_2026-01-13.csv`
 
 **Quoi partager:**
 
@@ -148,7 +148,7 @@ Aucun compte Dropbox requis • Les fichiers sont téléchargés en toute sécur
 
 ------------------------------------------------------------------------
 
-::: {.lang-en}
+::: lang-en
 ## Sharing Your Code With Me {.lang-en}
 
 ### How to Structure Your Code
@@ -157,27 +157,27 @@ A well-organized document helps me understand your research question, data, and 
 
 **Key Elements of Good Code Structure:**
 
-1. **Clear introduction** stating your research question
-2. **Load packages** at the beginning
-3. **Data exploration** before analysis
-4. **Commented code** explaining your thinking
-5. **Interpret results** in plain language
+1.  **Clear introduction** stating your research question
+2.  **Load packages** at the beginning
+3.  **Data exploration** before analysis
+4.  **Commented code** explaining your thinking
+5.  **Interpret results** in plain language
 
 ### What are Quarto and R Markdown?
 
 **Quarto** and **R Markdown** are document formats that combine text (like a Word document) with executable R code. They're perfect for reproducible analyses because:
 
-- Your code and explanations live in the same document
-- You can re-run analyses with one click
-- Outputs (plots, tables, statistics) are automatically updated
-- You can share as HTML, PDF, or Word documents
+-   Your code and explanations live in the same document
+-   You can re-run analyses with one click
+-   Outputs (plots, tables, statistics) are automatically updated
+-   You can share as HTML, PDF, or Word documents
 
 #### Quarto vs R Markdown - Which Should I Use?
 
 Both work great! The main differences:
 
-- **R Markdown (.Rmd)**: The older, well-established format - requires `rmarkdown` package
-- **Quarto (.qmd)**: The newer format - works with R, Python, Julia, and more - doesn't require extra R packages
+-   **R Markdown (.Rmd)**: The older, well-established format - requires `rmarkdown` package
+-   **Quarto (.qmd)**: The newer format - works with R, Python, Julia, and more - doesn't require extra R packages
 
 **For consultations, either format is fine!** Use whichever you're comfortable with.
 
@@ -185,21 +185,20 @@ Both work great! The main differences:
 
 **In RStudio:**
 
-1. File → New File → Quarto Document (or R Markdown)
-2. Give it a title and author
-3. Choose HTML as output format
-4. Click "Create"
+1.  File → New File → Quarto Document (or R Markdown)
+2.  Give it a title and author
+3.  Choose HTML as output format
+4.  Click "Create"
 
 #### How to Render to HTML
 
 Once you've written your document, you need to "render" it to create the HTML output:
 
-**Method 1: Click the Render/Knit button**
-- Quarto: Click the **"Render"** button at the top of the editor
-- R Markdown: Click the **"Knit"** button at the top of the editor
+**Method 1: Click the Render/Knit button** - Quarto: Click the **"Render"** button at the top of the editor - R Markdown: Click the **"Knit"** button at the top of the editor
 
 **Method 2: Use the console**
-```r
+
+``` r
 # For Quarto documents (.qmd)
 quarto::quarto_render("your_file.qmd")
 
@@ -211,8 +210,8 @@ rmarkdown::render("your_file.Rmd")
 
 When sharing your analysis for consultation, please send me **both**:
 
-1. **The source file** (.qmd or .Rmd) - so I can see your code
-2. **The rendered HTML** (.html) - so I can view your results without running the code
+1.  **The source file** (.qmd or .Rmd) - so I can see your code
+2.  **The rendered HTML** (.html) - so I can view your results without running the code
 
 This way, I can review your outputs and dive into your code if needed!
 
@@ -220,25 +219,25 @@ This way, I can review your outputs and dive into your code if needed!
 
 ✅ **DO:**
 
-- Start with a clear research question
-- Load all packages at the top
-- Comment your code liberally
-- Visualize before analyzing
-- Check model assumptions
-- Interpret results in plain language
+-   Start with a clear research question
+-   Load all packages at the top
+-   Comment your code liberally
+-   Visualize before analyzing
+-   Check model assumptions
+-   Interpret results in plain language
 
 ❌ **DON'T:**
 
-- Run analyses without exploring the data first
-- Forget to check model diagnostics
-- Leave code without comments
-- Skip interpretation of statistical outputs
-- Send code that doesn't run!
+-   Run analyses without exploring the data first
+-   Forget to check model diagnostics
+-   Leave code without comments
+-   Skip interpretation of statistical outputs
+-   Send code that doesn't run!
 
 For a complete example of well-structured code, see the [Code Structure Tutorial](code_structure_tutorial.html).
 :::
 
-::: {.lang-fr}
+::: lang-fr
 ## Partager votre code avec moi {.lang-fr}
 
 ### Comment structurer votre code
@@ -247,27 +246,27 @@ Un document bien organisé m'aide à comprendre rapidement votre question de rec
 
 **Éléments clés d'une bonne structure de code :**
 
-1. **Introduction claire** énonçant votre question de recherche
-2. **Charger les packages** au début
-3. **Exploration des données** avant l'analyse
-4. **Code commenté** expliquant votre raisonnement
-5. **Interpréter les résultats** en langage simple
+1.  **Introduction claire** énonçant votre question de recherche
+2.  **Charger les packages** au début
+3.  **Exploration des données** avant l'analyse
+4.  **Code commenté** expliquant votre raisonnement
+5.  **Interpréter les résultats** en langage simple
 
 ### Qu'est-ce que Quarto et R Markdown?
 
 **Quarto** et **R Markdown** sont des formats de documents qui combinent du texte (comme un document Word) avec du code R exécutable. Ils sont parfaits pour les analyses reproductibles car :
 
-- Votre code et vos explications sont dans le même document
-- Vous pouvez relancer les analyses en un clic
-- Les résultats (graphiques, tableaux, statistiques) sont automatiquement mis à jour
-- Vous pouvez partager au format HTML, PDF ou Word
+-   Votre code et vos explications sont dans le même document
+-   Vous pouvez relancer les analyses en un clic
+-   Les résultats (graphiques, tableaux, statistiques) sont automatiquement mis à jour
+-   Vous pouvez partager au format HTML, PDF ou Word
 
 #### Quarto vs R Markdown - Lequel utiliser?
 
 Les deux fonctionnent très bien! Les principales différences :
 
-- **R Markdown (.Rmd)**: Le format plus ancien et bien établi - nécessite le package `rmarkdown`
-- **Quarto (.qmd)**: Le format plus récent - fonctionne avec R, Python, Julia, et plus - ne nécessite pas de packages R supplémentaires
+-   **R Markdown (.Rmd)**: Le format plus ancien et bien établi - nécessite le package `rmarkdown`
+-   **Quarto (.qmd)**: Le format plus récent - fonctionne avec R, Python, Julia, et plus - ne nécessite pas de packages R supplémentaires
 
 **Pour les consultations, les deux formats conviennent!** Utilisez celui avec lequel vous êtes à l'aise.
 
@@ -275,21 +274,20 @@ Les deux fonctionnent très bien! Les principales différences :
 
 **Dans RStudio:**
 
-1. File → New File → Quarto Document (ou R Markdown)
-2. Donnez-lui un titre et un auteur
-3. Choisissez HTML comme format de sortie
-4. Cliquez sur "Create"
+1.  File → New File → Quarto Document (ou R Markdown)
+2.  Donnez-lui un titre et un auteur
+3.  Choisissez HTML comme format de sortie
+4.  Cliquez sur "Create"
 
 #### Comment générer en HTML
 
 Une fois que vous avez écrit votre document, vous devez le "rendre" pour créer la sortie HTML :
 
-**Méthode 1: Cliquez sur le bouton Render/Knit**
-- Quarto: Cliquez sur le bouton **"Render"** en haut de l'éditeur
-- R Markdown: Cliquez sur le bouton **"Knit"** en haut de l'éditeur
+**Méthode 1: Cliquez sur le bouton Render/Knit** - Quarto: Cliquez sur le bouton **"Render"** en haut de l'éditeur - R Markdown: Cliquez sur le bouton **"Knit"** en haut de l'éditeur
 
 **Méthode 2: Utilisez la console**
-```r
+
+``` r
 # Pour les documents Quarto (.qmd)
 quarto::quarto_render("votre_fichier.qmd")
 
@@ -301,29 +299,10 @@ rmarkdown::render("votre_fichier.Rmd")
 
 Lors du partage de votre analyse pour consultation, veuillez m'envoyer **les deux** :
 
-1. **Le fichier source** (.qmd ou .Rmd) - pour que je puisse voir votre code
-2. **Le HTML rendu** (.html) - pour que je puisse voir vos résultats sans exécuter le code
+1.  **Le fichier source** (.qmd ou .Rmd) - pour que je puisse voir votre code
+2.  **Le HTML rendu** (.html) - pour que je puisse voir vos résultats sans exécuter le code
 
 De cette façon, je peux examiner vos résultats et explorer votre code si nécessaire!
-
-### Conseils pour votre code
-
-✅ **À FAIRE:**
-
-- Commencer avec une question de recherche claire
-- Charger tous les packages en haut
-- Commenter votre code abondamment
-- Visualiser avant d'analyser
-- Vérifier les hypothèses du modèle
-- Interpréter les résultats en langage simple
-
-❌ **À NE PAS FAIRE:**
-
-- Exécuter des analyses sans explorer les données d'abord
-- Oublier de vérifier les diagnostics du modèle
-- Laisser du code sans commentaires
-- Ignorer l'interprétation des résultats statistiques
-- Envoyer du code qui ne fonctionne pas!
 
 Pour un exemple complet de code bien structuré, consultez le [Tutoriel sur la structure du code](code_structure_tutorial.html).
 :::

@@ -17,23 +17,23 @@ This document provides a template for structuring your R code when sharing analy
 4.  **Commented code** explaining your thinking
 5.  **Interpret results** in plain language
 
----
+------------------------------------------------------------------------
 
 ## What are Quarto and R Markdown?
 
 **Quarto** and **R Markdown** are document formats that combine text (like a Word document) with executable R code. They're perfect for reproducible analyses because:
 
-- Your code and explanations live in the same document
-- You can re-run analyses with one click
-- Outputs (plots, tables, statistics) are automatically updated
-- You can share as HTML, PDF, or Word documents
+-   Your code and explanations live in the same document
+-   You can re-run analyses with one click
+-   Outputs (plots, tables, statistics) are automatically updated
+-   You can share as HTML, PDF, or Word documents
 
 ### Quarto vs R Markdown - Which Should I Use?
 
 Both work great! The main differences:
 
-- **R Markdown (.Rmd)**: The older, well-established format - requires `rmarkdown` package
-- **Quarto (.qmd)**: The newer format - works with R, Python, Julia, and more - doesn't require extra R packages
+-   **R Markdown (.Rmd)**: The older, well-established format - requires `rmarkdown` package
+-   **Quarto (.qmd)**: The newer format - works with R, Python, Julia, and more - doesn't require extra R packages
 
 **For consultations, either format is fine!** Use whichever you're comfortable with.
 
@@ -41,21 +41,20 @@ Both work great! The main differences:
 
 **In RStudio:**
 
-1. File → New File → Quarto Document (or R Markdown)
-2. Give it a title and author
-3. Choose HTML as output format
-4. Click "Create"
+1.  File → New File → Quarto Document (or R Markdown)
+2.  Give it a title and author
+3.  Choose HTML as output format
+4.  Click "Create"
 
 ### How to Render to HTML
 
 Once you've written your document, you need to "render" it to create the HTML output:
 
-**Method 1: Click the Render/Knit button**
-- Quarto: Click the **"Render"** button at the top of the editor
-- R Markdown: Click the **"Knit"** button at the top of the editor
+**Method 1: Click the Render/Knit button** - Quarto: Click the **"Render"** button at the top of the editor - R Markdown: Click the **"Knit"** button at the top of the editor
 
 **Method 2: Use the console**
-```r
+
+``` r
 # For Quarto documents (.qmd)
 quarto::quarto_render("your_file.qmd")
 
@@ -64,7 +63,8 @@ rmarkdown::render("your_file.Rmd")
 ```
 
 **Method 3: Use the terminal**
-```bash
+
+``` bash
 # For Quarto documents
 quarto render your_file.qmd
 ```
@@ -73,8 +73,8 @@ quarto render your_file.qmd
 
 When sharing your analysis for consultation, please send me **both**:
 
-1. **The source file** (.qmd or .Rmd) - so I can see your code
-2. **The rendered HTML** (.html) - so I can view your results without running the code
+1.  **The source file** (.qmd or .Rmd) - so I can see your code
+2.  **The rendered HTML** (.html) - so I can view your results without running the code
 
 This way, I can review your outputs and dive into your code if needed!
 
@@ -82,7 +82,7 @@ This way, I can review your outputs and dive into your code if needed!
 
 Here's a minimal template to get you started:
 
-````markdown
+```` markdown
 ---
 title: "My Analysis Title"
 author: "Your Name"
@@ -117,7 +117,7 @@ my_data <- read_csv("data.csv")
 What do your results mean?
 ````
 
----
+------------------------------------------------------------------------
 
 ## Example: Fiddler Crab Analysis
 
@@ -237,23 +237,4 @@ If I were to extend this analysis, I would:
 
 ------------------------------------------------------------------------
 
-## Tips for Your Own Code
-
-✅ **DO:**
-
--   Start with a clear research question
--   Load all packages at the top
--   Comment your code liberally
--   Visualize before analyzing
--   Check model assumptions
--   Interpret results in plain language
-
-❌ **DON'T:**
-
--   Run analyses without exploring the data first
--   Forget to check model diagnostics
--   Leave code without comments
--   Skip interpretation of statistical outputs
--   Send code that doesn't run!
-
-------------------------------------------------------------------------
+##
