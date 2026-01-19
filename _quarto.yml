@@ -31,13 +31,18 @@ website:
 
 format:
   html:
-    theme: cosmo
+    theme: slate
     css: styles.css
     toc: true
     html-math-method: mathjax
     author-meta: "Allen Bush-Beaupré"
     keywords: "Allen Bush-Beaupré, ecological statistics, agricultural entomology, integrated pest management, Bayesian statistics, statistical consulting, GLMM, R programming, Université de Sherbrooke, CREUS"
     lang: en
+    mainfont: "system-ui, -apple-system, sans-serif"
+    monofont: "Fira Code, Monaco, Consolas, monospace"
+    fontsize: 1.05em
+    code-block-bg: true
+    code-block-border-left: "#00d9ff"
 
 editor: visual
 
