@@ -293,27 +293,35 @@ function setLanguage(lang) {
 }
 
 function filterTOC(lang) {
-  const tocItems = document.querySelectorAll('#TOC li');
+  const toc = document.querySelector('#TOC');
+  if (!toc) return;
+  
+  const tocItems = toc.querySelectorAll('li');
   
   tocItems.forEach(li => {
     const link = li.querySelector('a');
     if (!link) return;
     
     const href = link.getAttribute('href') || '';
-    
-    // Check if the section has a language class
     const targetId = href.replace('#', '');
     const targetElement = document.getElementById(targetId);
     
     if (!targetElement) return;
     
     // Check if this heading has a language class
-    if (targetElement.classList.contains('lang-en') || targetElement.classList.contains('lang-fr')) {
+    const hasEnglish = targetElement.classList.contains('lang-en');
+    const hasFrench = targetElement.classList.contains('lang-fr');
+    
+    if (hasEnglish || hasFrench) {
+      // This is a language-specific section
       if (targetElement.classList.contains('lang-' + lang)) {
-        li.style.display = 'block';
+        li.style.display = 'list-item';
       } else {
         li.style.display = 'none';
       }
+    } else {
+      // This is a non-language-specific section, always show
+      li.style.display = 'list-item';
     }
   });
 }
