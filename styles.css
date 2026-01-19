@@ -74,9 +74,15 @@ a:hover {
 /* Code blocks with tech aesthetic */
 pre {
   border-left: 3px solid var(--tech-cyan);
-  background: var(--darker-bg) !important;
+  background: #ffffff !important;
   border-radius: 4px;
   padding: 1rem;
+  color: #000000 !important;
+}
+
+pre code {
+  color: #000000 !important;
+  background: transparent !important;
 }
 
 code {
