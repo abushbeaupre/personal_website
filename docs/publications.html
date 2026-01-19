@@ -310,35 +310,38 @@ function setLanguage(lang) {
 }
 
 function filterTOC(lang) {
-  const toc = document.querySelector('#TOC');
-  if (!toc) return;
-  
-  const tocItems = toc.querySelectorAll('li');
+  // Get all TOC list items
+  const tocItems = document.querySelectorAll('#TOC li');
   
   tocItems.forEach(li => {
     const link = li.querySelector('a');
     if (!link) return;
     
     const href = link.getAttribute('href') || '';
-    const targetId = href.replace('#', '');
-    const targetElement = document.getElementById(targetId);
+    const text = link.textContent.toLowerCase();
     
-    if (!targetElement) return;
+    // French section identifiers (including accented characters)
+    const frenchSections = [
+      'articles-de-revues',
+      'articles-évalués-par-les-pairs',
+      'évalués'
+    ];
     
-    // Check if this heading has a language class
-    const hasEnglish = targetElement.classList.contains('lang-en');
-    const hasFrench = targetElement.classList.contains('lang-fr');
+    // English section identifiers
+    const englishSections = [
+      'journal-articles',
+      'peer-reviewed-articles'
+    ];
     
-    if (hasEnglish || hasFrench) {
-      // This is a language-specific section
-      if (targetElement.classList.contains('lang-' + lang)) {
-        li.style.display = 'list-item';
-      } else {
-        li.style.display = 'none';
-      }
+    const isFrench = frenchSections.some(section => href.includes(section) || text.includes(section));
+    const isEnglish = englishSections.some(section => href.includes(section));
+    
+    if (lang === 'en' && isFrench) {
+      li.style.display = 'none';
+    } else if (lang === 'fr' && isEnglish) {
+      li.style.display = 'none';
     } else {
-      // This is a non-language-specific section, always show
-      li.style.display = 'list-item';
+      li.style.display = '';
     }
   });
 }
