@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>About – Allen Bush-Beaupré</title>
+<title>publications_readme – Allen Bush-Beaupré</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -159,40 +159,85 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#publications-page---how-to-update" id="toc-publications-page---how-to-update" class="nav-link active" data-scroll-target="#publications-page---how-to-update">Publications Page - How to Update</a>
+  <ul class="collapse">
+  <li><a href="#adding-new-publications" id="toc-adding-new-publications" class="nav-link" data-scroll-target="#adding-new-publications">Adding New Publications</a></li>
+  <li><a href="#features-implemented" id="toc-features-implemented" class="nav-link" data-scroll-target="#features-implemented">Features Implemented</a></li>
+  <li><a href="#future-enhancement-automatic-orcid-integration" id="toc-future-enhancement-automatic-orcid-integration" class="nav-link" data-scroll-target="#future-enhancement-automatic-orcid-integration">Future Enhancement: Automatic ORCID Integration</a></li>
+  <li><a href="#rebuilding-the-site" id="toc-rebuilding-the-site" class="nav-link" data-scroll-target="#rebuilding-the-site">Rebuilding the Site</a></li>
+  <li><a href="#example-entry" id="toc-example-entry" class="nav-link" data-scroll-target="#example-entry">Example Entry</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">About</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
+<section id="publications-page---how-to-update" class="level1">
+<h1>Publications Page - How to Update</h1>
+<section id="adding-new-publications" class="level2">
+<h2 class="anchored" data-anchor-id="adding-new-publications">Adding New Publications</h2>
+<p>To add a new publication to your website, edit <code>/home/abush/working_vol/personal_website/personal_website/publications.qmd</code>:</p>
+<ol type="1">
+<li>Find the <code>pubs_data</code> section (around line 30-50)</li>
+<li>Add a new entry using this template:</li>
+</ol>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Full Article Title"</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">authors =</span> <span class="st">"Author1 Last F, Author2 Last F, Bush-Beaupré A, Author3 Last F"</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="st">"2025"</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">journal =</span> <span class="st">"Journal Name"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">doi =</span> <span class="st">"10.1234/example"</span>,  <span class="co"># Just the DOI number, not full URL</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">biorxiv =</span> <span class="st">"10.1101/2024.01.01.123456"</span>,  <span class="co"># Optional: only if you have a bioRxiv preprint</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">abstract =</span> <span class="st">"Brief description of your findings (optional)"</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  ),</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="features-implemented" class="level2">
+<h2 class="anchored" data-anchor-id="features-implemented">Features Implemented</h2>
+<p>✅ <strong>Automatic Name Bolding</strong>: Your name “Bush-Beaupré” is automatically bolded in the author list</p>
+<p>✅ <strong>bioRxiv Links</strong>: Add preprint DOIs and they’ll automatically link to bioRxiv</p>
+<p>✅ <strong>Bilingual Support</strong>: Publications appear in both English and French sections</p>
+<p>✅ <strong>Clean Formatting</strong>: Professional layout with proper styling</p>
+<p>✅ <strong>Multiple Links</strong>: Each publication shows: - Published version (DOI link) - bioRxiv preprint (if available) - Add to Zotero button</p>
+<p>✅ <strong>Journal Articles Only</strong>: Filtered to show only peer-reviewed journal articles</p>
+<p>✅ <strong>Automatic Sorting</strong>: Publications are automatically sorted by year (most recent first)</p>
+</section>
+<section id="future-enhancement-automatic-orcid-integration" class="level2">
+<h2 class="anchored" data-anchor-id="future-enhancement-automatic-orcid-integration">Future Enhancement: Automatic ORCID Integration</h2>
+<p>The ORCID public API requires complex parsing. For now, manually adding publications gives you full control over: - Author order and formatting - Which version (preprint vs published) to highlight - Abstract text - Links to code repositories (can be added to the template)</p>
+</section>
+<section id="rebuilding-the-site" class="level2">
+<h2 class="anchored" data-anchor-id="rebuilding-the-site">Rebuilding the Site</h2>
+<p>After updating publications, rebuild with:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /home/abush/working_vol/personal_website/personal_website</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render publications.qmd</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Or render the entire site:</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="example-entry" class="level2">
+<h2 class="anchored" data-anchor-id="example-entry">Example Entry</h2>
+<p>Here’s a complete example with all optional fields:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Impact of climate change on insect phenology in agricultural systems"</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">authors =</span> <span class="st">"Smith J, Johnson K, Bush-Beaupré A, Williams R"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="st">"2026"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">journal =</span> <span class="st">"Ecological Applications"</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">doi =</span> <span class="st">"10.1002/eap.2024"</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">biorxiv =</span> <span class="st">"10.1101/2025.12.15.648234"</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">abstract =</span> <span class="st">"We examined how climate warming affects the timing of pest insect emergence in temperate agricultural systems, finding significant shifts in phenology that could impact crop yields."</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  ),</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
-    
-  
-    
-  </div>
-  
 
-
-</header>
-
-
-<p>About this site</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
-</div>
-</div>
-
-
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
