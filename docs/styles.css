@@ -123,6 +123,7 @@ h2 {
 .lang-toggle {
   text-align: right;
   margin-bottom: 1rem;
+  white-space: nowrap;
 }
 
 .lang-toggle-btn {
