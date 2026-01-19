@@ -18,51 +18,83 @@ my_name <- "Bush-Beaupré"  # Used to bold your name in author lists
 # Helper function to bold author name
 bold_my_name <- function(authors, my_name) {
   if (is.na(authors) || authors == "") return(authors)
-  # Bold the author name (case-insensitive)
-  authors <- str_replace_all(authors, 
-                             regex(paste0("\\b(", my_name, "[^,;]*)\\b"), ignore_case = TRUE),
-                             "<strong>\\1</strong>")
+  # Bold variations of the author name
+  authors <- str_replace_all(authors, "Allen Bush-Beaupré", "<strong>Allen Bush-Beaupré</strong>")
+  authors <- str_replace_all(authors, "Allen Bush‐Beaupré", "<strong>Allen Bush-Beaupré</strong>")
   return(authors)
 }
 
-# Publication data - ADD YOUR PUBLICATIONS HERE
-# Copy this template for each publication:
-#   list(
-#     title = "Article Title",
-#     authors = "Last F, Last F, Bush-Beaupré A",  # Your name will be bolded automatically
-#     year = "2024",
-#     journal = "Journal Name",
-#     doi = "10.1234/example",  # Just the DOI, not full URL
-#     biorxiv = "10.1101/2024.01.01.123456",  # Optional: bioRxiv DOI if available
-#     abstract = "Brief description of the article"  # Optional
-#   ),
-
-pubs_data <- list(
-  list(
-    title = "Sterile insect technique reduces cabbage maggot (Diptera: Anthomyiidae) infestation in root crucifers in Canada",
-    authors = "Bush-Beaupré A, et al.",
-    year = "2025",
-    journal = "Journal of Economic Entomology",
-    doi = "10.1093/jee/toaf255",
-    biorxiv = "10.1101/2025.05.09.653057",
-    abstract = ""
-  ),
-  list(
-    title = "Reproductive compatibility of two lines of Delia platura",
-    authors = "Bush-Beaupré A, et al.",
-    year = "2024",
-    journal = "Entomologia Experimentalis et Applicata",
-    doi = "10.1111/eea.13468",
-    biorxiv = "10.1101/2023.08.01.551352",
-    abstract = ""
-  )
-) %>%
-  bind_rows() %>%
-  arrange(desc(year))
+# Load publications from automatically generated RDS file
+# To update: run process_orcid_simple.R to fetch latest from ORCID
+if (file.exists("orcid_publications.rds")) {
+  pubs_list <- readRDS("orcid_publications.rds")
+  
+  # Convert to data frame
+  pubs_data <- bind_rows(pubs_list)
+  
+  # Add bioRxiv links for known preprints
+  pubs_data$biorxiv <- NA_character_
+  pubs_data$biorxiv[pubs_data$doi == "10.1093/jee/toaf255"] <- "10.1101/2025.05.09.653057"
+  pubs_data$biorxiv[pubs_data$doi == "10.1111/eea.13468"] <- "10.1101/2023.08.01.551352"
+  pubs_data$biorxiv[pubs_data$doi == "10.4039/tce.2023.21"] <- "10.22541/au.166862709.99325814/v1"
+  
+  # Add abstract field (empty for now)
+  pubs_data$abstract <- NA_character_
+  
+  # Bold my name
+  pubs_data$authors <- sapply(pubs_data$authors, bold_my_name, my_name = my_name)
+  
+  # Convert year to numeric for sorting
+  pubs_data$year <- as.numeric(pubs_data$year)
+  
+  # Sort by year (most recent first)
+  pubs_data <- pubs_data %>% arrange(desc(year))
+  
+} else {
+  # Fallback: Manual publication list
+  pubs_data <- list(
+    list(
+      title = "Sterile insect technique reduces cabbage maggot (Diptera: Anthomyiidae) infestation in root crucifers in Canada",
+      authors = "Anne-Marie Fortier, Allen Bush-Beaupré, Jade Savage",
+      year = "2025",
+      journal = "Journal of Economic Entomology",
+      doi = "10.1093/jee/toaf255",
+      biorxiv = "10.1101/2025.05.09.653057"
+    ),
+    list(
+      title = "Reproductive compatibility of two lines of Delia platura",
+      authors = "Allen Bush-Beaupré, Jade Savage, Anne-Marie Fortier, François Fournier, Andrew MacDonald, Marc Bélisle",
+      year = "2024",
+      journal = "Entomologia Experimentalis et Applicata",
+      doi = "10.1111/eea.13468",
+      biorxiv = "10.1101/2023.08.01.551352"
+    ),
+    list(
+      title = "The effect of sex ratio and group density on the mating success of two lines of Delia platura (Diptera: Anthomyiidae)",
+      authors = "Allen Bush-Beaupré, Marc Bélisle, Anne-Marie Fortier, François Fournier, Jade Savage",
+      year = "2023",
+      journal = "The Canadian Entomologist",
+      doi = "10.4039/tce.2023.21",
+      biorxiv = "10.22541/au.166862709.99325814/v1"
+    )
+  ) %>%
+    bind_rows() %>%
+    mutate(year = as.numeric(year)) %>%
+    arrange(desc(year))
+  
+  # Bold my name in fallback data
+  pubs_data$authors <- sapply(pubs_data$authors, bold_my_name, my_name = my_name)
+}
 ```
 
 ::: lang-toggle
-<button class="lang-toggle-btn active" data-lang="en">English</button> <button class="lang-toggle-btn" data-lang="fr">Français</button>
+<button class="lang-toggle-btn active" data-lang="en">
+
+English
+
+</button>
+
+<button class="lang-toggle-btn" data-lang="fr">Français</button>
 :::
 
 ::: lang-en
@@ -140,7 +172,6 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
   cat("No publications found. Please check back later or visit my [ORCID profile](https://orcid.org/0000-0001-6989-9278).\n")
 }
 ```
-
 :::
 
 ::: lang-fr
@@ -218,7 +249,6 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
   cat("Aucune publication trouvée. Veuillez revenir plus tard ou visiter mon [profil ORCID](https://orcid.org/0000-0001-6989-9278).\n")
 }
 ```
-
 :::
 
 ```{=html}

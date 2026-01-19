@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Publications – Allen Bush-Beaupré</title>
+<title>publications_automation_readme – Allen Bush-Beaupré</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -93,7 +127,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./publications.html" aria-current="page"> 
+    <a class="nav-link" href="./publications.html"> 
 <span class="menu-text">Publications</span></a>
   </li>  
   <li class="nav-item">
@@ -130,13 +164,25 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#journal-articles" id="toc-journal-articles" class="nav-link active" data-scroll-target="#journal-articles">Journal Articles</a>
+  <li><a href="#automated-publication-management-with-orcid" id="toc-automated-publication-management-with-orcid" class="nav-link active" data-scroll-target="#automated-publication-management-with-orcid">Automated Publication Management with ORCID</a>
   <ul class="collapse">
-  <li><a href="#peer-reviewed-articles" id="toc-peer-reviewed-articles" class="nav-link" data-scroll-target="#peer-reviewed-articles">Peer-Reviewed Articles</a></li>
+  <li><a href="#how-it-works" id="toc-how-it-works" class="nav-link" data-scroll-target="#how-it-works">How It Works</a></li>
+  <li><a href="#files" id="toc-files" class="nav-link" data-scroll-target="#files">Files</a></li>
+  <li><a href="#api-credentials" id="toc-api-credentials" class="nav-link" data-scroll-target="#api-credentials">API Credentials</a></li>
+  <li><a href="#updating-publications" id="toc-updating-publications" class="nav-link" data-scroll-target="#updating-publications">Updating Publications</a>
+  <ul class="collapse">
+  <li><a href="#automatic-update-recommended" id="toc-automatic-update-recommended" class="nav-link" data-scroll-target="#automatic-update-recommended">Automatic Update (Recommended)</a></li>
+  <li><a href="#manual-update" id="toc-manual-update" class="nav-link" data-scroll-target="#manual-update">Manual Update</a></li>
   </ul></li>
-  <li><a href="#articles-de-revues" id="toc-articles-de-revues" class="nav-link" data-scroll-target="#articles-de-revues">Articles de revues</a>
+  <li><a href="#biorxiv-preprint-links" id="toc-biorxiv-preprint-links" class="nav-link" data-scroll-target="#biorxiv-preprint-links">bioRxiv Preprint Links</a></li>
+  <li><a href="#current-publications" id="toc-current-publications" class="nav-link" data-scroll-target="#current-publications">Current Publications</a></li>
+  <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a>
   <ul class="collapse">
-  <li><a href="#articles-évalués-par-les-pairs" id="toc-articles-évalués-par-les-pairs" class="nav-link" data-scroll-target="#articles-évalués-par-les-pairs">Articles évalués par les pairs</a></li>
+  <li><a href="#no-publications-showing" id="toc-no-publications-showing" class="nav-link" data-scroll-target="#no-publications-showing">No publications showing</a></li>
+  <li><a href="#author-names-not-showing-correctly" id="toc-author-names-not-showing-correctly" class="nav-link" data-scroll-target="#author-names-not-showing-correctly">Author names not showing correctly</a></li>
+  <li><a href="#new-publication-not-appearing" id="toc-new-publication-not-appearing" class="nav-link" data-scroll-target="#new-publication-not-appearing">New publication not appearing</a></li>
+  </ul></li>
+  <li><a href="#future-improvements" id="toc-future-improvements" class="nav-link" data-scroll-target="#future-improvements">Future Improvements</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -144,247 +190,114 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Publications</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<div class="lang-toggle">
-<button class="lang-toggle-btn active" data-lang="en">
-<p>English</p>
-</button>
-<button class="lang-toggle-btn" data-lang="fr">
-Français
-</button>
-</div>
-<section id="journal-articles" class="level2 lang-en">
-<h2 class="lang-en anchored" data-anchor-id="journal-articles">Journal Articles</h2>
-<p>My research focuses on agricultural entomology, integrated pest management, and ecological statistics. You can view my complete publication record on my <a href="https://orcid.org/0000-0001-6989-9278">ORCID profile</a>.</p>
-<section id="peer-reviewed-articles" class="level3 lang-en">
-<h3 class="lang-en anchored" data-anchor-id="peer-reviewed-articles">Peer-Reviewed Articles</h3>
-<div class="publication-entry">
-<div class="publication-title">
-Sterile insect technique reduces cabbage maggot (Diptera: Anthomyiidae) infestation in root crucifers in Canada
-</div>
-<div class="publication-authors">
-Anne-Marie Fortier, <strong><strong>Allen Bush-Beaupré</strong></strong>, Jade Savage
-</div>
-<div class="publication-details">
-2025 - <em>Journal of Economic Entomology</em>
-</div>
-<div class="publication-links">
-<p><a href="https://doi.org/10.1093/jee/toaf255">Published version</a> | <a href="https://doi.org/10.1101/2025.05.09.653057">bioRxiv preprint</a> | <a href="https://www.zotero.org/save?type=doi&amp;q=10.1093/jee/toaf255">Add to Zotero</a></p>
-</div>
-</div>
-<div class="publication-entry">
-<div class="publication-title">
-Reproductive compatibility of two lines of Delia platura
-</div>
-<div class="publication-authors">
-<strong><strong>Allen Bush-Beaupré</strong></strong>, Jade Savage, Anne‐Marie Fortier, François Fournier, Andrew MacDonald, Marc Bélisle
-</div>
-<div class="publication-details">
-2024 - <em>Entomologia Experimentalis et Applicata</em>
-</div>
-<div class="publication-links">
-<p><a href="https://doi.org/10.1111/eea.13468">Published version</a> | <a href="https://doi.org/10.1101/2023.08.01.551352">bioRxiv preprint</a> | <a href="https://www.zotero.org/save?type=doi&amp;q=10.1111/eea.13468">Add to Zotero</a></p>
-</div>
-</div>
-<div class="publication-entry">
-<div class="publication-title">
-The effect of sex ratio and group density on the mating success of two lines of Delia platura (Diptera: Anthomyiidae)
-</div>
-<div class="publication-authors">
-<strong><strong>Allen Bush-Beaupré</strong></strong>, Marc Bélisle, Anne-Marie Fortier, François Fournier, Jade Savage
-</div>
-<div class="publication-details">
-2023 - <em>The Canadian Entomologist</em>
-</div>
-<div class="publication-links">
-<p><a href="https://doi.org/10.4039/tce.2023.21">Published version</a> | <a href="https://doi.org/10.22541/au.166862709.99325814/v1">bioRxiv preprint</a> | <a href="https://www.zotero.org/save?type=doi&amp;q=10.4039/tce.2023.21">Add to Zotero</a></p>
-</div>
-</div>
+<section id="automated-publication-management-with-orcid" class="level1">
+<h1>Automated Publication Management with ORCID</h1>
+<p>This website automatically fetches your publications from ORCID using the public API.</p>
+<section id="how-it-works" class="level2">
+<h2 class="anchored" data-anchor-id="how-it-works">How It Works</h2>
+<p>The system: 1. Fetches your publication list from ORCID (ORCID ID: 0000-0001-6989-9278) 2. Filters for journal articles only 3. Gets complete author lists from CrossRef using DOIs 4. Automatically bolds your name in the author lists 5. Displays publications on your website with links to DOIs and preprints</p>
+</section>
+<section id="files" class="level2">
+<h2 class="anchored" data-anchor-id="files">Files</h2>
+<ul>
+<li><code>process_orcid_simple.R</code> - Main script that fetches publications from ORCID</li>
+<li><code>orcid_publications.rds</code> - Cached publication data (automatically generated)</li>
+<li><code>publications.qmd</code> - Quarto file that displays publications on your website</li>
+<li><code>orcid_raw_response.json</code> - Raw ORCID API response (for debugging)</li>
+</ul>
+</section>
+<section id="api-credentials" class="level2">
+<h2 class="anchored" data-anchor-id="api-credentials">API Credentials</h2>
+<p>Your ORCID API credentials are stored in the R scripts: - Client ID: <code>APP-RO85EC734G4T0RCB</code> - Client Secret: <code>13c16fee-86de-47a7-84bc-59cccf0c5283</code></p>
+<p><strong>Note:</strong> These credentials are for read-only public API access and can be safely committed to your repository.</p>
+</section>
+<section id="updating-publications" class="level2">
+<h2 class="anchored" data-anchor-id="updating-publications">Updating Publications</h2>
+<section id="automatic-update-recommended" class="level3">
+<h3 class="anchored" data-anchor-id="automatic-update-recommended">Automatic Update (Recommended)</h3>
+<p>To fetch the latest publications from ORCID:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /home/abush/working_vol/personal_website/personal_website</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> process_orcid_simple.R</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This will: 1. Fetch your current publication list from ORCID 2. Get complete author information from CrossRef 3. Update <code>orcid_publications.rds</code> 4. Re-render your website with updated publications</p>
+</section>
+<section id="manual-update" class="level3">
+<h3 class="anchored" data-anchor-id="manual-update">Manual Update</h3>
+<p>If you need to manually add or edit publications, you can modify the fallback section in <code>publications.qmd</code> (lines 41-77). This fallback data is only used if the <code>orcid_publications.rds</code> file doesn’t exist.</p>
 </section>
 </section>
-<section id="articles-de-revues" class="level2 lang-fr">
-<h2 class="lang-fr anchored" data-anchor-id="articles-de-revues">Articles de revues</h2>
-<p>Ma recherche se concentre sur l’entomologie agricole, la lutte intégrée et les statistiques écologiques. Vous pouvez consulter mon dossier de publication complet sur mon <a href="https://orcid.org/0000-0001-6989-9278">profil ORCID</a>.</p>
-<section id="articles-évalués-par-les-pairs" class="level3 lang-fr">
-<h3 class="lang-fr anchored" data-anchor-id="articles-évalués-par-les-pairs">Articles évalués par les pairs</h3>
-<div class="publication-entry">
-<div class="publication-title">
-Sterile insect technique reduces cabbage maggot (Diptera: Anthomyiidae) infestation in root crucifers in Canada
-</div>
-<div class="publication-authors">
-Anne-Marie Fortier, <strong><strong>Allen Bush-Beaupré</strong></strong>, Jade Savage
-</div>
-<div class="publication-details">
-2025 - <em>Journal of Economic Entomology</em>
-</div>
-<div class="publication-links">
-<p><a href="https://doi.org/10.1093/jee/toaf255">Version publiée</a> | <a href="https://doi.org/10.1101/2025.05.09.653057">Préimpression bioRxiv</a> | <a href="https://www.zotero.org/save?type=doi&amp;q=10.1093/jee/toaf255">Ajouter à Zotero</a></p>
-</div>
-</div>
-<div class="publication-entry">
-<div class="publication-title">
-Reproductive compatibility of two lines of Delia platura
-</div>
-<div class="publication-authors">
-<strong><strong>Allen Bush-Beaupré</strong></strong>, Jade Savage, Anne‐Marie Fortier, François Fournier, Andrew MacDonald, Marc Bélisle
-</div>
-<div class="publication-details">
-2024 - <em>Entomologia Experimentalis et Applicata</em>
-</div>
-<div class="publication-links">
-<p><a href="https://doi.org/10.1111/eea.13468">Version publiée</a> | <a href="https://doi.org/10.1101/2023.08.01.551352">Préimpression bioRxiv</a> | <a href="https://www.zotero.org/save?type=doi&amp;q=10.1111/eea.13468">Ajouter à Zotero</a></p>
-</div>
-</div>
-<div class="publication-entry">
-<div class="publication-title">
-The effect of sex ratio and group density on the mating success of two lines of Delia platura (Diptera: Anthomyiidae)
-</div>
-<div class="publication-authors">
-<strong><strong>Allen Bush-Beaupré</strong></strong>, Marc Bélisle, Anne-Marie Fortier, François Fournier, Jade Savage
-</div>
-<div class="publication-details">
-2023 - <em>The Canadian Entomologist</em>
-</div>
-<div class="publication-links">
-<p><a href="https://doi.org/10.4039/tce.2023.21">Version publiée</a> | <a href="https://doi.org/10.22541/au.166862709.99325814/v1">Préimpression bioRxiv</a> | <a href="https://www.zotero.org/save?type=doi&amp;q=10.4039/tce.2023.21">Ajouter à Zotero</a></p>
-</div>
-</div>
+<section id="biorxiv-preprint-links" class="level2">
+<h2 class="anchored" data-anchor-id="biorxiv-preprint-links">bioRxiv Preprint Links</h2>
+<p>bioRxiv/preprint links are currently mapped manually in <code>publications.qmd</code> (lines 27-30). When you add a new publication to ORCID that has a preprint, add the mapping:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pubs_data<span class="sc">$</span>biorxiv[pubs_data<span class="sc">$</span>doi <span class="sc">==</span> <span class="st">"10.XXXX/your.doi"</span>] <span class="ot">&lt;-</span> <span class="st">"10.1101/preprint.doi"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="current-publications" class="level2">
+<h2 class="anchored" data-anchor-id="current-publications">Current Publications</h2>
+<p>Your website currently displays 3 journal articles:</p>
+<ol type="1">
+<li><strong>Sterile insect technique reduces cabbage maggot</strong> (2025)
+<ul>
+<li>Journal of Economic Entomology</li>
+<li>DOI: 10.1093/jee/toaf255</li>
+<li>Authors: Anne-Marie Fortier, Allen Bush-Beaupré, Jade Savage</li>
+</ul></li>
+<li><strong>Reproductive compatibility of two lines of Delia platura</strong> (2024)
+<ul>
+<li>Entomologia Experimentalis et Applicata</li>
+<li>DOI: 10.1111/eea.13468</li>
+<li>Authors: Allen Bush-Beaupré, Jade Savage, Anne-Marie Fortier, François Fournier, Andrew MacDonald, Marc Bélisle</li>
+</ul></li>
+<li><strong>The effect of sex ratio and group density on the mating success</strong> (2023)
+<ul>
+<li>The Canadian Entomologist</li>
+<li>DOI: 10.4039/tce.2023.21</li>
+<li>Authors: Allen Bush-Beaupré, Marc Bélisle, Anne-Marie Fortier, François Fournier, Jade Savage</li>
+</ul></li>
+</ol>
+</section>
+<section id="troubleshooting" class="level2">
+<h2 class="anchored" data-anchor-id="troubleshooting">Troubleshooting</h2>
+<section id="no-publications-showing" class="level3">
+<h3 class="anchored" data-anchor-id="no-publications-showing">No publications showing</h3>
+<ul>
+<li>Check that <code>orcid_publications.rds</code> exists</li>
+<li>Run <code>Rscript process_orcid_simple.R</code> to regenerate it</li>
+<li>Check that your ORCID profile has publications marked as “journal-article”</li>
+</ul>
+</section>
+<section id="author-names-not-showing-correctly" class="level3">
+<h3 class="anchored" data-anchor-id="author-names-not-showing-correctly">Author names not showing correctly</h3>
+<ul>
+<li>The system fetches author names from CrossRef, not ORCID</li>
+<li>Some journals may have incomplete metadata</li>
+<li>You can manually override in the fallback section of <code>publications.qmd</code></li>
+</ul>
+</section>
+<section id="new-publication-not-appearing" class="level3">
+<h3 class="anchored" data-anchor-id="new-publication-not-appearing">New publication not appearing</h3>
+<ol type="1">
+<li>Make sure it’s added to your ORCID profile</li>
+<li>Make sure it’s marked as a “journal-article” (not “preprint”)</li>
+<li>Run <code>Rscript process_orcid_simple.R</code> to fetch updates</li>
+<li>Run <code>quarto render</code> to update the website</li>
+</ol>
 </section>
 </section>
-<script>
-// Language toggle functionality
-document.addEventListener('DOMContentLoaded', function() {
-  let currentLang = localStorage.getItem('language') || 'en';
-  setLanguage(currentLang);
-  
-  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const lang = this.dataset.lang;
-      setLanguage(lang);
-      localStorage.setItem('language', lang);
-    });
-  });
-});
-
-function setLanguage(lang) {
-  // Hide all language content
-  document.querySelectorAll('.lang-en, .lang-fr').forEach(el => {
-    el.style.display = 'none';
-  });
-  
-  // Show selected language content
-  document.querySelectorAll('.lang-' + lang).forEach(el => {
-    el.style.display = 'block';
-  });
-  
-  // Update active button state
-  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.dataset.lang === lang) {
-      btn.classList.add('active');
-    }
-  });
-  
-  // Update TOC if present
-  setTimeout(() => filterTOC(lang), 100);
-  setTimeout(() => filterTOC(lang), 500);
-  setTimeout(() => filterTOC(lang), 1000);
-}
-
-function filterTOC(lang) {
-  const tocItems = document.querySelectorAll('#TOC li');
-  
-  tocItems.forEach(li => {
-    const link = li.querySelector('a');
-    if (!link) return;
-    
-    const href = link.getAttribute('href') || '';
-    
-    // Check if the section has a language class
-    const targetId = href.replace('#', '');
-    const targetElement = document.getElementById(targetId);
-    
-    if (!targetElement) return;
-    
-    // Check if this heading has a language class
-    if (targetElement.classList.contains('lang-en') || targetElement.classList.contains('lang-fr')) {
-      if (targetElement.classList.contains('lang-' + lang)) {
-        li.style.display = 'block';
-      } else {
-        li.style.display = 'none';
-      }
-    }
-  });
-}
-</script>
-<style>
-.publication-entry {
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.publication-entry:last-child {
-  border-bottom: none;
-}
-
-.publication-title {
-  font-size: 1.1em;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.publication-authors {
-  color: #555;
-  margin-bottom: 0.3rem;
-}
-
-.publication-details {
-  font-style: italic;
-  color: #666;
-  margin-bottom: 0.5rem;
-}
-
-.publication-links {
-  margin-top: 0.5rem;
-}
-
-.publication-links a {
-  margin-right: 1rem;
-  color: #0078d4;
-  text-decoration: none;
-}
-
-.publication-links a:hover {
-  text-decoration: underline;
-}
-
-.publication-description {
-  margin-top: 0.5rem;
-  color: #444;
-  line-height: 1.6;
-}
-</style>
+<section id="future-improvements" class="level2">
+<h2 class="anchored" data-anchor-id="future-improvements">Future Improvements</h2>
+<ul>
+<li>Add abstracts automatically from CrossRef</li>
+<li>Add citation counts from CrossRef or OpenCitations</li>
+<li>Add Altmetric badges</li>
+<li>Automatically detect preprint/published version pairs</li>
+</ul>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

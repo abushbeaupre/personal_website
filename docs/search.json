@@ -35,11 +35,67 @@
     "text": "About this site\n\n1 + 1\n\n[1] 2"
   },
   {
-    "objectID": "posts.html",
-    "href": "posts.html",
-    "title": "Blog",
+    "objectID": "PUBLICATIONS_AUTOMATION_README.html",
+    "href": "PUBLICATIONS_AUTOMATION_README.html",
+    "title": "Automated Publication Management with ORCID",
     "section": "",
-    "text": "Visualizing indirect effects\n\n\n\ndata viz\n\n\nindirect effects\n\n\nmethod development\n\n\n\nHow do we quantify and visualize indirect effects in a path analysis when relationships are non-linear? Worse yet; non-monotonous?\n\n\n\nAllen Bush-Beaupré\n\n\nOct 31, 2023\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "This website automatically fetches your publications from ORCID using the public API.\n\n\nThe system: 1. Fetches your publication list from ORCID (ORCID ID: 0000-0001-6989-9278) 2. Filters for journal articles only 3. Gets complete author lists from CrossRef using DOIs 4. Automatically bolds your name in the author lists 5. Displays publications on your website with links to DOIs and preprints\n\n\n\n\nprocess_orcid_simple.R - Main script that fetches publications from ORCID\norcid_publications.rds - Cached publication data (automatically generated)\npublications.qmd - Quarto file that displays publications on your website\norcid_raw_response.json - Raw ORCID API response (for debugging)\n\n\n\n\nYour ORCID API credentials are stored in the R scripts: - Client ID: APP-RO85EC734G4T0RCB - Client Secret: 13c16fee-86de-47a7-84bc-59cccf0c5283\nNote: These credentials are for read-only public API access and can be safely committed to your repository.\n\n\n\n\n\nTo fetch the latest publications from ORCID:\ncd /home/abush/working_vol/personal_website/personal_website\nRscript process_orcid_simple.R\nquarto render\nThis will: 1. Fetch your current publication list from ORCID 2. Get complete author information from CrossRef 3. Update orcid_publications.rds 4. Re-render your website with updated publications\n\n\n\nIf you need to manually add or edit publications, you can modify the fallback section in publications.qmd (lines 41-77). This fallback data is only used if the orcid_publications.rds file doesn’t exist.\n\n\n\n\nbioRxiv/preprint links are currently mapped manually in publications.qmd (lines 27-30). When you add a new publication to ORCID that has a preprint, add the mapping:\npubs_data$biorxiv[pubs_data$doi == \"10.XXXX/your.doi\"] &lt;- \"10.1101/preprint.doi\"\n\n\n\nYour website currently displays 3 journal articles:\n\nSterile insect technique reduces cabbage maggot (2025)\n\nJournal of Economic Entomology\nDOI: 10.1093/jee/toaf255\nAuthors: Anne-Marie Fortier, Allen Bush-Beaupré, Jade Savage\n\nReproductive compatibility of two lines of Delia platura (2024)\n\nEntomologia Experimentalis et Applicata\nDOI: 10.1111/eea.13468\nAuthors: Allen Bush-Beaupré, Jade Savage, Anne-Marie Fortier, François Fournier, Andrew MacDonald, Marc Bélisle\n\nThe effect of sex ratio and group density on the mating success (2023)\n\nThe Canadian Entomologist\nDOI: 10.4039/tce.2023.21\nAuthors: Allen Bush-Beaupré, Marc Bélisle, Anne-Marie Fortier, François Fournier, Jade Savage\n\n\n\n\n\n\n\n\nCheck that orcid_publications.rds exists\nRun Rscript process_orcid_simple.R to regenerate it\nCheck that your ORCID profile has publications marked as “journal-article”\n\n\n\n\n\nThe system fetches author names from CrossRef, not ORCID\nSome journals may have incomplete metadata\nYou can manually override in the fallback section of publications.qmd\n\n\n\n\n\nMake sure it’s added to your ORCID profile\nMake sure it’s marked as a “journal-article” (not “preprint”)\nRun Rscript process_orcid_simple.R to fetch updates\nRun quarto render to update the website\n\n\n\n\n\n\nAdd abstracts automatically from CrossRef\nAdd citation counts from CrossRef or OpenCitations\nAdd Altmetric badges\nAutomatically detect preprint/published version pairs"
+  },
+  {
+    "objectID": "PUBLICATIONS_AUTOMATION_README.html#how-it-works",
+    "href": "PUBLICATIONS_AUTOMATION_README.html#how-it-works",
+    "title": "Automated Publication Management with ORCID",
+    "section": "",
+    "text": "The system: 1. Fetches your publication list from ORCID (ORCID ID: 0000-0001-6989-9278) 2. Filters for journal articles only 3. Gets complete author lists from CrossRef using DOIs 4. Automatically bolds your name in the author lists 5. Displays publications on your website with links to DOIs and preprints"
+  },
+  {
+    "objectID": "PUBLICATIONS_AUTOMATION_README.html#files",
+    "href": "PUBLICATIONS_AUTOMATION_README.html#files",
+    "title": "Automated Publication Management with ORCID",
+    "section": "",
+    "text": "process_orcid_simple.R - Main script that fetches publications from ORCID\norcid_publications.rds - Cached publication data (automatically generated)\npublications.qmd - Quarto file that displays publications on your website\norcid_raw_response.json - Raw ORCID API response (for debugging)"
+  },
+  {
+    "objectID": "PUBLICATIONS_AUTOMATION_README.html#api-credentials",
+    "href": "PUBLICATIONS_AUTOMATION_README.html#api-credentials",
+    "title": "Automated Publication Management with ORCID",
+    "section": "",
+    "text": "Your ORCID API credentials are stored in the R scripts: - Client ID: APP-RO85EC734G4T0RCB - Client Secret: 13c16fee-86de-47a7-84bc-59cccf0c5283\nNote: These credentials are for read-only public API access and can be safely committed to your repository."
+  },
+  {
+    "objectID": "PUBLICATIONS_AUTOMATION_README.html#updating-publications",
+    "href": "PUBLICATIONS_AUTOMATION_README.html#updating-publications",
+    "title": "Automated Publication Management with ORCID",
+    "section": "",
+    "text": "To fetch the latest publications from ORCID:\ncd /home/abush/working_vol/personal_website/personal_website\nRscript process_orcid_simple.R\nquarto render\nThis will: 1. Fetch your current publication list from ORCID 2. Get complete author information from CrossRef 3. Update orcid_publications.rds 4. Re-render your website with updated publications\n\n\n\nIf you need to manually add or edit publications, you can modify the fallback section in publications.qmd (lines 41-77). This fallback data is only used if the orcid_publications.rds file doesn’t exist."
+  },
+  {
+    "objectID": "PUBLICATIONS_AUTOMATION_README.html#biorxiv-preprint-links",
+    "href": "PUBLICATIONS_AUTOMATION_README.html#biorxiv-preprint-links",
+    "title": "Automated Publication Management with ORCID",
+    "section": "",
+    "text": "bioRxiv/preprint links are currently mapped manually in publications.qmd (lines 27-30). When you add a new publication to ORCID that has a preprint, add the mapping:\npubs_data$biorxiv[pubs_data$doi == \"10.XXXX/your.doi\"] &lt;- \"10.1101/preprint.doi\""
+  },
+  {
+    "objectID": "PUBLICATIONS_AUTOMATION_README.html#current-publications",
+    "href": "PUBLICATIONS_AUTOMATION_README.html#current-publications",
+    "title": "Automated Publication Management with ORCID",
+    "section": "",
+    "text": "Your website currently displays 3 journal articles:\n\nSterile insect technique reduces cabbage maggot (2025)\n\nJournal of Economic Entomology\nDOI: 10.1093/jee/toaf255\nAuthors: Anne-Marie Fortier, Allen Bush-Beaupré, Jade Savage\n\nReproductive compatibility of two lines of Delia platura (2024)\n\nEntomologia Experimentalis et Applicata\nDOI: 10.1111/eea.13468\nAuthors: Allen Bush-Beaupré, Jade Savage, Anne-Marie Fortier, François Fournier, Andrew MacDonald, Marc Bélisle\n\nThe effect of sex ratio and group density on the mating success (2023)\n\nThe Canadian Entomologist\nDOI: 10.4039/tce.2023.21\nAuthors: Allen Bush-Beaupré, Marc Bélisle, Anne-Marie Fortier, François Fournier, Jade Savage"
+  },
+  {
+    "objectID": "PUBLICATIONS_AUTOMATION_README.html#troubleshooting",
+    "href": "PUBLICATIONS_AUTOMATION_README.html#troubleshooting",
+    "title": "Automated Publication Management with ORCID",
+    "section": "",
+    "text": "Check that orcid_publications.rds exists\nRun Rscript process_orcid_simple.R to regenerate it\nCheck that your ORCID profile has publications marked as “journal-article”\n\n\n\n\n\nThe system fetches author names from CrossRef, not ORCID\nSome journals may have incomplete metadata\nYou can manually override in the fallback section of publications.qmd\n\n\n\n\n\nMake sure it’s added to your ORCID profile\nMake sure it’s marked as a “journal-article” (not “preprint”)\nRun Rscript process_orcid_simple.R to fetch updates\nRun quarto render to update the website"
+  },
+  {
+    "objectID": "PUBLICATIONS_AUTOMATION_README.html#future-improvements",
+    "href": "PUBLICATIONS_AUTOMATION_README.html#future-improvements",
+    "title": "Automated Publication Management with ORCID",
+    "section": "",
+    "text": "Add abstracts automatically from CrossRef\nAdd citation counts from CrossRef or OpenCitations\nAdd Altmetric badges\nAutomatically detect preprint/published version pairs"
   },
   {
     "objectID": "PUBLICATIONS_README.html",
@@ -84,6 +140,13 @@
     "text": "Here’s a complete example with all optional fields:\n  list(\n    title = \"Impact of climate change on insect phenology in agricultural systems\",\n    authors = \"Smith J, Johnson K, Bush-Beaupré A, Williams R\",\n    year = \"2026\",\n    journal = \"Ecological Applications\",\n    doi = \"10.1002/eap.2024\",\n    biorxiv = \"10.1101/2025.12.15.648234\",\n    abstract = \"We examined how climate warming affects the timing of pest insect emergence in temperate agricultural systems, finding significant shifts in phenology that could impact crop yields.\"\n  ),"
   },
   {
+    "objectID": "posts.html",
+    "href": "posts.html",
+    "title": "Blog",
+    "section": "",
+    "text": "Visualizing indirect effects\n\n\n\ndata viz\n\n\nindirect effects\n\n\nmethod development\n\n\n\nHow do we quantify and visualize indirect effects in a path analysis when relationships are non-linear? Worse yet; non-monotonous?\n\n\n\nAllen Bush-Beaupré\n\n\nOct 31, 2023\n\n\n\n\n\n\n\n\nNo matching items"
+  },
+  {
     "objectID": "code_structure_tutorial.html",
     "href": "code_structure_tutorial.html",
     "title": "How to Structure Your Code for Statistical Consultations",
@@ -123,21 +186,21 @@
     "href": "publications.html",
     "title": "Publications",
     "section": "",
-    "text": "English\n\nFrançais"
+    "text": "English\n\n\nFrançais"
   },
   {
     "objectID": "publications.html#journal-articles",
     "href": "publications.html#journal-articles",
     "title": "Publications",
     "section": "Journal Articles",
-    "text": "Journal Articles\nMy research focuses on agricultural entomology, integrated pest management, and ecological statistics. You can view my complete publication record on my ORCID profile.\n\nPeer-Reviewed Articles\n\n\nSterile insect technique reduces cabbage maggot (Diptera: Anthomyiidae) infestation in root crucifers in Canada\n\n\nBush-Beaupré A, et al.\n\n\n2025 - Journal of Economic Entomology\n\n\nPublished version | bioRxiv preprint | Add to Zotero\n\n\n\n\nReproductive compatibility of two lines of Delia platura\n\n\nBush-Beaupré A, et al.\n\n\n2024 - Entomologia Experimentalis et Applicata\n\n\nPublished version | bioRxiv preprint | Add to Zotero"
+    "text": "Journal Articles\nMy research focuses on agricultural entomology, integrated pest management, and ecological statistics. You can view my complete publication record on my ORCID profile.\n\nPeer-Reviewed Articles\n\n\nSterile insect technique reduces cabbage maggot (Diptera: Anthomyiidae) infestation in root crucifers in Canada\n\n\nAnne-Marie Fortier, Allen Bush-Beaupré, Jade Savage\n\n\n2025 - Journal of Economic Entomology\n\n\nPublished version | bioRxiv preprint | Add to Zotero\n\n\n\n\nReproductive compatibility of two lines of Delia platura\n\n\nAllen Bush-Beaupré, Jade Savage, Anne‐Marie Fortier, François Fournier, Andrew MacDonald, Marc Bélisle\n\n\n2024 - Entomologia Experimentalis et Applicata\n\n\nPublished version | bioRxiv preprint | Add to Zotero\n\n\n\n\nThe effect of sex ratio and group density on the mating success of two lines of Delia platura (Diptera: Anthomyiidae)\n\n\nAllen Bush-Beaupré, Marc Bélisle, Anne-Marie Fortier, François Fournier, Jade Savage\n\n\n2023 - The Canadian Entomologist\n\n\nPublished version | bioRxiv preprint | Add to Zotero"
   },
   {
     "objectID": "publications.html#articles-de-revues",
     "href": "publications.html#articles-de-revues",
     "title": "Publications",
     "section": "Articles de revues",
-    "text": "Articles de revues\nMa recherche se concentre sur l’entomologie agricole, la lutte intégrée et les statistiques écologiques. Vous pouvez consulter mon dossier de publication complet sur mon profil ORCID.\n\nArticles évalués par les pairs\n\n\nSterile insect technique reduces cabbage maggot (Diptera: Anthomyiidae) infestation in root crucifers in Canada\n\n\nBush-Beaupré A, et al.\n\n\n2025 - Journal of Economic Entomology\n\n\nVersion publiée | Préimpression bioRxiv | Ajouter à Zotero\n\n\n\n\nReproductive compatibility of two lines of Delia platura\n\n\nBush-Beaupré A, et al.\n\n\n2024 - Entomologia Experimentalis et Applicata\n\n\nVersion publiée | Préimpression bioRxiv | Ajouter à Zotero"
+    "text": "Articles de revues\nMa recherche se concentre sur l’entomologie agricole, la lutte intégrée et les statistiques écologiques. Vous pouvez consulter mon dossier de publication complet sur mon profil ORCID.\n\nArticles évalués par les pairs\n\n\nSterile insect technique reduces cabbage maggot (Diptera: Anthomyiidae) infestation in root crucifers in Canada\n\n\nAnne-Marie Fortier, Allen Bush-Beaupré, Jade Savage\n\n\n2025 - Journal of Economic Entomology\n\n\nVersion publiée | Préimpression bioRxiv | Ajouter à Zotero\n\n\n\n\nReproductive compatibility of two lines of Delia platura\n\n\nAllen Bush-Beaupré, Jade Savage, Anne‐Marie Fortier, François Fournier, Andrew MacDonald, Marc Bélisle\n\n\n2024 - Entomologia Experimentalis et Applicata\n\n\nVersion publiée | Préimpression bioRxiv | Ajouter à Zotero\n\n\n\n\nThe effect of sex ratio and group density on the mating success of two lines of Delia platura (Diptera: Anthomyiidae)\n\n\nAllen Bush-Beaupré, Marc Bélisle, Anne-Marie Fortier, François Fournier, Jade Savage\n\n\n2023 - The Canadian Entomologist\n\n\nVersion publiée | Préimpression bioRxiv | Ajouter à Zotero"
   },
   {
     "objectID": "consultation.html#book-a-consultation",
