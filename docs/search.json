@@ -131,5 +131,26 @@
     "title": "Consultations CREUS",
     "section": "Partager votre code avec moi",
     "text": "Partager votre code avec moi\n\nComment structurer votre code\nUn document bien organisé m’aide à comprendre rapidement votre question de recherche, vos données et votre analyse, ce qui me permet de fournir de meilleurs commentaires.\nÉléments clés d’une bonne structure de code :\n\nIntroduction claire énonçant votre question de recherche\nCharger les packages au début\nExploration des données avant l’analyse\nCode commenté expliquant votre raisonnement\nInterpréter les résultats en langage simple\n\n\n\nQu’est-ce que Quarto et R Markdown?\nQuarto et R Markdown sont des formats de documents qui combinent du texte (comme un document Word) avec du code R exécutable. Ils sont parfaits pour les analyses reproductibles car :\n\nVotre code et vos explications sont dans le même document\nVous pouvez relancer les analyses en un clic\nLes résultats (graphiques, tableaux, statistiques) sont automatiquement mis à jour\nVous pouvez partager au format HTML, PDF ou Word\n\n\nQuarto vs R Markdown - Lequel utiliser?\nLes deux fonctionnent très bien! Les principales différences :\n\nR Markdown (.Rmd): Le format plus ancien et bien établi - nécessite le package rmarkdown\nQuarto (.qmd): Le format plus récent - fonctionne avec R, Python, Julia, et plus - ne nécessite pas de packages R supplémentaires\n\nPour les consultations, les deux formats conviennent! Utilisez celui avec lequel vous êtes à l’aise.\n\n\nComment créer un document Quarto/R Markdown\nDans RStudio:\n\nFile → New File → Quarto Document (ou R Markdown)\nDonnez-lui un titre et un auteur\nChoisissez HTML comme format de sortie\nCliquez sur “Create”\n\n\n\nComment générer en HTML\nUne fois que vous avez écrit votre document, vous devez le “rendre” pour créer la sortie HTML :\nMéthode 1: Cliquez sur le bouton Render/Knit - Quarto: Cliquez sur le bouton “Render” en haut de l’éditeur - R Markdown: Cliquez sur le bouton “Knit” en haut de l’éditeur\nMéthode 2: Utilisez la console\n# Pour les documents Quarto (.qmd)\nquarto::quarto_render(\"votre_fichier.qmd\")\n\n# Pour les documents R Markdown (.Rmd)\nrmarkdown::render(\"votre_fichier.Rmd\")\n\n\nQuoi m’envoyer\nLors du partage de votre analyse pour consultation, veuillez m’envoyer les deux :\n\nLe fichier source (.qmd ou .Rmd) - pour que je puisse voir votre code\nLe HTML rendu (.html) - pour que je puisse voir vos résultats sans exécuter le code\n\nDe cette façon, je peux examiner vos résultats et explorer votre code si nécessaire!\n\n\n\nConseils pour votre code\n✅ À FAIRE:\n\nCommencer avec une question de recherche claire\nCharger tous les packages en haut\nCommenter votre code abondamment\nVisualiser avant d’analyser\nVérifier les hypothèses du modèle\nInterpréter les résultats en langage simple\n\n❌ À NE PAS FAIRE:\n\nExécuter des analyses sans explorer les données d’abord\nOublier de vérifier les diagnostics du modèle\nLaisser du code sans commentaires\nIgnorer l’interprétation des résultats statistiques\nEnvoyer du code qui ne fonctionne pas!\n\nPour un exemple complet de code bien structuré, consultez le Tutoriel sur la structure du code."
+  },
+  {
+    "objectID": "publications.html",
+    "href": "publications.html",
+    "title": "Publications",
+    "section": "",
+    "text": "English\n\nFrançais"
+  },
+  {
+    "objectID": "publications.html#journal-articles",
+    "href": "publications.html#journal-articles",
+    "title": "Publications",
+    "section": "Journal Articles",
+    "text": "Journal Articles\nMy research focuses on agricultural entomology, integrated pest management, and ecological statistics. You can view my complete publication record on my ORCID profile.\n\nPeer-Reviewed Articles\n\n\nSterile insect technique reduces cabbage maggot (Diptera: Anthomyiidae) infestation in root crucifers in Canada\n\n\nBush-Beaupré A, et al.\n\n\n2025 - Journal of Economic Entomology\n\n\nPublished version | bioRxiv preprint | Add to Zotero\n\n\n\n\nReproductive compatibility of two lines of Delia platura\n\n\nBush-Beaupré A, et al.\n\n\n2024 - Entomologia Experimentalis et Applicata\n\n\nPublished version | bioRxiv preprint | Add to Zotero"
+  },
+  {
+    "objectID": "publications.html#articles-de-revues",
+    "href": "publications.html#articles-de-revues",
+    "title": "Publications",
+    "section": "Articles de revues",
+    "text": "Articles de revues\nMa recherche se concentre sur l’entomologie agricole, la lutte intégrée et les statistiques écologiques. Vous pouvez consulter mon dossier de publication complet sur mon profil ORCID.\n\nArticles évalués par les pairs\n\n\nSterile insect technique reduces cabbage maggot (Diptera: Anthomyiidae) infestation in root crucifers in Canada\n\n\nBush-Beaupré A, et al.\n\n\n2025 - Journal of Economic Entomology\n\n\nVersion publiée | Préimpression bioRxiv | Ajouter à Zotero\n\n\n\n\nReproductive compatibility of two lines of Delia platura\n\n\nBush-Beaupré A, et al.\n\n\n2024 - Entomologia Experimentalis et Applicata\n\n\nVersion publiée | Préimpression bioRxiv | Ajouter à Zotero"
   }
 ]

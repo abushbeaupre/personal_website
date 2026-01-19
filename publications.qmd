@@ -1,0 +1,342 @@
+---
+title: "Publications"
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+library(dplyr)
+library(stringr)
+
+# Your ORCID ID and name
+my_orcid <- "0000-0001-6989-9278"
+my_name <- "Bush-Beaupré"  # Used to bold your name in author lists
+
+# Helper function to bold author name
+bold_my_name <- function(authors, my_name) {
+  if (is.na(authors) || authors == "") return(authors)
+  # Bold the author name (case-insensitive)
+  authors <- str_replace_all(authors, 
+                             regex(paste0("\\b(", my_name, "[^,;]*)\\b"), ignore_case = TRUE),
+                             "<strong>\\1</strong>")
+  return(authors)
+}
+
+# Publication data - ADD YOUR PUBLICATIONS HERE
+# Copy this template for each publication:
+#   list(
+#     title = "Article Title",
+#     authors = "Last F, Last F, Bush-Beaupré A",  # Your name will be bolded automatically
+#     year = "2024",
+#     journal = "Journal Name",
+#     doi = "10.1234/example",  # Just the DOI, not full URL
+#     biorxiv = "10.1101/2024.01.01.123456",  # Optional: bioRxiv DOI if available
+#     abstract = "Brief description of the article"  # Optional
+#   ),
+
+pubs_data <- list(
+  list(
+    title = "Sterile insect technique reduces cabbage maggot (Diptera: Anthomyiidae) infestation in root crucifers in Canada",
+    authors = "Bush-Beaupré A, et al.",
+    year = "2025",
+    journal = "Journal of Economic Entomology",
+    doi = "10.1093/jee/toaf255",
+    biorxiv = "10.1101/2025.05.09.653057",
+    abstract = ""
+  ),
+  list(
+    title = "Reproductive compatibility of two lines of Delia platura",
+    authors = "Bush-Beaupré A, et al.",
+    year = "2024",
+    journal = "Entomologia Experimentalis et Applicata",
+    doi = "10.1111/eea.13468",
+    biorxiv = "10.1101/2023.08.01.551352",
+    abstract = ""
+  )
+) %>%
+  bind_rows() %>%
+  arrange(desc(year))
+```
+
+::: lang-toggle
+<button class="lang-toggle-btn active" data-lang="en">English</button> <button class="lang-toggle-btn" data-lang="fr">Français</button>
+:::
+
+::: lang-en
+## Journal Articles {.lang-en}
+
+My research focuses on agricultural entomology, integrated pest management, and ecological statistics. You can view my complete publication record on my [ORCID profile](https://orcid.org/0000-0001-6989-9278).
+
+### Peer-Reviewed Articles {.lang-en}
+
+```{r display-pubs-en}
+#| results: asis
+if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
+  for (i in 1:nrow(pubs_data)) {
+    pub <- pubs_data[i, ]
+    
+    cat('<div class="publication-entry">\n')
+    
+    # Title
+    cat('<div class="publication-title">', pub$title, '</div>\n', sep = "")
+    
+    # Authors (with name bolded)
+    if (!is.na(pub$authors) && pub$authors != "") {
+      authors_formatted <- bold_my_name(pub$authors, my_name)
+      cat('<div class="publication-authors">', authors_formatted, '</div>\n', sep = "")
+    }
+    
+    # Journal and year
+    details <- c()
+    if (!is.na(pub$year)) details <- c(details, pub$year)
+    if (!is.na(pub$journal)) details <- c(details, paste0("*", pub$journal, "*"))
+    
+    if (length(details) > 0) {
+      cat('<div class="publication-details">', paste(details, collapse = " - "), '</div>\n', sep = "")
+    }
+    
+    # Abstract
+    if (!is.na(pub$abstract) && pub$abstract != "") {
+      # Truncate if too long
+      abstract_text <- pub$abstract
+      if (nchar(abstract_text) > 400) {
+        abstract_text <- paste0(substr(abstract_text, 1, 400), "...")
+      }
+      cat('<div class="publication-description">', abstract_text, '</div>\n', sep = "")
+    }
+    
+    # Links
+    cat('<div class="publication-links">\n')
+    links <- c()
+    
+    if (!is.na(pub$doi)) {
+      links <- c(links, paste0('[Published version](https://doi.org/', pub$doi, ')'))
+    }
+    
+    if (!is.na(pub$biorxiv) && pub$biorxiv != "") {
+      # Check if it's already a full URL
+      if (grepl("^http", pub$biorxiv)) {
+        links <- c(links, paste0('[bioRxiv preprint](', pub$biorxiv, ')'))
+      } else {
+        links <- c(links, paste0('[bioRxiv preprint](https://doi.org/', pub$biorxiv, ')'))
+      }
+    }
+    
+    if (!is.na(pub$doi)) {
+      links <- c(links, paste0('[Add to Zotero](https://www.zotero.org/save?type=doi&q=', pub$doi, ')'))
+    }
+    
+    if (length(links) > 0) {
+      cat(paste(links, collapse = " | "))
+    }
+    
+    cat('\n</div>\n')
+    cat('</div>\n\n')
+  }
+} else {
+  cat("No publications found. Please check back later or visit my [ORCID profile](https://orcid.org/0000-0001-6989-9278).\n")
+}
+```
+
+:::
+
+::: lang-fr
+## Articles de revues {.lang-fr}
+
+Ma recherche se concentre sur l'entomologie agricole, la lutte intégrée et les statistiques écologiques. Vous pouvez consulter mon dossier de publication complet sur mon [profil ORCID](https://orcid.org/0000-0001-6989-9278).
+
+### Articles évalués par les pairs {.lang-fr}
+
+```{r display-pubs-fr}
+#| results: asis
+if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
+  for (i in 1:nrow(pubs_data)) {
+    pub <- pubs_data[i, ]
+    
+    cat('<div class="publication-entry">\n')
+    
+    # Title
+    cat('<div class="publication-title">', pub$title, '</div>\n', sep = "")
+    
+    # Authors (with name bolded)
+    if (!is.na(pub$authors) && pub$authors != "") {
+      authors_formatted <- bold_my_name(pub$authors, my_name)
+      cat('<div class="publication-authors">', authors_formatted, '</div>\n', sep = "")
+    }
+    
+    # Journal and year
+    details <- c()
+    if (!is.na(pub$year)) details <- c(details, pub$year)
+    if (!is.na(pub$journal)) details <- c(details, paste0("*", pub$journal, "*"))
+    
+    if (length(details) > 0) {
+      cat('<div class="publication-details">', paste(details, collapse = " - "), '</div>\n', sep = "")
+    }
+    
+    # Abstract
+    if (!is.na(pub$abstract) && pub$abstract != "") {
+      # Truncate if too long
+      abstract_text <- pub$abstract
+      if (nchar(abstract_text) > 400) {
+        abstract_text <- paste0(substr(abstract_text, 1, 400), "...")
+      }
+      cat('<div class="publication-description">', abstract_text, '</div>\n', sep = "")
+    }
+    
+    # Links
+    cat('<div class="publication-links">\n')
+    links <- c()
+    
+    if (!is.na(pub$doi)) {
+      links <- c(links, paste0('[Version publiée](https://doi.org/', pub$doi, ')'))
+    }
+    
+    if (!is.na(pub$biorxiv) && pub$biorxiv != "") {
+      # Check if it's already a full URL
+      if (grepl("^http", pub$biorxiv)) {
+        links <- c(links, paste0('[Préimpression bioRxiv](', pub$biorxiv, ')'))
+      } else {
+        links <- c(links, paste0('[Préimpression bioRxiv](https://doi.org/', pub$biorxiv, ')'))
+      }
+    }
+    
+    if (!is.na(pub$doi)) {
+      links <- c(links, paste0('[Ajouter à Zotero](https://www.zotero.org/save?type=doi&q=', pub$doi, ')'))
+    }
+    
+    if (length(links) > 0) {
+      cat(paste(links, collapse = " | "))
+    }
+    
+    cat('\n</div>\n')
+    cat('</div>\n\n')
+  }
+} else {
+  cat("Aucune publication trouvée. Veuillez revenir plus tard ou visiter mon [profil ORCID](https://orcid.org/0000-0001-6989-9278).\n")
+}
+```
+
+:::
+
+```{=html}
+<script>
+// Language toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  let currentLang = localStorage.getItem('language') || 'en';
+  setLanguage(currentLang);
+  
+  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const lang = this.dataset.lang;
+      setLanguage(lang);
+      localStorage.setItem('language', lang);
+    });
+  });
+});
+
+function setLanguage(lang) {
+  // Hide all language content
+  document.querySelectorAll('.lang-en, .lang-fr').forEach(el => {
+    el.style.display = 'none';
+  });
+  
+  // Show selected language content
+  document.querySelectorAll('.lang-' + lang).forEach(el => {
+    el.style.display = 'block';
+  });
+  
+  // Update active button state
+  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.lang === lang) {
+      btn.classList.add('active');
+    }
+  });
+  
+  // Update TOC if present
+  setTimeout(() => filterTOC(lang), 100);
+  setTimeout(() => filterTOC(lang), 500);
+  setTimeout(() => filterTOC(lang), 1000);
+}
+
+function filterTOC(lang) {
+  const tocItems = document.querySelectorAll('#TOC li');
+  
+  tocItems.forEach(li => {
+    const link = li.querySelector('a');
+    if (!link) return;
+    
+    const href = link.getAttribute('href') || '';
+    
+    // Check if the section has a language class
+    const targetId = href.replace('#', '');
+    const targetElement = document.getElementById(targetId);
+    
+    if (!targetElement) return;
+    
+    // Check if this heading has a language class
+    if (targetElement.classList.contains('lang-en') || targetElement.classList.contains('lang-fr')) {
+      if (targetElement.classList.contains('lang-' + lang)) {
+        li.style.display = 'block';
+      } else {
+        li.style.display = 'none';
+      }
+    }
+  });
+}
+</script>
+```
+
+```{=html}
+<style>
+.publication-entry {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.publication-entry:last-child {
+  border-bottom: none;
+}
+
+.publication-title {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.publication-authors {
+  color: #555;
+  margin-bottom: 0.3rem;
+}
+
+.publication-details {
+  font-style: italic;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.publication-links {
+  margin-top: 0.5rem;
+}
+
+.publication-links a {
+  margin-right: 1rem;
+  color: #0078d4;
+  text-decoration: none;
+}
+
+.publication-links a:hover {
+  text-decoration: underline;
+}
+
+.publication-description {
+  margin-top: 0.5rem;
+  color: #444;
+  line-height: 1.6;
+}
+</style>
+```
