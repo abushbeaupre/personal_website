@@ -257,8 +257,8 @@ function filterTOC(lang) {
     
     const href = link.getAttribute('href') || '';
     
-    const frenchSections = ['bienvenue', 'un-peu-à-propos-de-moi'];
-    const englishSections = ['welcome', 'a-bit-about-me'];
+    const frenchSections = ['bienvenue', 'utilisation-des-grands-modèles-de-langage'];
+    const englishSections = ['welcome', 'use-of-large-language-models'];
     
     const isFrench = frenchSections.some(section => href.includes(section));
     const isEnglish = englishSections.some(section => href.includes(section));
