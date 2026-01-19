@@ -11,11 +11,11 @@ website:
     left:
       - text: "Home"
         file: index.qmd
-      - text: "Publications"
-        file: publications.qmd
       - text: "Consultations CREUS"
         file: consultation.qmd
       - posts.qmd
+      - text: "Publications"
+        file: publications.qmd
     tools:
       - icon: github
         menu:
