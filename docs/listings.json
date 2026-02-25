@@ -2,6 +2,7 @@
   {
     "listing": "/posts.html",
     "items": [
+      "/posts/interactions_tutorial/index.html",
       "/posts/indirect_effects/index.html"
     ]
   }
