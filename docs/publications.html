@@ -359,6 +359,13 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+// Also filter TOC after window load to ensure it's ready
+window.addEventListener('load', function() {
+  let currentLang = localStorage.getItem('language') || 'en';
+  setTimeout(() => filterTOC(currentLang), 100);
+  setTimeout(() => filterTOC(currentLang), 500);
+});
+
 function setLanguage(lang) {
   // Update body class for CSS rules
   document.body.className = document.body.className.replace(/lang-[a-z]{2}/g, '');
@@ -391,6 +398,9 @@ function setLanguage(lang) {
 function filterTOC(lang) {
   // Get all TOC list items
   const tocItems = document.querySelectorAll('#TOC li');
+  
+  // Exit if no TOC found
+  if (tocItems.length === 0) return;
 
   // Define which sections belong to which language based on href
   const englishSections = ['#journal-articles', '#preprints'];
@@ -410,7 +420,7 @@ function filterTOC(lang) {
       li.style.display = 'none';
     } else if (lang === 'fr' && isEnglish) {
       li.style.display = 'none';
-    } else {
+    } else if (isEnglish || isFrench) {
       li.style.display = '';
     }
   });
