@@ -488,9 +488,9 @@ function filterTOC(lang) {
   console.log('Filtering TOC for language:', lang);
   console.log('Found', tocItems.length, 'TOC items');
 
-  // Define which sections belong to which language based on href
-  const englishSections = ['#journal-articles', '#preprints'];
-  const frenchSections = ['#articles-de-revues', '#pré-publications'];
+  // Define which sections belong to which language
+  const englishSections = ['journal-articles', 'preprints'];
+  const frenchSections = ['articles-de-revues', 'publications'];
 
   tocItems.forEach(li => {
     const link = li.querySelector('a');
@@ -499,11 +499,11 @@ function filterTOC(lang) {
     const href = link.getAttribute('href') || '';
     console.log('Processing TOC item with href:', href);
 
-    // Check if this is an English or French section
-    const isEnglish = englishSections.includes(href);
-    const isFrench = frenchSections.includes(href);
+    // Check if this is an English or French section using includes
+    const isEnglish = englishSections.some(section => href.includes(section));
+    const isFrench = frenchSections.some(section => href.includes(section));
 
-    if (lang === 'en' && isFrench) {
+    if (lang === 'en' && isFrench && !isEnglish) {
       li.style.setProperty('display', 'none', 'important');
       console.log('Hiding French section:', href);
     } else if (lang === 'fr' && isEnglish) {
