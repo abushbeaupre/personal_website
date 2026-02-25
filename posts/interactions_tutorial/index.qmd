@@ -363,7 +363,7 @@ ggplot() +
   geom_line(data = pred_sex_mass_1, aes(x = snow_depth, y = estimate, color = sex), lineend = "round", linewidth = 2) +
   geom_point(data = bighorn_mass_1, aes(y = weight, x = snow_depth, color = sex)) +
   guides(alpha = "none", fill = "none") +
-  labs(title = "Sample predictions (n = 100, balanced)") +
+  labs(title = "Sample predictions") +
   coord_cartesian(ylim = c(50, 220)) -> p1
 
 p1
@@ -390,7 +390,7 @@ ggplot() +
   geom_line(data = pred_sex_mass_true, aes(x = snow_depth, y = estimate, color = sex), lineend = "round", linewidth = 2) +
   geom_point(data = bighorn_population, aes(y = weight, x = snow_depth, color = sex)) +
   guides(alpha = "none", fill = "none") +
-  labs(title = "True population (n = 1000)") +
+  labs(title = "True population") +
   coord_cartesian(ylim = c(50, 220)) -> p2
 
 p2
