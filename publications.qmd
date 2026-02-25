@@ -25,31 +25,62 @@ bold_my_name <- function(authors, my_name) {
 }
 
 # Load publications from automatically generated RDS file
-# To update: run process_orcid_simple.R to fetch latest from ORCID
-if (file.exists("orcid_publications.rds")) {
+# To update: run debug_orcid.R then process_orcid_with_preprints.R to fetch latest from ORCID
+if (file.exists("orcid_publications_full.rds")) {
+  all_pubs <- readRDS("orcid_publications_full.rds")
+
+  # Convert published articles to data frame
+  if (length(all_pubs$published) > 0) {
+    pubs_data <- bind_rows(all_pubs$published)
+
+    # Add bioRxiv links for known preprints of published articles
+    pubs_data$biorxiv <- NA_character_
+    pubs_data$biorxiv[pubs_data$doi == "10.1093/jee/toaf255"] <- "10.1101/2025.05.09.653057"
+    pubs_data$biorxiv[pubs_data$doi == "10.1111/eea.13468"] <- "10.1101/2023.08.01.551352"
+    pubs_data$biorxiv[pubs_data$doi == "10.4039/tce.2023.21"] <- "10.22541/au.166862709.99325814/v1"
+
+    # Add abstract field (empty for now)
+    pubs_data$abstract <- NA_character_
+
+    # Bold my name
+    pubs_data$authors <- sapply(pubs_data$authors, bold_my_name, my_name = my_name)
+
+    # Convert year to numeric for sorting
+    pubs_data$year <- as.numeric(pubs_data$year)
+
+    # Sort by year (most recent first)
+    pubs_data <- pubs_data %>% arrange(desc(year))
+  } else {
+    pubs_data <- NULL
+  }
+
+  # Convert preprints to data frame
+  if (length(all_pubs$preprints) > 0) {
+    preprints_data <- bind_rows(all_pubs$preprints)
+
+    # Add abstract field (empty for now)
+    preprints_data$abstract <- NA_character_
+
+    # Bold my name
+    preprints_data$authors <- sapply(preprints_data$authors, bold_my_name, my_name = my_name)
+
+    # Convert year to numeric for sorting
+    preprints_data$year <- as.numeric(preprints_data$year)
+
+    # Sort by year (most recent first)
+    preprints_data <- preprints_data %>% arrange(desc(year))
+  } else {
+    preprints_data <- NULL
+  }
+
+} else if (file.exists("orcid_publications.rds")) {
+  # Fallback to old format
   pubs_list <- readRDS("orcid_publications.rds")
-  
-  # Convert to data frame
   pubs_data <- bind_rows(pubs_list)
-  
-  # Add bioRxiv links for known preprints
-  pubs_data$biorxiv <- NA_character_
-  pubs_data$biorxiv[pubs_data$doi == "10.1093/jee/toaf255"] <- "10.1101/2025.05.09.653057"
-  pubs_data$biorxiv[pubs_data$doi == "10.1111/eea.13468"] <- "10.1101/2023.08.01.551352"
-  pubs_data$biorxiv[pubs_data$doi == "10.4039/tce.2023.21"] <- "10.22541/au.166862709.99325814/v1"
-  
-  # Add abstract field (empty for now)
-  pubs_data$abstract <- NA_character_
-  
-  # Bold my name
   pubs_data$authors <- sapply(pubs_data$authors, bold_my_name, my_name = my_name)
-  
-  # Convert year to numeric for sorting
   pubs_data$year <- as.numeric(pubs_data$year)
-  
-  # Sort by year (most recent first)
   pubs_data <- pubs_data %>% arrange(desc(year))
-  
+  preprints_data <- NULL
 } else {
   # Fallback: Manual publication list
   pubs_data <- list(
@@ -81,9 +112,33 @@ if (file.exists("orcid_publications.rds")) {
     bind_rows() %>%
     mutate(year = as.numeric(year)) %>%
     arrange(desc(year))
-  
+
   # Bold my name in fallback data
   pubs_data$authors <- sapply(pubs_data$authors, bold_my_name, my_name = my_name)
+
+  # Fallback preprints
+  preprints_data <- list(
+    list(
+      title = "Extending the causal inference toolkit for ecologists: A visualization method of indirect effects",
+      authors = "Allen Bush-Beaupré, Simon Coroller-Chouraki, Marc Bélisle",
+      year = "2026",
+      journal = "",
+      doi = "10.64898/2026.02.09.704914"
+    ),
+    list(
+      title = "Enemy mitigation in farmlands: Intensive agriculture impacts avian nesting and subsequent ectoparasite infestation",
+      authors = "Simon Coroller-Chouraki, Allen Bush-Beaupré, Jade Savage, Marc Bélisle",
+      year = "2026",
+      journal = "",
+      doi = "10.64898/2026.02.02.703377"
+    )
+  ) %>%
+    bind_rows() %>%
+    mutate(year = as.numeric(year)) %>%
+    arrange(desc(year))
+
+  # Bold my name in preprints
+  preprints_data$authors <- sapply(preprints_data$authors, bold_my_name, my_name = my_name)
 }
 ```
 
@@ -109,27 +164,27 @@ My research focuses on agricultural entomology, integrated pest management, and 
 if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
   for (i in 1:nrow(pubs_data)) {
     pub <- pubs_data[i, ]
-    
+
     cat('<div class="publication-entry">\n')
-    
+
     # Title
     cat('<div class="publication-title">', pub$title, '</div>\n', sep = "")
-    
+
     # Authors (with name bolded)
     if (!is.na(pub$authors) && pub$authors != "") {
       authors_formatted <- bold_my_name(pub$authors, my_name)
       cat('<div class="publication-authors">', authors_formatted, '</div>\n', sep = "")
     }
-    
+
     # Journal and year
     details <- c()
     if (!is.na(pub$year)) details <- c(details, pub$year)
     if (!is.na(pub$journal)) details <- c(details, paste0("*", pub$journal, "*"))
-    
+
     if (length(details) > 0) {
       cat('<div class="publication-details">', paste(details, collapse = " - "), '</div>\n', sep = "")
     }
-    
+
     # Abstract
     if (!is.na(pub$abstract) && pub$abstract != "") {
       # Truncate if too long
@@ -139,15 +194,15 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
       }
       cat('<div class="publication-description">', abstract_text, '</div>\n', sep = "")
     }
-    
+
     # Links
     cat('<div class="publication-links">\n')
     links <- c()
-    
+
     if (!is.na(pub$doi)) {
       links <- c(links, paste0('[Published version](https://doi.org/', pub$doi, ')'))
     }
-    
+
     if (!is.na(pub$biorxiv) && pub$biorxiv != "") {
       # Check if it's already a full URL
       if (grepl("^http", pub$biorxiv)) {
@@ -156,15 +211,15 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
         links <- c(links, paste0('[bioRxiv preprint](https://doi.org/', pub$biorxiv, ')'))
       }
     }
-    
+
     if (!is.na(pub$doi)) {
       links <- c(links, paste0('[Add to Zotero](https://www.zotero.org/save?type=doi&q=', pub$doi, ')'))
     }
-    
+
     if (length(links) > 0) {
       cat(paste(links, collapse = " | "))
     }
-    
+
     cat('\n</div>\n')
     cat('</div>\n\n')
   }
@@ -172,6 +227,59 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
   cat("No publications found. Please check back later or visit my [ORCID profile](https://orcid.org/0000-0001-6989-9278).\n")
 }
 ```
+
+### Preprints {.lang-en}
+
+```{r display-preprints-en}
+#| results: asis
+if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
+  for (i in 1:nrow(preprints_data)) {
+    pub <- preprints_data[i, ]
+
+    cat('<div class="publication-entry">\n')
+
+    # Title
+    cat('<div class="publication-title">', pub$title, '</div>\n', sep = "")
+
+    # Authors (with name bolded)
+    if (!is.na(pub$authors) && pub$authors != "") {
+      authors_formatted <- bold_my_name(pub$authors, my_name)
+      cat('<div class="publication-authors">', authors_formatted, '</div>\n', sep = "")
+    }
+
+    # Year
+    details <- c()
+    if (!is.na(pub$year)) details <- c(details, pub$year)
+    if (!is.na(pub$journal) && pub$journal != "") details <- c(details, paste0("*", pub$journal, "*"))
+
+    if (length(details) > 0) {
+      cat('<div class="publication-details">', paste(details, collapse = " - "), '</div>\n', sep = "")
+    }
+
+    # Links
+    cat('<div class="publication-links">\n')
+    links <- c()
+
+    if (!is.na(pub$doi)) {
+      links <- c(links, paste0('[Preprint](https://doi.org/', pub$doi, ')'))
+    }
+
+    if (!is.na(pub$doi)) {
+      links <- c(links, paste0('[Add to Zotero](https://www.zotero.org/save?type=doi&q=', pub$doi, ')'))
+    }
+
+    if (length(links) > 0) {
+      cat(paste(links, collapse = " | "))
+    }
+
+    cat('\n</div>\n')
+    cat('</div>\n\n')
+  }
+} else {
+  cat("No preprints available.\n")
+}
+```
+
 :::
 
 ::: lang-fr
@@ -186,27 +294,27 @@ Ma recherche se concentre sur l'entomologie agricole, la lutte intégrée et les
 if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
   for (i in 1:nrow(pubs_data)) {
     pub <- pubs_data[i, ]
-    
+
     cat('<div class="publication-entry">\n')
-    
+
     # Title
     cat('<div class="publication-title">', pub$title, '</div>\n', sep = "")
-    
+
     # Authors (with name bolded)
     if (!is.na(pub$authors) && pub$authors != "") {
       authors_formatted <- bold_my_name(pub$authors, my_name)
       cat('<div class="publication-authors">', authors_formatted, '</div>\n', sep = "")
     }
-    
+
     # Journal and year
     details <- c()
     if (!is.na(pub$year)) details <- c(details, pub$year)
     if (!is.na(pub$journal)) details <- c(details, paste0("*", pub$journal, "*"))
-    
+
     if (length(details) > 0) {
       cat('<div class="publication-details">', paste(details, collapse = " - "), '</div>\n', sep = "")
     }
-    
+
     # Abstract
     if (!is.na(pub$abstract) && pub$abstract != "") {
       # Truncate if too long
@@ -216,15 +324,15 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
       }
       cat('<div class="publication-description">', abstract_text, '</div>\n', sep = "")
     }
-    
+
     # Links
     cat('<div class="publication-links">\n')
     links <- c()
-    
+
     if (!is.na(pub$doi)) {
       links <- c(links, paste0('[Version publiée](https://doi.org/', pub$doi, ')'))
     }
-    
+
     if (!is.na(pub$biorxiv) && pub$biorxiv != "") {
       # Check if it's already a full URL
       if (grepl("^http", pub$biorxiv)) {
@@ -233,15 +341,15 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
         links <- c(links, paste0('[Préimpression bioRxiv](https://doi.org/', pub$biorxiv, ')'))
       }
     }
-    
+
     if (!is.na(pub$doi)) {
       links <- c(links, paste0('[Ajouter à Zotero](https://www.zotero.org/save?type=doi&q=', pub$doi, ')'))
     }
-    
+
     if (length(links) > 0) {
       cat(paste(links, collapse = " | "))
     }
-    
+
     cat('\n</div>\n')
     cat('</div>\n\n')
   }
@@ -249,6 +357,59 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
   cat("Aucune publication trouvée. Veuillez revenir plus tard ou visiter mon [profil ORCID](https://orcid.org/0000-0001-6989-9278).\n")
 }
 ```
+
+### Pré-publications {.lang-fr}
+
+```{r display-preprints-fr}
+#| results: asis
+if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
+  for (i in 1:nrow(preprints_data)) {
+    pub <- preprints_data[i, ]
+
+    cat('<div class="publication-entry">\n')
+
+    # Title
+    cat('<div class="publication-title">', pub$title, '</div>\n', sep = "")
+
+    # Authors (with name bolded)
+    if (!is.na(pub$authors) && pub$authors != "") {
+      authors_formatted <- bold_my_name(pub$authors, my_name)
+      cat('<div class="publication-authors">', authors_formatted, '</div>\n', sep = "")
+    }
+
+    # Year
+    details <- c()
+    if (!is.na(pub$year)) details <- c(details, pub$year)
+    if (!is.na(pub$journal) && pub$journal != "") details <- c(details, paste0("*", pub$journal, "*"))
+
+    if (length(details) > 0) {
+      cat('<div class="publication-details">', paste(details, collapse = " - "), '</div>\n', sep = "")
+    }
+
+    # Links
+    cat('<div class="publication-links">\n')
+    links <- c()
+
+    if (!is.na(pub$doi)) {
+      links <- c(links, paste0('[Pré-publication](https://doi.org/', pub$doi, ')'))
+    }
+
+    if (!is.na(pub$doi)) {
+      links <- c(links, paste0('[Ajouter à Zotero](https://www.zotero.org/save?type=doi&q=', pub$doi, ')'))
+    }
+
+    if (length(links) > 0) {
+      cat(paste(links, collapse = " | "))
+    }
+
+    cat('\n</div>\n')
+    cat('</div>\n\n')
+  }
+} else {
+  cat("Aucune pré-publication disponible.\n")
+}
+```
+
 :::
 
 ```{=html}
@@ -257,7 +418,7 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
 document.addEventListener('DOMContentLoaded', function() {
   let currentLang = localStorage.getItem('language') || 'en';
   setLanguage(currentLang);
-  
+
   document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const lang = this.dataset.lang;
@@ -272,12 +433,12 @@ function setLanguage(lang) {
   document.querySelectorAll('.lang-en, .lang-fr').forEach(el => {
     el.style.display = 'none';
   });
-  
+
   // Show selected language content
   document.querySelectorAll('.lang-' + lang).forEach(el => {
     el.style.display = 'block';
   });
-  
+
   // Update active button state
   document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
     btn.classList.remove('active');
@@ -285,7 +446,7 @@ function setLanguage(lang) {
       btn.classList.add('active');
     }
   });
-  
+
   // Update TOC if present
   setTimeout(() => filterTOC(lang), 100);
   setTimeout(() => filterTOC(lang), 500);
@@ -295,30 +456,32 @@ function setLanguage(lang) {
 function filterTOC(lang) {
   // Get all TOC list items
   const tocItems = document.querySelectorAll('#TOC li');
-  
+
   tocItems.forEach(li => {
     const link = li.querySelector('a');
     if (!link) return;
-    
+
     const href = link.getAttribute('href') || '';
     const text = link.textContent.toLowerCase();
-    
+
     // French section identifiers (including accented characters)
     const frenchSections = [
       'articles-de-revues',
       'articles-évalués-par-les-pairs',
-      'évalués'
+      'évalués',
+      'pré-publications'
     ];
-    
+
     // English section identifiers
     const englishSections = [
       'journal-articles',
-      'peer-reviewed-articles'
+      'peer-reviewed-articles',
+      'preprints'
     ];
-    
+
     const isFrench = frenchSections.some(section => href.includes(section) || text.includes(section));
     const isEnglish = englishSections.some(section => href.includes(section));
-    
+
     if (lang === 'en' && isFrench) {
       li.style.display = 'none';
     } else if (lang === 'fr' && isEnglish) {

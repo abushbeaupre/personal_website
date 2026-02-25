@@ -139,10 +139,12 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#journal-articles" id="toc-journal-articles" class="nav-link active" data-scroll-target="#journal-articles">Journal Articles</a>
   <ul class="collapse">
   <li><a href="#peer-reviewed-articles" id="toc-peer-reviewed-articles" class="nav-link" data-scroll-target="#peer-reviewed-articles">Peer-Reviewed Articles</a></li>
+  <li><a href="#preprints" id="toc-preprints" class="nav-link" data-scroll-target="#preprints">Preprints</a></li>
   </ul></li>
   <li><a href="#articles-de-revues" id="toc-articles-de-revues" class="nav-link" data-scroll-target="#articles-de-revues">Articles de revues</a>
   <ul class="collapse">
   <li><a href="#articles-évalués-par-les-pairs" id="toc-articles-évalués-par-les-pairs" class="nav-link" data-scroll-target="#articles-évalués-par-les-pairs">Articles évalués par les pairs</a></li>
+  <li><a href="#pré-publications" id="toc-pré-publications" class="nav-link" data-scroll-target="#pré-publications">Pré-publications</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -231,6 +233,37 @@ The effect of sex ratio and group density on the mating success of two lines of 
 </div>
 </div>
 </section>
+<section id="preprints" class="level3 lang-en">
+<h3 class="lang-en anchored" data-anchor-id="preprints">Preprints</h3>
+<div class="publication-entry">
+<div class="publication-title">
+Extending the causal inference toolkit for ecologists: A visualization method of indirect effects
+</div>
+<div class="publication-authors">
+<strong><strong>Allen Bush-Beaupré</strong></strong>, Simon Coroller-Chouraki, Marc Bélisle
+</div>
+<div class="publication-details">
+2026
+</div>
+<div class="publication-links">
+<p><a href="https://doi.org/10.64898/2026.02.09.704914">Preprint</a> | <a href="https://www.zotero.org/save?type=doi&amp;q=10.64898/2026.02.09.704914">Add to Zotero</a></p>
+</div>
+</div>
+<div class="publication-entry">
+<div class="publication-title">
+Enemy mitigation in farmlands: Intensive agriculture impacts avian nesting and subsequent ectoparasite infestation
+</div>
+<div class="publication-authors">
+Simon Coroller-Chouraki, <strong><strong>Allen Bush-Beaupré</strong></strong>, Jade Savage, Marc Bélisle
+</div>
+<div class="publication-details">
+2026
+</div>
+<div class="publication-links">
+<p><a href="https://doi.org/10.64898/2026.02.02.703377">Preprint</a> | <a href="https://www.zotero.org/save?type=doi&amp;q=10.64898/2026.02.02.703377">Add to Zotero</a></p>
+</div>
+</div>
+</section>
 </section>
 <section id="articles-de-revues" class="level2 lang-fr">
 <h2 class="lang-fr anchored" data-anchor-id="articles-de-revues">Articles de revues</h2>
@@ -280,13 +313,44 @@ The effect of sex ratio and group density on the mating success of two lines of 
 </div>
 </div>
 </section>
+<section id="pré-publications" class="level3 lang-fr">
+<h3 class="lang-fr anchored" data-anchor-id="pré-publications">Pré-publications</h3>
+<div class="publication-entry">
+<div class="publication-title">
+Extending the causal inference toolkit for ecologists: A visualization method of indirect effects
+</div>
+<div class="publication-authors">
+<strong><strong>Allen Bush-Beaupré</strong></strong>, Simon Coroller-Chouraki, Marc Bélisle
+</div>
+<div class="publication-details">
+2026
+</div>
+<div class="publication-links">
+<p><a href="https://doi.org/10.64898/2026.02.09.704914">Pré-publication</a> | <a href="https://www.zotero.org/save?type=doi&amp;q=10.64898/2026.02.09.704914">Ajouter à Zotero</a></p>
+</div>
+</div>
+<div class="publication-entry">
+<div class="publication-title">
+Enemy mitigation in farmlands: Intensive agriculture impacts avian nesting and subsequent ectoparasite infestation
+</div>
+<div class="publication-authors">
+Simon Coroller-Chouraki, <strong><strong>Allen Bush-Beaupré</strong></strong>, Jade Savage, Marc Bélisle
+</div>
+<div class="publication-details">
+2026
+</div>
+<div class="publication-links">
+<p><a href="https://doi.org/10.64898/2026.02.02.703377">Pré-publication</a> | <a href="https://www.zotero.org/save?type=doi&amp;q=10.64898/2026.02.02.703377">Ajouter à Zotero</a></p>
+</div>
+</div>
+</section>
 </section>
 <script>
 // Language toggle functionality
 document.addEventListener('DOMContentLoaded', function() {
   let currentLang = localStorage.getItem('language') || 'en';
   setLanguage(currentLang);
-  
+
   document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const lang = this.dataset.lang;
@@ -301,12 +365,12 @@ function setLanguage(lang) {
   document.querySelectorAll('.lang-en, .lang-fr').forEach(el => {
     el.style.display = 'none';
   });
-  
+
   // Show selected language content
   document.querySelectorAll('.lang-' + lang).forEach(el => {
     el.style.display = 'block';
   });
-  
+
   // Update active button state
   document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
     btn.classList.remove('active');
@@ -314,7 +378,7 @@ function setLanguage(lang) {
       btn.classList.add('active');
     }
   });
-  
+
   // Update TOC if present
   setTimeout(() => filterTOC(lang), 100);
   setTimeout(() => filterTOC(lang), 500);
@@ -324,30 +388,32 @@ function setLanguage(lang) {
 function filterTOC(lang) {
   // Get all TOC list items
   const tocItems = document.querySelectorAll('#TOC li');
-  
+
   tocItems.forEach(li => {
     const link = li.querySelector('a');
     if (!link) return;
-    
+
     const href = link.getAttribute('href') || '';
     const text = link.textContent.toLowerCase();
-    
+
     // French section identifiers (including accented characters)
     const frenchSections = [
       'articles-de-revues',
       'articles-évalués-par-les-pairs',
-      'évalués'
+      'évalués',
+      'pré-publications'
     ];
-    
+
     // English section identifiers
     const englishSections = [
       'journal-articles',
-      'peer-reviewed-articles'
+      'peer-reviewed-articles',
+      'preprints'
     ];
-    
+
     const isFrench = frenchSections.some(section => href.includes(section) || text.includes(section));
     const isEnglish = englishSections.some(section => href.includes(section));
-    
+
     if (lang === 'en' && isFrench) {
       li.style.display = 'none';
     } else if (lang === 'fr' && isEnglish) {
