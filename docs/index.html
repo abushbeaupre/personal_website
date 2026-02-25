@@ -169,6 +169,29 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<style>
+.footnotes {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.footnotes h2,
+.footnotes .footnote-back {
+  display: none;
+}
+
+.footnotes ol {
+  list-style: none;
+  padding-left: 0;
+}
+
+.footnotes li::before {
+  content: "";
+}
+</style>
 <div class="lang-toggle">
 <button class="lang-toggle-btn active" data-lang="en">
 <p>English</p>
@@ -197,7 +220,7 @@ ul.task-list li input[type="checkbox"] {
 document.addEventListener('DOMContentLoaded', function() {
   let currentLang = localStorage.getItem('language') || 'en';
   setLanguage(currentLang);
-  
+
   document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const lang = this.dataset.lang;
@@ -212,20 +235,23 @@ function setLanguage(lang) {
   document.querySelectorAll('.lang-en, .lang-fr').forEach(el => {
     el.style.display = 'none';
   });
-  
+
   // Show selected language content
   document.querySelectorAll('.lang-' + lang).forEach(el => {
     el.style.display = 'block';
   });
-  
-  // Update active button state
+
+  // Update active button state and text
   document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.lang === lang) {
       btn.classList.add('active');
+      btn.style.display = 'none';
+    } else {
+      btn.style.display = 'inline-block';
     }
   });
-  
+
   // Update TOC if present
   setTimeout(() => filterTOC(lang), 100);
   setTimeout(() => filterTOC(lang), 500);
@@ -234,20 +260,20 @@ function setLanguage(lang) {
 
 function filterTOC(lang) {
   const tocItems = document.querySelectorAll('#TOC li');
-  
+
   tocItems.forEach(li => {
     const link = li.querySelector('a');
     if (!link) return;
-    
+
     const href = link.getAttribute('href') || '';
     const text = link.textContent || '';
-    
+
     const frenchSections = ['bienvenue'];
     const englishSections = ['welcome'];
-    
+
     const isFrench = frenchSections.some(section => href.includes(section));
     const isEnglish = englishSections.some(section => href.includes(section));
-    
+
     if (lang === 'en' && isFrench) {
       li.style.display = 'none';
     } else if (lang === 'fr' && isEnglish) {
