@@ -425,12 +425,15 @@ if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
 document.addEventListener('DOMContentLoaded', function() {
   let currentLang = localStorage.getItem('language') || 'en';
   setLanguage(currentLang);
+  // Filter TOC immediately
+  filterTOC(currentLang);
 
   document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const lang = this.dataset.lang;
       setLanguage(lang);
       localStorage.setItem('language', lang);
+      filterTOC(lang);
     });
   });
 });
@@ -438,6 +441,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Also filter TOC after window load to ensure it's ready
 window.addEventListener('load', function() {
   let currentLang = localStorage.getItem('language') || 'en';
+  filterTOC(currentLang);
   setTimeout(() => filterTOC(currentLang), 100);
   setTimeout(() => filterTOC(currentLang), 500);
 });
@@ -476,7 +480,13 @@ function filterTOC(lang) {
   const tocItems = document.querySelectorAll('#TOC li');
   
   // Exit if no TOC found
-  if (tocItems.length === 0) return;
+  if (tocItems.length === 0) {
+    console.log('No TOC items found');
+    return;
+  }
+
+  console.log('Filtering TOC for language:', lang);
+  console.log('Found', tocItems.length, 'TOC items');
 
   // Define which sections belong to which language based on href
   const englishSections = ['#journal-articles', '#preprints'];
@@ -487,17 +497,21 @@ function filterTOC(lang) {
     if (!link) return;
 
     const href = link.getAttribute('href') || '';
+    console.log('Processing TOC item with href:', href);
 
     // Check if this is an English or French section
-    const isEnglish = englishSections.some(section => href === section);
-    const isFrench = frenchSections.some(section => href === section);
+    const isEnglish = englishSections.includes(href);
+    const isFrench = frenchSections.includes(href);
 
     if (lang === 'en' && isFrench) {
       li.style.display = 'none';
+      console.log('Hiding French section:', href);
     } else if (lang === 'fr' && isEnglish) {
       li.style.display = 'none';
+      console.log('Hiding English section:', href);
     } else if (isEnglish || isFrench) {
       li.style.display = '';
+      console.log('Showing section:', href);
     }
   });
 }
