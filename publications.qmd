@@ -60,6 +60,10 @@ if (file.exists("orcid_publications_full.rds")) {
 
     # Add abstract field (empty for now)
     preprints_data$abstract <- NA_character_
+    
+    # Add website field (empty for now)
+    preprints_data$website <- NA_character_
+    preprints_data$website[preprints_data$doi == "10.64898/2026.02.09.704914"] <- "https://abushbeaupre.github.io/indirect_viz/"
 
     # Bold my name
     preprints_data$authors <- sapply(preprints_data$authors, bold_my_name, my_name = my_name)
@@ -123,14 +127,16 @@ if (file.exists("orcid_publications_full.rds")) {
       authors = "Allen Bush-Beaupré, Simon Coroller-Chouraki, Marc Bélisle",
       year = "2026",
       journal = "",
-      doi = "10.64898/2026.02.09.704914"
+      doi = "10.64898/2026.02.09.704914",
+      website = "https://abushbeaupre.github.io/indirect_viz/"
     ),
     list(
       title = "Enemy mitigation in farmlands: Intensive agriculture impacts avian nesting and subsequent ectoparasite infestation",
       authors = "Simon Coroller-Chouraki, Allen Bush-Beaupré, Jade Savage, Marc Bélisle",
       year = "2026",
       journal = "",
-      doi = "10.64898/2026.02.02.703377"
+      doi = "10.64898/2026.02.02.703377",
+      website = NA_character_
     )
   ) %>%
     bind_rows() %>%
@@ -267,6 +273,10 @@ if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
     if (!is.na(pub$doi)) {
       links <- c(links, paste0('[bioRxiv preprint](https://doi.org/', pub$doi, ')'))
     }
+    
+    if (!is.na(pub$website) && pub$website != "") {
+      links <- c(links, paste0('[Publication Website](', pub$website, ')'))
+    }
 
     if (!is.na(pub$doi)) {
       links <- c(links, paste0('[Add to Zotero](https://www.zotero.org/save?type=doi&q=', pub$doi, ')'))
@@ -399,6 +409,10 @@ if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
 
     if (!is.na(pub$doi)) {
       links <- c(links, paste0('[Préimpression bioRxiv](https://doi.org/', pub$doi, ')'))
+    }
+    
+    if (!is.na(pub$website) && pub$website != "") {
+      links <- c(links, paste0('[Site web de la publication](', pub$website, ')'))
     }
 
     if (!is.na(pub$doi)) {
