@@ -60,7 +60,7 @@ if (file.exists("orcid_publications_full.rds")) {
 
     # Add abstract field (empty for now)
     preprints_data$abstract <- NA_character_
-    
+
     # Add website field (empty for now)
     preprints_data$website <- NA_character_
     preprints_data$website[preprints_data$doi == "10.64898/2026.02.09.704914"] <- "https://abushbeaupre.github.io/indirect_viz/"
@@ -273,7 +273,7 @@ if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
     if (!is.na(pub$doi)) {
       links <- c(links, paste0('[bioRxiv preprint](https://doi.org/', pub$doi, ')'))
     }
-    
+
     if (!is.na(pub$website) && pub$website != "") {
       links <- c(links, paste0('[Publication Website](', pub$website, ')'))
     }
@@ -410,7 +410,7 @@ if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
     if (!is.na(pub$doi)) {
       links <- c(links, paste0('[Préimpression bioRxiv](https://doi.org/', pub$doi, ')'))
     }
-    
+
     if (!is.na(pub$website) && pub$website != "") {
       links <- c(links, paste0('[Site web de la publication](', pub$website, ')'))
     }
