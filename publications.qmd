@@ -153,11 +153,9 @@ English
 :::
 
 ::: lang-en
-## Journal Articles {.lang-en}
-
 My research focuses on agricultural entomology, integrated pest management, and ecological statistics. You can view my complete publication record on my [ORCID profile](https://orcid.org/0000-0001-6989-9278).
 
-### Journal Articles {.lang-en}
+## Journal Articles {.lang-en}
 
 ```{r display-pubs-en}
 #| results: asis
@@ -228,7 +226,7 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
 }
 ```
 
-### Preprints {.lang-en}
+## Preprints {.lang-en}
 
 ```{r display-preprints-en}
 #| results: asis
@@ -283,11 +281,9 @@ if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
 :::
 
 ::: lang-fr
-## Articles de revues {.lang-fr}
-
 Ma recherche se concentre sur l'entomologie agricole, la lutte intégrée et les statistiques écologiques. Vous pouvez consulter mon dossier de publication complet sur mon [profil ORCID](https://orcid.org/0000-0001-6989-9278).
 
-### Articles de revues {.lang-fr}
+## Articles de revues {.lang-fr}
 
 ```{r display-pubs-fr}
 #| results: asis
@@ -358,7 +354,7 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
 }
 ```
 
-### Pré-publications {.lang-fr}
+## Pré-publications {.lang-fr}
 
 ```{r display-preprints-fr}
 #| results: asis
