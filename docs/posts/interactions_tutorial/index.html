@@ -458,24 +458,9 @@ window.Quarto = {
 <p>Now we can see the true negative relationships within each sex.</p>
 <p>Let’s fit a model to the full population to establish our “ground truth”:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mod_mass_true <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(weight <span class="sc">~</span> sex <span class="sc">*</span> snow_depth, <span class="at">data =</span> bighorn_population, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(<span class="fu">c</span>(male_loss, female_loss))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] -1.65</code></pre>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mod_mass_true <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(weight <span class="sc">~</span> sex <span class="sc">*</span> snow_depth, <span class="at">data =</span> bighorn_population, <span class="at">family =</span> <span class="fu">gaussian</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_mass_true, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>, <span class="at">newdata =</span> bighorn_population)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
- Estimate Std. Error     z Pr(&gt;|z|)     S 2.5 % 97.5 %
-    -1.68     0.0466 -36.1   &lt;0.001 945.2 -1.77  -1.59
-
-Term: snow_depth
-Type: response
-Comparison: dY/dX</code></pre>
-</div>
-</div>
-<p>The true average slope across the population is -1.65 kg/cm, which our model recovers accurately.</p>
+<p>We will use this model to compare with two different sampling scenarios later on.</p>
 </section>
 </section>
 </section>
@@ -492,14 +477,14 @@ Comparison: dY/dX</code></pre>
 <h2 class="anchored" data-anchor-id="scenario-1-balanced-sampling">Scenario 1: Balanced sampling</h2>
 <p>We set up our sheep trapping apparatus and start weighing sheep. We will sample 100 individuals. Luckily, our trap attracts both sexes approximately equally.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># number of individuals weighed</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>n_individuals <span class="ot">&lt;-</span> <span class="dv">100</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Subsample 100 individuals with even sex ratio (50 males, 50 females)</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>bighorn_mass_1 <span class="ot">&lt;-</span> bighorn_population <span class="sc">|&gt;</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">|&gt;</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> n_individuals <span class="sc">/</span> <span class="dv">2</span>, <span class="at">replace =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># number of individuals weighed</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>n_individuals <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Subsample 100 individuals with even sex ratio (50 males, 50 females)</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>bighorn_mass_1 <span class="ot">&lt;-</span> bighorn_population <span class="sc">|&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">|&gt;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> n_individuals <span class="sc">/</span> <span class="dv">2</span>, <span class="at">replace =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>group_by: one grouping variable (sex)
 slice_sample (grouped): removed 900 rows (90%), 100 rows remaining (removed 0 groups, 2 groups remaining)
@@ -509,9 +494,9 @@ ungroup: no grouping variables remain</code></pre>
 <p>Let’s look at the raw data of the subsample</p>
 <p>What is the apparent correlation between spring mass and snow depth?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bighorn_mass_1) <span class="sc">+</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight), <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bighorn_mass_1) <span class="sc">+</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight), <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -523,10 +508,10 @@ ungroup: no grouping variables remain</code></pre>
 <p>Simpson’s Paradox is still present in our sample!</p>
 <p>When we look at the effect of snow depth on the spring mass by sex, we get different conclusions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bighorn_mass_1) <span class="sc">+</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight), <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight, <span class="at">color =</span> sex), <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bighorn_mass_1) <span class="sc">+</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight), <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight, <span class="at">color =</span> sex), <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -539,9 +524,9 @@ ungroup: no grouping variables remain</code></pre>
 <section id="fitting-the-model" class="level3">
 <h3 class="anchored" data-anchor-id="fitting-the-model">Fitting the model</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>mod_mass_1 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(weight <span class="sc">~</span> sex <span class="sc">*</span> snow_depth, <span class="at">data =</span> bighorn_mass_1, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod_mass_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>mod_mass_1 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(weight <span class="sc">~</span> sex <span class="sc">*</span> snow_depth, <span class="at">data =</span> bighorn_mass_1, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod_mass_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Family: gaussian  ( identity )
 Formula:          weight ~ sex * snow_depth
@@ -581,7 +566,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <h2 class="anchored" data-anchor-id="question-1-do-males-and-females-differ-in-their-mass-in-spring">Question 1: Do males and females differ in their mass in spring?</h2>
 <p>To answer this, we need the <strong>average</strong> weight for each sex across all observed snow depths. This is a marginal prediction.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predictions</span>(mod_mass_1, <span class="at">by =</span> <span class="st">"sex"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predictions</span>(mod_mass_1, <span class="at">by =</span> <span class="st">"sex"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     sex Estimate Std. Error    z Pr(&gt;|z|)   S 2.5 % 97.5 %
@@ -593,9 +578,9 @@ Type: response</code></pre>
 </div>
 <p>How do these predictions compare to the raw data?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>bighorn_mass_1 <span class="sc">|&gt;</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">|&gt;</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(weight))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>bighorn_mass_1 <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">avg =</span> <span class="fu">mean</span>(weight))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>group_by: one grouping variable (sex)
 summarise: now 2 rows and 2 columns, ungrouped</code></pre>
@@ -611,8 +596,8 @@ summarise: now 2 rows and 2 columns, ungrouped</code></pre>
 <p>Exactly the same! The <code>predictions()</code> function with <code>by = "sex"</code> gives us the model-predicted mean for each sex, marginalized over the distribution of snow depth in our sample.</p>
 <p>We can now compare the two weights by passing the predictions through the <code>hypotheses()</code> function and stating the null hypothesis that the difference between females (b1, for the first row of the predictions() output) and males (b2) is zero.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predictions</span>(mod_mass_1, <span class="at">by =</span> <span class="st">"sex"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypotheses</span>(<span class="at">hypothesis =</span> <span class="st">"b1 - b2 = 0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predictions</span>(mod_mass_1, <span class="at">by =</span> <span class="st">"sex"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypotheses</span>(<span class="at">hypothesis =</span> <span class="st">"b1 - b2 = 0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Hypothesis Estimate Std. Error     z Pr(&gt;|z|)     S 2.5 % 97.5 %
@@ -628,12 +613,12 @@ summarise: now 2 rows and 2 columns, ungrouped</code></pre>
 <h3 class="anchored" data-anchor-id="understanding-slopes">Understanding slopes()</h3>
 <p>The <code>slopes()</code> function computes the <strong>instantaneous rate of change</strong> of the response with respect to a predictor. For a linear model, this is just the slope coefficient. But when interactions are present, the slope depends on other variables.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_mass_1, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">by =</span> <span class="st">"sex"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">xmax =</span> conf.high, <span class="at">xmin =</span> conf.low, <span class="at">y =</span> sex, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">pch =</span> <span class="dv">21</span>, <span class="at">stroke =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> female_loss, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> male_loss, <span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_mass_1, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">by =</span> <span class="st">"sex"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">xmax =</span> conf.high, <span class="at">xmin =</span> conf.low, <span class="at">y =</span> sex, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">pch =</span> <span class="dv">21</span>, <span class="at">stroke =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> female_loss, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> male_loss, <span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -648,8 +633,8 @@ summarise: now 2 rows and 2 columns, ungrouped</code></pre>
 <h3 class="anchored" data-anchor-id="testing-for-a-difference-in-slopes">Testing for a difference in slopes</h3>
 <p>We can formally test whether the slopes differ:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_mass_1, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">by =</span> <span class="st">"sex"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypotheses</span>(<span class="at">hypothesis =</span> <span class="st">"b1 - b2 = 0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_mass_1, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">by =</span> <span class="st">"sex"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypotheses</span>(<span class="at">hypothesis =</span> <span class="st">"b1 - b2 = 0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Hypothesis Estimate Std. Error     z Pr(&gt;|z|)    S 2.5 % 97.5 %
@@ -659,8 +644,8 @@ summarise: now 2 rows and 2 columns, ungrouped</code></pre>
 <p>This tests whether the female slope minus the male slope equals zero. This is mathematically equivalent to testing whether the interaction term <code>sexmale:snow_depth</code> is different from zero.</p>
 <p>Alternatively, we could test using a ratio:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_mass_1, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">by =</span> <span class="st">"sex"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypotheses</span>(<span class="at">hypothesis =</span> <span class="st">"b1/b2 = 1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_mass_1, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">by =</span> <span class="st">"sex"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypotheses</span>(<span class="at">hypothesis =</span> <span class="st">"b1/b2 = 1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Hypothesis Estimate Std. Error    z Pr(&gt;|z|)   S 2.5 % 97.5 %
@@ -680,7 +665,7 @@ summarise: now 2 rows and 2 columns, ungrouped</code></pre>
 <p>Mathematically, for each individual <span class="math inline">\(i\)</span>: <span class="math display">\[\text{slope}_i = \frac{\partial E[Y_i]}{\partial X_i}\]</span></p>
 <p>Then we average: <span class="math inline">\(\overline{\text{slope}} = \frac{1}{n}\sum_{i=1}^{n} \text{slope}_i\)</span></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_mass_1, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_mass_1, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Estimate Std. Error     z Pr(&gt;|z|)     S 2.5 % 97.5 %
@@ -693,7 +678,7 @@ Comparison: dY/dX</code></pre>
 </div>
 <p>How does this compare to the average simulated slope?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(<span class="fu">c</span>(male_loss, female_loss))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(<span class="fu">c</span>(male_loss, female_loss))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] -1.65</code></pre>
 </div>
@@ -704,22 +689,22 @@ Comparison: dY/dX</code></pre>
 <h3 class="anchored" data-anchor-id="visualizing-marginal-vs-conditional-predictions">Visualizing marginal vs conditional predictions</h3>
 <p>Let’s plot these average predictions along with the sex-specific regression lines to see the difference between marginal and conditional effects.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>avg_pred_mass_1 <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_mass_1, <span class="at">variables =</span> <span class="st">"snow_depth"</span>)</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>pred_sex_mass_1 <span class="ot">&lt;-</span> <span class="fu">predictions</span>(mod_mass_1, <span class="at">newdata =</span> bighorn_mass_1)</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> avg_pred_mass_1, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">color =</span> <span class="st">"lightgreen"</span>, <span class="at">fill =</span> <span class="st">"lightgreen"</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> avg_pred_mass_1, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"lightgreen"</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> pred_sex_mass_1, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high, <span class="at">color =</span> sex, <span class="at">fill =</span> sex), <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> pred_sex_mass_1, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate, <span class="at">color =</span> sex), <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> bighorn_mass_1, <span class="fu">aes</span>(<span class="at">y =</span> weight, <span class="at">x =</span> snow_depth, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">alpha =</span> <span class="st">"none"</span>, <span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Sample predictions (n = 100, balanced)"</span>) <span class="sc">+</span></span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">220</span>)) <span class="ot">-&gt;</span> p1</span>
-<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>p1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>avg_pred_mass_1 <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_mass_1, <span class="at">variables =</span> <span class="st">"snow_depth"</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>pred_sex_mass_1 <span class="ot">&lt;-</span> <span class="fu">predictions</span>(mod_mass_1, <span class="at">newdata =</span> bighorn_mass_1)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> avg_pred_mass_1, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">color =</span> <span class="st">"lightgreen"</span>, <span class="at">fill =</span> <span class="st">"lightgreen"</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> avg_pred_mass_1, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"lightgreen"</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> pred_sex_mass_1, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high, <span class="at">color =</span> sex, <span class="at">fill =</span> sex), <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> pred_sex_mass_1, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate, <span class="at">color =</span> sex), <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> bighorn_mass_1, <span class="fu">aes</span>(<span class="at">y =</span> weight, <span class="at">x =</span> snow_depth, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">alpha =</span> <span class="st">"none"</span>, <span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Sample predictions"</span>) <span class="sc">+</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">220</span>)) <span class="ot">-&gt;</span> p1</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>p1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -735,22 +720,22 @@ Comparison: dY/dX</code></pre>
 <h3 class="anchored" data-anchor-id="comparing-to-the-true-population">Comparing to the true population</h3>
 <p>How do our predictions differ from the true latent trends?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>avg_pred_mass_true <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_mass_true, <span class="at">variables =</span> <span class="st">"snow_depth"</span>)</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>pred_sex_mass_true <span class="ot">&lt;-</span> <span class="fu">predictions</span>(mod_mass_true, <span class="at">newdata =</span> bighorn_population)</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> avg_pred_mass_true, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">color =</span> <span class="st">"lightgreen"</span>, <span class="at">fill =</span> <span class="st">"lightgreen"</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> avg_pred_mass_true, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"lightgreen"</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> pred_sex_mass_true, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high, <span class="at">color =</span> sex, <span class="at">fill =</span> sex), <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> pred_sex_mass_true, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate, <span class="at">color =</span> sex), <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> bighorn_population, <span class="fu">aes</span>(<span class="at">y =</span> weight, <span class="at">x =</span> snow_depth, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">alpha =</span> <span class="st">"none"</span>, <span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"True population (n = 1000)"</span>) <span class="sc">+</span></span>
-<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">220</span>)) <span class="ot">-&gt;</span> p2</span>
-<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>p2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>avg_pred_mass_true <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_mass_true, <span class="at">variables =</span> <span class="st">"snow_depth"</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>pred_sex_mass_true <span class="ot">&lt;-</span> <span class="fu">predictions</span>(mod_mass_true, <span class="at">newdata =</span> bighorn_population)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> avg_pred_mass_true, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">color =</span> <span class="st">"lightgreen"</span>, <span class="at">fill =</span> <span class="st">"lightgreen"</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> avg_pred_mass_true, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"lightgreen"</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> pred_sex_mass_true, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high, <span class="at">color =</span> sex, <span class="at">fill =</span> sex), <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> pred_sex_mass_true, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate, <span class="at">color =</span> sex), <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> bighorn_population, <span class="fu">aes</span>(<span class="at">y =</span> weight, <span class="at">x =</span> snow_depth, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">alpha =</span> <span class="st">"none"</span>, <span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"True population"</span>) <span class="sc">+</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">220</span>)) <span class="ot">-&gt;</span> p2</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>p2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -760,7 +745,7 @@ Comparison: dY/dX</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">+</span> p2 <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">&amp;</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">+</span> p2 <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">&amp;</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -778,20 +763,20 @@ Comparison: dY/dX</code></pre>
 <p>What if our sampling method attracted more males than females such that the sex ratio was biased towards males (80% males, 20% females)?</p>
 <p>This is a common situation in ecology - traps, detection methods, or observer bias can lead to unbalanced samples that don’t reflect the true population composition.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subsample 100 individuals with uneven sex ratio (80 males, 20 females)</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>bighorn_mass_2 <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  bighorn_population <span class="sc">|&gt;</span> <span class="fu">filter</span>(sex <span class="sc">==</span> <span class="st">"male"</span>) <span class="sc">|&gt;</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">80</span>),</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  bighorn_population <span class="sc">|&gt;</span> <span class="fu">filter</span>(sex <span class="sc">==</span> <span class="st">"female"</span>) <span class="sc">|&gt;</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">20</span>)</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subsample 100 individuals with uneven sex ratio (80 males, 20 females)</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>bighorn_mass_2 <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  bighorn_population <span class="sc">|&gt;</span> <span class="fu">filter</span>(sex <span class="sc">==</span> <span class="st">"male"</span>) <span class="sc">|&gt;</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">80</span>),</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  bighorn_population <span class="sc">|&gt;</span> <span class="fu">filter</span>(sex <span class="sc">==</span> <span class="st">"female"</span>) <span class="sc">|&gt;</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">20</span>)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>filter: removed 500 rows (50%), 500 rows remaining
 slice_sample: removed 420 rows (84%), 80 rows remaining
 filter: removed 500 rows (50%), 500 rows remaining
 slice_sample: removed 480 rows (96%), 20 rows remaining</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>mod_mass_2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(weight <span class="sc">~</span> sex <span class="sc">*</span> snow_depth, <span class="at">data =</span> bighorn_mass_2, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_mass_2, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>mod_mass_2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(weight <span class="sc">~</span> sex <span class="sc">*</span> snow_depth, <span class="at">data =</span> bighorn_mass_2, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_mass_2, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Estimate Std. Error     z Pr(&gt;|z|)    S 2.5 % 97.5 %
@@ -801,22 +786,22 @@ Term: snow_depth
 Type: response
 Comparison: dY/dX</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>avg_pred_mass_2 <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_mass_2, <span class="at">variables =</span> <span class="st">"snow_depth"</span>)</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>pred_sex_mass_2 <span class="ot">&lt;-</span> <span class="fu">predictions</span>(mod_mass_2, <span class="at">newdata =</span> bighorn_mass_2)</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> avg_pred_mass_2, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">color =</span> <span class="st">"lightgreen"</span>, <span class="at">fill =</span> <span class="st">"lightgreen"</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> avg_pred_mass_2, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"lightgreen"</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> pred_sex_mass_2, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high, <span class="at">color =</span> sex, <span class="at">fill =</span> sex), <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> pred_sex_mass_2, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate, <span class="at">color =</span> sex), <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> bighorn_mass_2, <span class="fu">aes</span>(<span class="at">y =</span> weight, <span class="at">x =</span> snow_depth, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
-<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">alpha =</span> <span class="st">"none"</span>, <span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Biased sample (80% males)"</span>) <span class="sc">+</span></span>
-<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">220</span>))  <span class="ot">-&gt;</span> p3</span>
-<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>p3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>avg_pred_mass_2 <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_mass_2, <span class="at">variables =</span> <span class="st">"snow_depth"</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>pred_sex_mass_2 <span class="ot">&lt;-</span> <span class="fu">predictions</span>(mod_mass_2, <span class="at">newdata =</span> bighorn_mass_2)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> avg_pred_mass_2, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">color =</span> <span class="st">"lightgreen"</span>, <span class="at">fill =</span> <span class="st">"lightgreen"</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> avg_pred_mass_2, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"lightgreen"</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> pred_sex_mass_2, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high, <span class="at">color =</span> sex, <span class="at">fill =</span> sex), <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> pred_sex_mass_2, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate, <span class="at">color =</span> sex), <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> bighorn_mass_2, <span class="fu">aes</span>(<span class="at">y =</span> weight, <span class="at">x =</span> snow_depth, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">alpha =</span> <span class="st">"none"</span>, <span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Biased sample (80% males)"</span>) <span class="sc">+</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">220</span>))  <span class="ot">-&gt;</span> p3</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>p3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -826,7 +811,7 @@ Comparison: dY/dX</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>p3 <span class="sc">+</span> p2 <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">&amp;</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>p3 <span class="sc">+</span> p2 <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">&amp;</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -848,31 +833,31 @@ Comparison: dY/dX</code></pre>
 <section id="creating-balanced-prediction-data" class="level3">
 <h3 class="anchored" data-anchor-id="creating-balanced-prediction-data">Creating balanced prediction data</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>newdata_mass_balanced <span class="ot">&lt;-</span> bighorn_mass_2 <span class="sc">|&gt;</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">|&gt;</span></span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reframe</span>(<span class="at">snow_depth =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="fu">min</span>(snow_depth), <span class="at">to =</span> <span class="fu">max</span>(snow_depth), <span class="at">length.out =</span> <span class="dv">50</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>newdata_mass_balanced <span class="ot">&lt;-</span> bighorn_mass_2 <span class="sc">|&gt;</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">|&gt;</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reframe</span>(<span class="at">snow_depth =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="fu">min</span>(snow_depth), <span class="at">to =</span> <span class="fu">max</span>(snow_depth), <span class="at">length.out =</span> <span class="dv">50</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>group_by: one grouping variable (sex)
 ungroup: no grouping variables remain</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>avg_pred_mass_3 <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_mass_2,</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">variables =</span> <span class="st">"snow_depth"</span>,</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> newdata_mass_balanced</span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  avg_pred_mass_2 <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">"biased"</span>),</span>
-<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  avg_pred_mass_3 <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">"corrected"</span>),</span>
-<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  avg_pred_mass_true <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">"true"</span>)</span>
-<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate, <span class="at">color =</span> type), <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Comparing marginal predictions"</span>,</span>
-<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Biased sample corrected using balanced newdata"</span>,</span>
-<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Predicted weight (kg)"</span>,</span>
-<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Snow depth (cm)"</span>,</span>
-<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Prediction type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>avg_pred_mass_3 <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_mass_2,</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">variables =</span> <span class="st">"snow_depth"</span>,</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> newdata_mass_balanced</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  avg_pred_mass_2 <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">"biased"</span>),</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>  avg_pred_mass_3 <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">"corrected"</span>),</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>  avg_pred_mass_true <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">"true"</span>)</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate, <span class="at">color =</span> type), <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Comparing marginal predictions"</span>,</span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Biased sample corrected using balanced newdata"</span>,</span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Predicted weight (kg)"</span>,</span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Snow depth (cm)"</span>,</span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Prediction type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>mutate: new variable 'type' (character) with one unique value and 0% NA
 mutate: new variable 'type' (character) with one unique value and 0% NA

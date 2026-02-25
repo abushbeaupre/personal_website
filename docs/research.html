@@ -9,7 +9,7 @@
 <meta name="author" content="Allen Bush-Beaupré">
 <meta name="keywords" content="Allen Bush-Beaupré, ecological statistics, agricultural entomology, integrated pest management, Bayesian statistics, statistical consulting, GLMM, Université de Sherbrooke, CREUS, Bishop’s University">
 
-<title>Blog – Allen Bush-Beaupré</title>
+<title>Research – Allen Bush-Beaupré</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -32,8 +32,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -70,69 +68,12 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-author','listing-date','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="Blog – Allen Bush-Beaupré">
+<meta property="og:title" content="Research – Allen Bush-Beaupré">
 <meta property="og:description" content="Research Scientist in ecological statistics and agricultural entomology at Université de Sherbrooke. Research in integrated pest management, statistical modeling, and reproducible science.">
+<meta property="og:image" content="https://www.allenbushbeaupre.com/swarms_cover_image.jpg">
 <meta property="og:site_name" content="Allen Bush-Beaupré">
 <meta property="og:locale" content="en_US">
 </head>
@@ -163,7 +104,7 @@ window.Quarto = {
 <span class="menu-text">Consultations CREUS</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./posts.html" aria-current="page"> 
+    <a class="nav-link" href="./posts.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
@@ -191,15 +132,15 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(2)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(1)</span></div><div class="category" data-category="data viz">data viz <span class="quarto-category-count">(1)</span></div><div class="category" data-category="glmm">glmm <span class="quarto-category-count">(1)</span></div><div class="category" data-category="indirect effects">indirect effects <span class="quarto-category-count">(1)</span></div><div class="category" data-category="interactions">interactions <span class="quarto-category-count">(1)</span></div><div class="category" data-category="marginaleffects">marginaleffects <span class="quarto-category-count">(1)</span></div><div class="category" data-category="method development">method development <span class="quarto-category-count">(1)</span></div><div class="category" data-category="statistics">statistics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="tutorial">tutorial <span class="quarto-category-count">(1)</span></div></div></div>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Blog</h1>
+<h1 class="title">Research</h1>
 </div>
 
 
@@ -222,96 +163,170 @@ window.Quarto = {
 </header>
 
 
+<div class="lang-toggle">
+<button class="lang-toggle-btn active" data-lang="en">
+<p>English</p>
+</button>
+<button class="lang-toggle-btn" data-lang="fr">
+Français
+</button>
+</div>
+<div class="lang-en">
+<div class="lang-en">
+<section id="research-interests" class="level2">
+<h2 class="anchored" data-anchor-id="research-interests">Research Interests</h2>
+<p>[Add a brief introduction to your research interests here]</p>
+</section>
+<section id="current-projects" class="level2">
+<h2 class="anchored" data-anchor-id="current-projects">Current Projects</h2>
+<section id="project-1-project-title" class="level3">
+<h3 class="anchored" data-anchor-id="project-1-project-title">Project 1: [Project Title]</h3>
+<div class="project-container">
+<p><img src="swarms_cover_image.jpg" class="project-image img-fluid"></p>
+<p>[Add project description here. Explain the objectives, methods, collaborators, and significance of the research.]</p>
+<p><strong>Collaborators:</strong> [Names and institutions]</p>
+<p><strong>Funding:</strong> [Funding sources if applicable]</p>
+</div>
+<hr>
+</section>
+<section id="project-2-project-title" class="level3">
+<h3 class="anchored" data-anchor-id="project-2-project-title">Project 2: [Project Title]</h3>
+<div class="project-container">
+<p><img src="path/to/your/image.jpg" class="project-image img-fluid"></p>
+<p>[Add project description here. Explain the objectives, methods, collaborators, and significance of the research.]</p>
+<p><strong>Collaborators:</strong> [Names and institutions]</p>
+<p><strong>Funding:</strong> [Funding sources if applicable]</p>
+</div>
+<hr>
+</section>
+<section id="project-3-project-title" class="level3">
+<h3 class="anchored" data-anchor-id="project-3-project-title">Project 3: [Project Title]</h3>
+<div class="project-container">
+<p><img src="path/to/your/image.jpg" class="project-image img-fluid"></p>
+<p>[Add project description here. Explain the objectives, methods, collaborators, and significance of the research.]</p>
+<p><strong>Collaborators:</strong> [Names and institutions]</p>
+<p><strong>Funding:</strong> [Funding sources if applicable]</p>
+</div>
+</section>
+</section>
+<section id="publications" class="level2">
+<h2 class="anchored" data-anchor-id="publications">Publications</h2>
+<p>See my full publication list on the <a href="publications.html">Publications page</a>.</p>
+</section>
+</div>
+</div>
+<div class="lang-fr">
+<section id="intérêts-de-recherche" class="level2 lang-fr">
+<h2 class="lang-fr anchored" data-anchor-id="intérêts-de-recherche">Intérêts de recherche</h2>
+<p>[Ajoutez une brève introduction à vos intérêts de recherche ici]</p>
+</section>
+<section id="projets-en-cours" class="level2 lang-fr">
+<h2 class="lang-fr anchored" data-anchor-id="projets-en-cours">Projets en cours</h2>
+<section id="projet-1" class="level3 lang-fr">
+<h3 class="lang-fr anchored" data-anchor-id="projet-1">Projet 1: <img src="images/paste-1.png" class="img-fluid"></h3>
+<div class="project-container">
+<p><img src="swarms_cover_image.jpg" class="project-image img-fluid"></p>
+<p>[Ajoutez la description du projet ici. Expliquez les objectifs, méthodes, collaborateurs et l’importance de la recherche.]</p>
+<p><strong>Collaborateurs:</strong> [Noms et institutions]</p>
+<p><strong>Financement:</strong> [Sources de financement si applicable]</p>
+</div>
+<hr>
+</section>
+<section id="projet-2-titre-du-projet" class="level3 lang-fr">
+<h3 class="lang-fr anchored" data-anchor-id="projet-2-titre-du-projet">Projet 2: [Titre du projet]</h3>
+<div class="project-container">
+<p><img src="path/to/your/image.jpg" class="project-image img-fluid"></p>
+<p>[Ajoutez la description du projet ici. Expliquez les objectifs, méthodes, collaborateurs et l’importance de la recherche.]</p>
+<p><strong>Collaborateurs:</strong> [Noms et institutions]</p>
+<p><strong>Financement:</strong> [Sources de financement si applicable]</p>
+</div>
+<hr>
+</section>
+<section id="projet-3-titre-du-projet" class="level3 lang-fr">
+<h3 class="lang-fr anchored" data-anchor-id="projet-3-titre-du-projet">Projet 3: [Titre du projet]</h3>
+<div class="project-container">
+<p><img src="path/to/your/image.jpg" class="project-image img-fluid"></p>
+<p>[Ajoutez la description du projet ici. Expliquez les objectifs, méthodes, collaborateurs et l’importance de la recherche.]</p>
+<p><strong>Collaborateurs:</strong> [Noms et institutions]</p>
+<p><strong>Financement:</strong> [Sources de financement si applicable]</p>
+</div>
+</section>
+</section>
+<section id="publications-1" class="level2 lang-fr">
+<h2 class="lang-fr anchored" data-anchor-id="publications-1">Publications</h2>
+<p>Consultez ma liste complète de publications sur la <a href="publications.html">page Publications</a>.</p>
+</section>
+</div>
+<script>
+// Language toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  let currentLang = localStorage.getItem('language') || 'en';
+  setLanguage(currentLang);
+  
+  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const lang = this.dataset.lang;
+      setLanguage(lang);
+      localStorage.setItem('language', lang);
+    });
+  });
+});
+
+function setLanguage(lang) {
+  // Hide all language content
+  document.querySelectorAll('.lang-en, .lang-fr').forEach(el => {
+    el.style.display = 'none';
+  });
+  
+  // Show selected language content
+  document.querySelectorAll('.lang-' + lang).forEach(el => {
+    el.style.display = 'block';
+  });
+  
+  // Update active button state
+  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.lang === lang) {
+      btn.classList.add('active');
+    }
+  });
+  
+  // Update TOC if present
+  setTimeout(() => filterTOC(lang), 100);
+  setTimeout(() => filterTOC(lang), 500);
+  setTimeout(() => filterTOC(lang), 1000);
+}
+
+function filterTOC(lang) {
+  const tocItems = document.querySelectorAll('#TOC li');
+  
+  tocItems.forEach(li => {
+    const link = li.querySelector('a');
+    if (!link) return;
+    
+    const href = link.getAttribute('href') || '';
+    const text = link.textContent.toLowerCase();
+    
+    const frenchSections = ['intérêts-de-recherche', 'projets-en-cours', 'publications'];
+    const englishSections = ['research-interests', 'current-projects', 'publications'];
+    
+    const isFrench = frenchSections.some(section => href.includes(section));
+    const isEnglish = englishSections.some(section => href.includes(section));
+    
+    if (lang === 'en' && isFrench) {
+      li.style.display = 'none';
+    } else if (lang === 'fr' && isEnglish) {
+      li.style.display = 'none';
+    } else {
+      li.style.display = '';
+    }
+  });
+}
+</script>
 
 
 
-
-<div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
-<div class="list grid quarto-listing-cols-3">
-<div class="g-col-1" data-index="0" data-categories="tutorial,interactions,marginaleffects,glmm,statistics,R" data-listing-date-sort="1771977600000" data-listing-file-modified-sort="1772035633891" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="18" data-listing-word-count-sort="3514">
-<a href="./posts/interactions_tutorial/index.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<p class="card-img-top"><img src="posts/interactions_tutorial/index_files/figure-html/unnamed-chunk-3-1.png" style="height: 150px;"  class="thumbnail-image card-img"/></p>
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Understanding and Interpreting Interactions in Regression Models
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('tutorial'); return false;">
-tutorial
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('interactions'); return false;">
-interactions
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('marginaleffects'); return false;">
-marginaleffects
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('glmm'); return false;">
-glmm
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('statistics'); return false;">
-statistics
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-</div>
-<div class="card-text listing-description">
-A tutorial on marginal effects, Simpson’s Paradox, and sampling bias using the marginaleffects package in R
-</div>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Allen Bush-Beaupré
-</div>
-<div class="listing-date">
-Feb 25, 2026
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="1" data-categories="data viz,indirect effects,method development" data-listing-date-sort="1698710400000" data-listing-file-modified-sort="1768232404611" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2667">
-<a href="./posts/indirect_effects/index.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<p class="card-img-top">
-<img loading="lazy" src="./posts/indirect_effects/Y_X_anim.gif" class="thumbnail-image card-img" style="height: 150px;">
-</p>
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Visualizing indirect effects
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('data viz'); return false;">
-data viz
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('indirect effects'); return false;">
-indirect effects
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('method development'); return false;">
-method development
-</div>
-</div>
-<div class="card-text listing-description">
-How do we quantify and visualize indirect effects in a path analysis when relationships are non-linear? Worse yet; non-monotonous?
-</div>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Allen Bush-Beaupré
-</div>
-<div class="listing-date">
-Oct 31, 2023
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
