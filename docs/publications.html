@@ -402,7 +402,7 @@ function setLanguage(lang) {
 function filterTOC(lang) {
   // Get all TOC list items
   const tocItems = document.querySelectorAll('#TOC li');
-  
+
   // Exit if no TOC found
   if (tocItems.length === 0) {
     console.log('No TOC items found');
@@ -428,13 +428,13 @@ function filterTOC(lang) {
     const isFrench = frenchSections.includes(href);
 
     if (lang === 'en' && isFrench) {
-      li.style.display = 'none';
+      li.style.setProperty('display', 'none', 'important');
       console.log('Hiding French section:', href);
     } else if (lang === 'fr' && isEnglish) {
-      li.style.display = 'none';
+      li.style.setProperty('display', 'none', 'important');
       console.log('Hiding English section:', href);
     } else if (isEnglish || isFrench) {
-      li.style.display = '';
+      li.style.setProperty('display', '', 'important');
       console.log('Showing section:', href);
     }
   });
