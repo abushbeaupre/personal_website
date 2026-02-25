@@ -157,7 +157,7 @@ English
 
 My research focuses on agricultural entomology, integrated pest management, and ecological statistics. You can view my complete publication record on my [ORCID profile](https://orcid.org/0000-0001-6989-9278).
 
-### Peer-Reviewed Articles {.lang-en}
+### Journal Articles {.lang-en}
 
 ```{r display-pubs-en}
 #| results: asis
@@ -261,7 +261,7 @@ if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
     links <- c()
 
     if (!is.na(pub$doi)) {
-      links <- c(links, paste0('[Preprint](https://doi.org/', pub$doi, ')'))
+      links <- c(links, paste0('[bioRxiv preprint](https://doi.org/', pub$doi, ')'))
     }
 
     if (!is.na(pub$doi)) {
@@ -287,7 +287,7 @@ if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
 
 Ma recherche se concentre sur l'entomologie agricole, la lutte intégrée et les statistiques écologiques. Vous pouvez consulter mon dossier de publication complet sur mon [profil ORCID](https://orcid.org/0000-0001-6989-9278).
 
-### Articles évalués par les pairs {.lang-fr}
+### Articles de revues {.lang-fr}
 
 ```{r display-pubs-fr}
 #| results: asis
@@ -391,7 +391,7 @@ if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
     links <- c()
 
     if (!is.na(pub$doi)) {
-      links <- c(links, paste0('[Pré-publication](https://doi.org/', pub$doi, ')'))
+      links <- c(links, paste0('[Préimpression bioRxiv](https://doi.org/', pub$doi, ')'))
     }
 
     if (!is.na(pub$doi)) {
@@ -467,15 +467,12 @@ function filterTOC(lang) {
     // French section identifiers (including accented characters)
     const frenchSections = [
       'articles-de-revues',
-      'articles-évalués-par-les-pairs',
-      'évalués',
       'pré-publications'
     ];
 
     // English section identifiers
     const englishSections = [
       'journal-articles',
-      'peer-reviewed-articles',
       'preprints'
     ];
 
