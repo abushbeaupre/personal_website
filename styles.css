@@ -169,3 +169,31 @@ h2 {
 .lang-fr {
   display: none;
 }
+
+/* Research page project layout */
+.project-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.project-image {
+  flex-shrink: 0;
+  width: 300px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive: stack image and text on smaller screens */
+@media (max-width: 768px) {
+  .project-container {
+    flex-direction: column;
+  }
+  
+  .project-image {
+    width: 100%;
+    max-width: 400px;
+  }
+}

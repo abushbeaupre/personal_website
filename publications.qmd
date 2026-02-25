@@ -154,8 +154,11 @@ English
 
 ::: lang-en
 My research focuses on agricultural entomology, integrated pest management, and ecological statistics. You can view my complete publication record on my [ORCID profile](https://orcid.org/0000-0001-6989-9278).
+:::
 
 ## Journal Articles {.lang-en}
+
+::: lang-en
 
 ```{r display-pubs-en}
 #| results: asis
@@ -225,8 +228,11 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
   cat("No publications found. Please check back later or visit my [ORCID profile](https://orcid.org/0000-0001-6989-9278).\n")
 }
 ```
+:::
 
 ## Preprints {.lang-en}
+
+::: lang-en
 
 ```{r display-preprints-en}
 #| results: asis
@@ -282,8 +288,11 @@ if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
 
 ::: lang-fr
 Ma recherche se concentre sur l'entomologie agricole, la lutte intégrée et les statistiques écologiques. Vous pouvez consulter mon dossier de publication complet sur mon [profil ORCID](https://orcid.org/0000-0001-6989-9278).
+:::
 
 ## Articles de revues {.lang-fr}
+
+::: lang-fr
 
 ```{r display-pubs-fr}
 #| results: asis
@@ -353,9 +362,11 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
   cat("Aucune publication trouvée. Veuillez revenir plus tard ou visiter mon [profil ORCID](https://orcid.org/0000-0001-6989-9278).\n")
 }
 ```
+:::
 
 ## Pré-publications {.lang-fr}
 
+::: lang-fr
 ```{r display-preprints-fr}
 #| results: asis
 if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
@@ -425,6 +436,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function setLanguage(lang) {
+  // Update body class for CSS rules
+  document.body.className = document.body.className.replace(/lang-[a-z]{2}/g, '');
+  document.body.classList.add('lang-' + lang);
+
   // Hide all language content
   document.querySelectorAll('.lang-en, .lang-fr').forEach(el => {
     el.style.display = 'none';
@@ -453,27 +468,19 @@ function filterTOC(lang) {
   // Get all TOC list items
   const tocItems = document.querySelectorAll('#TOC li');
 
+  // Define which sections belong to which language based on href
+  const englishSections = ['#journal-articles', '#preprints'];
+  const frenchSections = ['#articles-de-revues', '#pré-publications'];
+
   tocItems.forEach(li => {
     const link = li.querySelector('a');
     if (!link) return;
 
     const href = link.getAttribute('href') || '';
-    const text = link.textContent.toLowerCase();
 
-    // French section identifiers (including accented characters)
-    const frenchSections = [
-      'articles-de-revues',
-      'pré-publications'
-    ];
-
-    // English section identifiers
-    const englishSections = [
-      'journal-articles',
-      'preprints'
-    ];
-
-    const isFrench = frenchSections.some(section => href.includes(section) || text.includes(section));
-    const isEnglish = englishSections.some(section => href.includes(section));
+    // Check if this is an English or French section
+    const isEnglish = englishSections.some(section => href === section);
+    const isFrench = frenchSections.some(section => href === section);
 
     if (lang === 'en' && isFrench) {
       li.style.display = 'none';
@@ -534,6 +541,23 @@ function filterTOC(lang) {
   margin-top: 0.5rem;
   color: #444;
   line-height: 1.6;
+}
+
+/* Language-specific header visibility */
+h2.lang-en {
+  display: block;
+}
+
+h2.lang-fr {
+  display: none;
+}
+
+body.lang-fr h2.lang-en {
+  display: none;
+}
+
+body.lang-fr h2.lang-fr {
+  display: block;
 }
 </style>
 ```
