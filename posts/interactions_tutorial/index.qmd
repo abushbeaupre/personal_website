@@ -177,13 +177,9 @@ Let's fit a model to the full population to establish our "ground truth":
 
 ```{r}
 mod_mass_true <- glmmTMB(weight ~ sex * snow_depth, data = bighorn_population, family = gaussian())
-
-mean(c(male_loss, female_loss))
-
-avg_slopes(mod_mass_true, variables = "snow_depth", vcov = TRUE, newdata = bighorn_population)
 ```
 
-The true average slope across the population is `r mean(c(male_loss, female_loss))` kg/cm, which our model recovers accurately.
+We will use this model to compare with two different sampling scenarios later on.
 
 # Sampling from the population
 
