@@ -7,12 +7,10 @@ author:
     orcid: 0000-0001-6989-9278
 date: 10-31-2023
 categories: [data viz, indirect effects, method development] # self-defined categories
-citation: 
-  url: https://abushbeaupre.github.io/posts/indirect_effects/ 
 image: Y_X_anim.gif
 draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
-format: 
-  html: 
+format:
+  html:
     code-fold: TRUE
 ---
 
@@ -119,12 +117,12 @@ Here, I use a long-winded way to compute the predictions to show how it is done
 ```{r}
 #| message: false
 #create dataframe with values of X for which we want to predict Y
-new_dat_Y_X <- tibble(X = seq(from = min(data$X), to = max(data$X), length.out = 30)) 
+new_dat_Y_X <- tibble(X = seq(from = min(data$X), to = max(data$X), length.out = 30))
 
 #predict Y but on the link scale (log) to calculate confidence intervals
 pred_new_dat_Y_X <- predict(mY_X, newdata = new_dat_Y_X, type = "link", se.fit = TRUE)
 
-#extract the inverse link function for the model (exponential in this case) 
+#extract the inverse link function for the model (exponential in this case)
 ilink<- family(mY_X)$linkinv
 # bind the dataframes with values of X and the predicted Y values
 predictions_Y_X <- cbind(new_dat_Y_X,data.frame(pred_new_dat_Y_X)) %>%
@@ -152,7 +150,7 @@ Now, the conditional (direct) effect of X on K
 ```{r}
 #| message: false
 new_dat_K_X <- tibble(X = seq(from = min(data$X), to = max(data$X), length.out = 30),
-                      Y = mean(data$Y)) # set y to its mean to 
+                      Y = mean(data$Y)) # set y to its mean to
 
 pred_new_dat_K_X <- predict(mK_XY, newdata = new_dat_K_X, type = "link", se.fit = TRUE)
 
@@ -171,11 +169,11 @@ pK_X <- ggplot() +
             size = 2)+
   geom_line(data = predictions_K_X, aes(y = Pred, x = X)) +
   geom_ribbon(data = predictions_K_X, aes(ymin = CI.low, ymax = CI.up, x = X)) +
-  
+
   theme_classic() +
   labs(title = "Conditional effect of X on K")
 
-pK_X 
+pK_X
 ```
 
 What about the conditional (direct) effect of Y on K ?
@@ -204,7 +202,7 @@ pK_Y <- ggplot() +
   theme_classic() +
   labs(title = "Conditional effect of Y on K")
 
-pK_Y 
+pK_Y
 ```
 
 So this is the direct effect of Y on K. But, remember that Y is caused by X so it may be of interest to see how X affects K indirectly, through Y
@@ -248,9 +246,9 @@ Now, we need the values of X that were associated with the predicted values of Y
 #| message: false
 #| output: false
 pred_K_YX <- select(predictions_K_YX, c(Y, Pred)) %>%
-  left_join(predictions_Y_X %>% 
-              select(X, Pred) %>% 
-              rename(Y = Pred), 
+  left_join(predictions_Y_X %>%
+              select(X, Pred) %>%
+              rename(Y = Pred),
             by = "Y")
 
 pred_K_YX
@@ -259,7 +257,7 @@ pred_K_YX
 Now, we simply superimpose both graphs of K \~ Y
 
 ```{r}
-pK_Y 
+pK_Y
 ```
 
 ```{r}
@@ -276,7 +274,7 @@ And what about interactions?
 Simulate data
 
 ```{r}
- 
+
 n <- 3000
 #interacting variables
 X1 <- rnorm(n = n, mean = 0, sd = 1)
@@ -427,9 +425,9 @@ predictions_K_YX <- cbind(new_data_KYX,data.frame(pred_new_dat_K_YX)) %>%
          CI.low = ilink(fit - (1.96*se.fit)),
          Pred=ilink(fit)) %>%
   select(-c(X1, X2)) %>% #remove X1 and X2 that are set to their means as we don't need them
-  mutate(X1 = predictions_Y_X$X1, 
+  mutate(X1 = predictions_Y_X$X1,
          X2 = predictions_Y_X$X2)  # add the values of X1 and X2 that were used to predict Y
-  
+
 COLS <- alpha(colorRampPalette(c("blue","red"))(30),0.6)
 ggplot() +
   geom_ribbon(data = predictions_K_YX, aes(ymin = CI.low, ymax = CI.up, x = Y, fill = as.factor(X1)), alpha = 0.2) +

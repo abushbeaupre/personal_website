@@ -7,8 +7,6 @@ author:
     orcid: 0000-0001-6989-9278
 date: 02-25-2026
 categories: [tutorial, interactions, marginaleffects, glmm, statistics, R, series]
-citation:
-  url: https://abushbeaupre.github.io/posts/interactions_categorical_numerical/
 draft: false
 editor: source
 format:
