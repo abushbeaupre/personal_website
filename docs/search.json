@@ -361,7 +361,7 @@
     "href": "posts/interactions_categorical_numerical/index.html#when-to-use-each-approach",
     "title": "Understanding Interactions in Regression Models: Part 1 - Categorical × Numerical",
     "section": "When to use each approach",
-    "text": "When to use each approach\n\nWant to know the effect for a specific group? Use slopes() or predictions() with by = \"group\"\nWant to know the population-average effect? Use avg_slopes() or avg_predictions()\nHave biased sampling but know population composition? Use newdata to specify the balanced population\nWant to compare groups? Use hypotheses() or comparisons() to test differences\nWant to visualize predictions? Use predictions() to generate data for plotting\n\nThere are many ways to use marginaleffects for these approaches. For more detail visit [https://marginaleffects.com/]"
+    "text": "When to use each approach\n\nWant to know the effect for a specific group? Use slopes() or predictions() with by = \"group\"\nWant to know the population-average effect? Use avg_slopes() or avg_predictions()\nHave biased sampling but know population composition? Use newdata to specify the balanced population\nWant to compare groups? Use hypotheses() or comparisons() to test differences\nWant to visualize predictions? Use predictions() to generate predicted means for plotting\n\nThere are many ways to use marginaleffects for these approaches. For more detail visit the marginaleffects website."
   },
   {
     "objectID": "consultation.html#book-a-consultation",

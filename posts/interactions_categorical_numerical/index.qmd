@@ -568,6 +568,6 @@ This is particularly powerful when:
 -   **Want to know the population-average effect?** Use `avg_slopes()` or `avg_predictions()`
 -   **Have biased sampling but know population composition?** Use `newdata` to specify the balanced population
 -   **Want to compare groups?** Use `hypotheses()` or `comparisons()` to test differences
--   **Want to visualize predictions?** Use `predictions()` to generate data for plotting
+-   **Want to visualize predictions?** Use `predictions()` to generate predicted means for plotting
 
-There are many ways to use `marginaleffects` for these approaches. For more detail visit [https://marginaleffects.com/]
+There are many ways to use `marginaleffects` for these approaches. For more detail visit the [marginaleffects website](https://marginaleffects.com/).
