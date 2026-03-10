@@ -569,3 +569,5 @@ This is particularly powerful when:
 -   **Have biased sampling but know population composition?** Use `newdata` to specify the balanced population
 -   **Want to compare groups?** Use `hypotheses()` or `comparisons()` to test differences
 -   **Want to visualize predictions?** Use `predictions()` to generate data for plotting
+
+There are many ways to use `marginaleffects` for these approaches. For more detail visit [https://marginaleffects.com/]
