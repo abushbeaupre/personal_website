@@ -1,14 +1,14 @@
 ---
-title: "Understanding and Interpreting Interactions in Regression Models"
-description: "A tutorial on marginal effects, Simpson's Paradox, and sampling bias using the marginaleffects package in R"
+title: "Understanding Interactions in Regression Models: Part 1 - Categorical × Numerical"
+description: "First in a series on interactions: exploring categorical × numerical interactions, marginal effects, Simpson's Paradox, and sampling bias using the marginaleffects package in R"
 author:
   - name: Allen Bush-Beaupré
     url: https://abushbeaupre.github.io/
     orcid: 0000-0001-6989-9278
 date: 02-25-2026
-categories: [tutorial, interactions, marginaleffects, glmm, statistics, R]
+categories: [tutorial, interactions, marginaleffects, glmm, statistics, R, series]
 citation:
-  url: https://abushbeaupre.github.io/posts/interactions_tutorial/
+  url: https://abushbeaupre.github.io/posts/interactions_categorical_numerical/
 draft: false
 editor: source
 format:
@@ -20,9 +20,18 @@ format:
 
 # Introduction
 
-Interactions in regression models (GLMM or GAMM) can be confusing to conceptualize and interpret especially when link functions are involved. Often, the typical model coefficients output does not answer the research question that we are interested in.
+::: {.callout-note}
+## Series: Understanding Interactions in Regression Models
 
-We will explore various ways interactions can be interpreted depending on a variety of research questions. We will start with linear models and build up to generalized linear models and generalized additive models. Using the marginaleffects package, we will compute various quantities of interests and/or model predictions.
+This is **Part 1** of a tutorial series on interactions in regression models. This part focuses on **categorical × numerical interactions**. Future parts will cover:
+- Part 2: Numerical × numerical interactions
+- Part 3: Interactions in generalized linear models (non-linear link functions)
+- Part 4: Interactions in generalized additive models
+:::
+
+Interactions in regression models (GL(M)M or GA(M)M) can be confusing to conceptualize and interpret, especially when link functions are involved. Often, the typical model coefficients output does not answer the research question that we are interested in.
+
+In this tutorial, we will explore how to interpret interactions between categorical and numerical variables. We'll examine various quantities of interest using the marginaleffects package, including marginal effects, conditional effects, and how to handle Simpson's Paradox and sampling bias.
 
 ## What are interactions?
 
@@ -51,11 +60,11 @@ First, we load the relevant packages and set up our ggplot2 theme for the rest o
 ```{r}
 #| output: false
 #| warning: false
-library(tidyverse) # Data manipulation and plotting
-library(tidylog) # Print a log of data manipulations done with tidyverse
-library(glmmTMB) # Generalized linear (mixed) models
+library(tidyverse)       # Data manipulation and plotting
+library(tidylog)         # Print a log of data manipulations done with tidyverse
+library(glmmTMB)         # Generalized linear (mixed) models
 library(marginaleffects) # Compute marginal/condition effects
-library(patchwork) # Combine multiple plots
+library(patchwork)       # Combine multiple plots
 
 # Set ggplot2 theme
 black_theme <- theme(
@@ -84,9 +93,11 @@ options(marginaleffects_safe = FALSE)
 set.seed(333)
 ```
 
-# Case Study: Interactions between a categorical and numerical variable
+# Case Study: Categorical × Numerical Interactions
 
 For this example, let's travel to Ram Mountain, Alberta. We are interested in the mass of Bighorn sheep (*Ovis canadensis*) in spring and how it relates to winter conditions. However, males and females segregate during winter such that females typically go to lower altitudes and experience less snow than the males.
+
+This case study demonstrates a **categorical × numerical interaction**: the effect of a continuous variable (snow depth) differs between categories (male vs female).
 
 We will simulate a population of 1000 individuals with a 50:50 sex ratio from which we will subsample to try to estimate the true (latent) population trends.
 
@@ -118,8 +129,8 @@ female_loss <- -2.5
 tibble(
   sex = rep(sexes, n_individuals_population / length(sexes)),
   snow_depth = runif(n_individuals_population,
-    min = ifelse(sex == "male", 35, 0),
-    max = ifelse(sex == "male", 70, 35)
+    min = ifelse(sex == "male", 35, 0), # if male, snow depth starts at 35, if female, 0
+    max = ifelse(sex == "male", 70, 35) # if male, snow depth ends at 70, if female, 35
   ),
   weight = rnorm(n_individuals_population,
     mean = ifelse(sex == "male", male_intercept + male_loss * snow_depth, female_intercept + female_loss * snow_depth),
@@ -144,7 +155,11 @@ What is the apparent correlation between spring mass and snow depth?
 #| warning: false
 ggplot(bighorn_population) +
   geom_point(aes(x = snow_depth, y = weight, color = sex)) +
-  geom_smooth(aes(x = snow_depth, y = weight), method = "lm", se = FALSE, color = "red", linewidth = 2)
+  geom_smooth(aes(x = snow_depth, y = weight),
+              method = "lm",
+              se = FALSE,
+              color = "red",
+              linewidth = 2)
 ```
 
 This is what is called **Simpson's Paradox**. When we ignore the grouping variable (sex), we see a **positive** correlation between snow depth and weight! How can this be when we know that both males and females lose weight with increasing snow depth?
@@ -214,7 +229,10 @@ What is the apparent correlation between spring mass and snow depth?
 #| warning: false
 ggplot(bighorn_mass_1) +
   geom_point(aes(x = snow_depth, y = weight, color = sex)) +
-  geom_smooth(aes(x = snow_depth, y = weight), method = "lm", se = FALSE, color = "red")
+  geom_smooth(aes(x = snow_depth, y = weight),
+              method = "lm",
+              se = FALSE,
+              color = "red")
 ```
 
 Simpson's Paradox is still present in our sample!
@@ -291,7 +309,11 @@ The `slopes()` function computes the **instantaneous rate of change** of the res
 ```{r}
 slopes(mod_mass_1, variables = "snow_depth", by = "sex", vcov = TRUE) |>
   ggplot(aes(x = estimate, xmax = conf.high, xmin = conf.low, y = sex, color = sex)) +
-  geom_pointrange(size = 1.5, lineend = "round", linewidth = 2, pch = 21, stroke = 4) +
+  geom_pointrange(size = 1.5,
+                  lineend = "round",
+                  linewidth = 2,
+                  pch = 21,
+                  stroke = 4) +
   geom_vline(xintercept = female_loss, color = "red") +
   geom_vline(xintercept = male_loss, color = "blue") +
   theme(legend.position = "none")
@@ -330,10 +352,6 @@ We saw from plotting the raw data that we can't fit a model ignoring sex to calc
 
 The `avg_slopes()` function computes the **average marginal effect**. It calculates the slope for each observation (accounting for interactions with other predictors), then averages those slopes. This gives us the population-average effect.
 
-Mathematically, for each individual $i$: $$\text{slope}_i = \frac{\partial E[Y_i]}{\partial X_i}$$
-
-Then we average: $\overline{\text{slope}} = \frac{1}{n}\sum_{i=1}^{n} \text{slope}_i$
-
 ```{r}
 avg_slopes(mod_mass_1, variables = "snow_depth", vcov = TRUE)
 ```
@@ -357,11 +375,25 @@ pred_sex_mass_1 <- predictions(mod_mass_1, newdata = bighorn_mass_1)
 
 
 ggplot() +
-  geom_ribbon(data = avg_pred_mass_1, aes(x = snow_depth, ymin = conf.low, ymax = conf.high), color = "lightgreen", fill = "lightgreen", alpha = 0.4) +
-  geom_line(data = avg_pred_mass_1, aes(x = snow_depth, y = estimate), color = "lightgreen", lineend = "round", linewidth = 2) +
-  geom_ribbon(data = pred_sex_mass_1, aes(x = snow_depth, ymin = conf.low, ymax = conf.high, color = sex, fill = sex), alpha = 0.8) +
-  geom_line(data = pred_sex_mass_1, aes(x = snow_depth, y = estimate, color = sex), lineend = "round", linewidth = 2) +
-  geom_point(data = bighorn_mass_1, aes(y = weight, x = snow_depth, color = sex)) +
+  geom_ribbon(data = avg_pred_mass_1,
+              aes(x = snow_depth, ymin = conf.low, ymax = conf.high),
+              color = "lightgreen",
+              fill = "lightgreen",
+              alpha = 0.4) +
+  geom_line(data = avg_pred_mass_1,
+            aes(x = snow_depth, y = estimate),
+            color = "lightgreen",
+            lineend = "round",
+            linewidth = 2) +
+  geom_ribbon(data = pred_sex_mass_1,
+              aes(x = snow_depth, ymin = conf.low, ymax = conf.high, color = sex, fill = sex),
+              alpha = 0.8) +
+  geom_line(data = pred_sex_mass_1,
+            aes(x = snow_depth, y = estimate, color = sex),
+            lineend = "round",
+            linewidth = 2) +
+  geom_point(data = bighorn_mass_1,
+             aes(y = weight, x = snow_depth, color = sex)) +
   guides(alpha = "none", fill = "none") +
   labs(title = "Sample predictions") +
   coord_cartesian(ylim = c(50, 220)) -> p1
@@ -370,8 +402,6 @@ p1
 ```
 
 The green line shows the **marginal prediction** - what we expect for a randomly selected individual from the population at a given snow depth. The blue and red lines show the **conditional predictions** - what we expect for males or females specifically.
-
-Notice that the marginal prediction line is not simply the average of the two conditional lines - it's weighted by the distribution of snow depths for each sex in our sample.
 
 ### Comparing to the true population
 
@@ -425,11 +455,25 @@ pred_sex_mass_2 <- predictions(mod_mass_2, newdata = bighorn_mass_2)
 
 
 ggplot() +
-  geom_ribbon(data = avg_pred_mass_2, aes(x = snow_depth, ymin = conf.low, ymax = conf.high), color = "lightgreen", fill = "lightgreen", alpha = 0.4) +
-  geom_line(data = avg_pred_mass_2, aes(x = snow_depth, y = estimate), color = "lightgreen", lineend = "round", linewidth = 2) +
-  geom_ribbon(data = pred_sex_mass_2, aes(x = snow_depth, ymin = conf.low, ymax = conf.high, color = sex, fill = sex), alpha = 0.8) +
-  geom_line(data = pred_sex_mass_2, aes(x = snow_depth, y = estimate, color = sex), lineend = "round", linewidth = 2) +
-  geom_point(data = bighorn_mass_2, aes(y = weight, x = snow_depth, color = sex)) +
+  geom_ribbon(data = avg_pred_mass_2,
+              aes(x = snow_depth, ymin = conf.low, ymax = conf.high),
+              color = "lightgreen",
+              fill = "lightgreen",
+              alpha = 0.4) +
+  geom_line(data = avg_pred_mass_2,
+            aes(x = snow_depth, y = estimate),
+            color = "lightgreen",
+            lineend = "round",
+            linewidth = 2) +
+  geom_ribbon(data = pred_sex_mass_2,
+              aes(x = snow_depth, ymin = conf.low, ymax = conf.high, color = sex, fill = sex),
+              alpha = 0.8) +
+  geom_line(data = pred_sex_mass_2,
+            aes(x = snow_depth, y = estimate, color = sex),
+            lineend = "round",
+            linewidth = 2) +
+  geom_point(data = bighorn_mass_2,
+             aes(y = weight, x = snow_depth, color = sex)) +
   guides(alpha = "none", fill = "none") +
   labs(title = "Biased sample (80% males)") +
   coord_cartesian(ylim = c(50, 220))  -> p3

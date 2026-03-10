@@ -2,46 +2,50 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.allenbushbeaupre.com/index.html</loc>
-    <lastmod>2026-02-25T17:22:53.848Z</lastmod>
+    <lastmod>2026-02-25T17:24:04.173Z</lastmod>
   </url>
   <url>
-    <loc>https://www.allenbushbeaupre.com/posts/indirect_effects/index.html</loc>
-    <lastmod>2026-01-12T15:40:04.611Z</lastmod>
+    <loc>https://www.allenbushbeaupre.com/posts/interactions_tutorial/index.html</loc>
+    <lastmod>2026-03-10T13:40:27.595Z</lastmod>
   </url>
   <url>
-    <loc>https://www.allenbushbeaupre.com/about.html</loc>
-    <lastmod>2025-01-15T21:12:22.440Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.allenbushbeaupre.com/PUBLICATIONS_AUTOMATION_README.html</loc>
-    <lastmod>2026-01-19T15:10:44.990Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.allenbushbeaupre.com/PUBLICATIONS_README.html</loc>
-    <lastmod>2026-01-19T14:41:58.900Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.allenbushbeaupre.com/posts.html</loc>
-    <lastmod>2026-01-13T14:57:35.995Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.allenbushbeaupre.com/code_structure_tutorial.html</loc>
-    <lastmod>2026-01-19T18:07:19.146Z</lastmod>
+    <loc>https://www.allenbushbeaupre.com/posts/interactions_categorical_numerical/index.html</loc>
+    <lastmod>2026-03-10T13:40:27.375Z</lastmod>
   </url>
   <url>
     <loc>https://www.allenbushbeaupre.com/publications.html</loc>
     <lastmod>2026-02-25T17:15:25.766Z</lastmod>
   </url>
   <url>
-    <loc>https://www.allenbushbeaupre.com/consultation.html</loc>
-    <lastmod>2026-01-19T20:08:00.417Z</lastmod>
+    <loc>https://www.allenbushbeaupre.com/code_structure_tutorial.html</loc>
+    <lastmod>2026-01-19T18:07:19.146Z</lastmod>
   </url>
   <url>
-    <loc>https://www.allenbushbeaupre.com/posts/interactions_tutorial/index.html</loc>
-    <lastmod>2026-02-25T16:07:13.891Z</lastmod>
+    <loc>https://www.allenbushbeaupre.com/posts.html</loc>
+    <lastmod>2026-01-13T14:57:35.995Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.allenbushbeaupre.com/PUBLICATIONS_README.html</loc>
+    <lastmod>2026-01-19T14:41:58.900Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.allenbushbeaupre.com/PUBLICATIONS_AUTOMATION_README.html</loc>
+    <lastmod>2026-01-19T15:10:44.990Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.allenbushbeaupre.com/about.html</loc>
+    <lastmod>2025-01-15T21:12:22.440Z</lastmod>
   </url>
   <url>
     <loc>https://www.allenbushbeaupre.com/research.html</loc>
     <lastmod>2026-01-19T20:22:45.402Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.allenbushbeaupre.com/posts/indirect_effects/index.html</loc>
+    <lastmod>2026-01-12T15:40:04.611Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.allenbushbeaupre.com/consultation.html</loc>
+    <lastmod>2026-01-19T20:08:00.417Z</lastmod>
   </url>
 </urlset>
