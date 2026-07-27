@@ -1,6 +1,6 @@
 ---
 title: "Understanding Interactions in Regression Models: Part 2 - Numerical × Numerical"
-description: "First in a series on interactions: exploring categorical × numerical interactions, marginal effects, Simpson's Paradox, and sampling bias using the marginaleffects package in R"
+description: "Second in a series on interactions: exploring numerical × numerical interactions, marginal effects, conditional effects, and distributional regression in R"
 author:
   - name: Allen Bush-Beaupré
     url: https://abushbeaupre.github.io/
