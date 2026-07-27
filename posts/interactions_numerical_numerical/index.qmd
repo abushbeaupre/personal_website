@@ -5,7 +5,7 @@ author:
   - name: Allen Bush-Beaupré
     url: https://abushbeaupre.github.io/
     orcid: 0000-0001-6989-9278
-date: 02-25-2026
+date: 07-27-2026
 categories: [tutorial, interactions, marginaleffects, glmm, statistics, R, series]
 draft: false
 editor: source
@@ -336,7 +336,7 @@ predictions(mod_flower_measurements_1,
     y = "Temp"
   ) -> resp_surface_3d
 
-#animate_3d(resp_surface_3d, yaw = c(0, 360))
+animate_3d(resp_surface_3d, yaw = c(0, 360))
 ```
 
 The animation does not render the way I would like it to but I hope the reader can still appreciate the shape of the response surface in all its dimensions. We will explore response surfaces of different shapes in a future tutorial on interactions with Generalized Additive Models (GAMs).
