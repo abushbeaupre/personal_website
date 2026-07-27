@@ -32,8 +32,8 @@ library(tidylog)         # Print a log of data manipulations done with tidyverse
 library(glmmTMB)         # Generalized linear (mixed) models
 library(marginaleffects) # Compute marginal/condition effects
 library(patchwork)       # Combine multiple plots
-library(distributional)
-library(ggdist)
+library(distributional)  # Simulate distributions
+library(ggdist)          # Plot nice distributions
 
 # Set ggplot2 theme
 black_theme <- theme(
