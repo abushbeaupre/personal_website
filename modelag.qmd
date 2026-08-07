@@ -2,9 +2,13 @@
 title: "ModelAG"
 ---
 
+::: {style="text-align: center; margin-bottom: 1rem;"}
+![](images/modelag-logo.svg){width="320" fig-alt="ModelAG logo"}
+:::
+
 ::: {style="text-align: center; margin-bottom: 2rem;"}
-## Statistical Consulting Services for Agriculture & Ecology
-### *Rigorous analysis. Clear communication. Actionable insights.*
+### Statistical Consulting Services for Agriculture & Ecology
+#### *Rigorous analysis. Clear communication. Actionable insights.*
 :::
 
 ------------------------------------------------------------------------

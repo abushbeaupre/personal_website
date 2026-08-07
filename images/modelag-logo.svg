@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="320" height="80">
+  <!-- "Model" in black, bold -->
+  <text
+    x="10"
+    y="58"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="60"
+    font-weight="bold"
+    fill="#111111"
+    letter-spacing="-1"
+  >Model</text>
+  <!-- "AG" in dark green, subscript (smaller, lower baseline) -->
+  <text
+    x="242"
+    y="70"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="32"
+    font-weight="bold"
+    fill="#2d6a2d"
+    letter-spacing="0"
+  >AG</text>
+</svg>
