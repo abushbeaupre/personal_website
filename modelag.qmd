@@ -1,0 +1,92 @@
+---
+title: "ModelAG"
+---
+
+::: {style="text-align: center; margin-bottom: 2rem;"}
+## Statistical Consulting Services
+### *Rigorous analysis. Clear communication. Actionable insights.*
+:::
+
+------------------------------------------------------------------------
+
+## About ModelAG
+
+**ModelAG** is a statistical consulting service dedicated to helping researchers, graduate students, and organizations make sense of their data. We specialize in applied statistics, quantitative ecology, and reproducible data analysis workflows.
+
+Whether you are designing a study, analyzing complex datasets, or trying to communicate your results effectively, ModelAG provides expert guidance tailored to your specific needs.
+
+------------------------------------------------------------------------
+
+## Services We Offer
+
+### Study Design & Planning
+
+- Power analysis and sample size determination
+- Experimental and observational study design
+- Sampling strategies and survey design
+- Pre-registration and open science support
+
+### Statistical Analysis
+
+- Generalized Linear Models (GLM) and Generalized Linear Mixed Models (GLMM)
+- Generalized Additive Models (GAM/GAMM)
+- Path analysis and Structural Equation Modeling (SEM)
+- Multivariate statistics (ordination, clustering, discriminant analysis)
+- Bayesian statistical methods
+- Time series analysis
+- Survival and event-history analysis
+
+### Reproducible Research & Programming
+
+- R programming and data wrangling
+- Quarto and R Markdown document preparation
+- Data visualization (ggplot2, custom figures)
+- Reproducible workflow development
+- Code review and optimization
+
+### Results Interpretation & Communication
+
+- Model output interpretation and diagnostics
+- Effect size estimation and uncertainty quantification
+- Scientific writing support for methods and results sections
+- Preparation of publication-quality figures and tables
+
+------------------------------------------------------------------------
+
+## Our Team
+
+### Allen Bush-Beaupré — Founder & Lead Statistician
+
+Allen is a research scientist at Université de Sherbrooke and Bishop's University with expertise in applied statistics and quantitative ecology. He holds an MSc and has extensive experience designing and analyzing studies across a broad range of ecological and agricultural research contexts.
+
+**Specialties:** GLMM, Bayesian methods, path analysis, ecological statistics, R programming, reproducible research
+
+**Affiliations:**
+- Laboratoire Marc Bélisle, Université de Sherbrooke
+- Laboratoire Jade Savage, Bishop's University
+- Statistical consultant, Centre de Recherche en Écologie de l'Université de Sherbrooke (CREUS)
+
+------------------------------------------------------------------------
+
+## Who We Work With
+
+ModelAG works with:
+
+- **Graduate students** (MSc and PhD) navigating statistical challenges in their theses
+- **Academic researchers** seeking a statistical collaborator for grants, publications, or ongoing projects
+- **Non-profit organizations and government agencies** requiring rigorous data analysis
+- **Industry partners** in agriculture, ecology, and environmental sciences
+
+------------------------------------------------------------------------
+
+## Get in Touch
+
+Interested in working with ModelAG? We would love to hear from you.
+
+::: {style="text-align: center; padding: 2.5rem; background-color: #f8f9fa; border-radius: 8px; margin: 2rem 0;"}
+<a href="mailto:allen.bush-beaupre@usherbrooke.ca" style="display: inline-block; padding: 14px 36px; background-color: #343a40; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 1.1em; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">📬 Contact ModelAG</a>
+
+<p style="margin-top: 1.5rem; color: #666; font-size: 0.9em; font-style: italic;">
+We typically respond within 2 business days.
+</p>
+:::
