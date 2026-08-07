@@ -3,7 +3,7 @@ title: "ModelAG"
 ---
 
 ::: {style="text-align: center; margin-bottom: 2rem;"}
-## Statistical Consulting Services
+## Statistical Consulting Services for Agriculture & Ecology
 ### *Rigorous analysis. Clear communication. Actionable insights.*
 :::
 
@@ -11,45 +11,62 @@ title: "ModelAG"
 
 ## About ModelAG
 
-**ModelAG** is a statistical consulting service dedicated to helping researchers, graduate students, and organizations make sense of their data. We specialize in applied statistics, quantitative ecology, and reproducible data analysis workflows.
+**ModelAG** is a statistical consulting service specializing in the analysis of agricultural data, with a particular focus on insect pests and biodiversity. We help researchers, producers, and organizations turn complex field data into clear, evidence-based answers.
 
-Whether you are designing a study, analyzing complex datasets, or trying to communicate your results effectively, ModelAG provides expert guidance tailored to your specific needs.
+Our expertise spans the full analytical pipeline — from designing rigorous trials and field surveys to producing compelling data visualizations and interpretable statistical results. We work with data from randomized controlled trials, field observations, and drone-based remote sensing, and we tailor every engagement to the specific questions and context of our clients.
 
 ------------------------------------------------------------------------
 
 ## Services We Offer
 
-### Study Design & Planning
+### Statistical Analysis of Agricultural Data
 
-- Power analysis and sample size determination
-- Experimental and observational study design
-- Sampling strategies and survey design
-- Pre-registration and open science support
+Our core specialty is analyzing data from agricultural systems, with deep expertise in insect pest dynamics and biodiversity assessments.
 
-### Statistical Analysis
-
-- Generalized Linear Models (GLM) and Generalized Linear Mixed Models (GLMM)
-- Generalized Additive Models (GAM/GAMM)
-- Path analysis and Structural Equation Modeling (SEM)
+- Analysis of randomized trials (RCT, RCBD, Latin square, split-plot designs)
+- Field observation and survey data analysis
+- Insect pest population dynamics and monitoring data
+- Biodiversity indices, species richness, and community composition
+- Generalized Linear Models (GLM/GLMM) and Generalized Additive Models (GAM/GAMM)
 - Multivariate statistics (ordination, clustering, discriminant analysis)
 - Bayesian statistical methods
-- Time series analysis
-- Survival and event-history analysis
 
-### Reproducible Research & Programming
+### Data Visualization
 
-- R programming and data wrangling
-- Quarto and R Markdown document preparation
-- Data visualization (ggplot2, custom figures)
-- Reproducible workflow development
-- Code review and optimization
+We produce clear, publication-quality figures that communicate your results effectively to both scientific and general audiences.
 
-### Results Interpretation & Communication
+- Custom figures and infographics tailored to your data
+- Interactive visualizations for reports and presentations
+- Publication-ready plots (ggplot2 and related tools)
+- Spatial maps and field layout visualizations
 
-- Model output interpretation and diagnostics
-- Effect size estimation and uncertainty quantification
-- Scientific writing support for methods and results sections
-- Preparation of publication-quality figures and tables
+### Drone Data Collection & Analysis
+
+We offer drone-based data collection services to support field research and agricultural monitoring.
+
+- Aerial imagery acquisition over agricultural plots and natural habitats
+- Vegetation indices (NDVI and related metrics) for crop and habitat assessment
+- Insect and biodiversity survey support using aerial platforms
+- Integration of drone-derived data with ground-truth statistical analyses
+
+### Workshops
+
+We design and deliver hands-on workshops tailored to the specific needs and skill levels of our clients.
+
+- Introduction to statistics for agricultural and ecological research
+- R programming for data analysis and visualization
+- Reproducible research workflows (Quarto, R Markdown)
+- Experimental design and data collection best practices
+- Custom topic workshops on request
+
+### Research Collaboration
+
+We are available to collaborate as statistical partners on research projects from inception through publication.
+
+- Co-design of study protocols and data collection strategies
+- Long-term collaboration on multi-year or multi-site studies
+- Statistical contributions to grant applications
+- Co-authorship on peer-reviewed publications where appropriate
 
 ------------------------------------------------------------------------
 
@@ -57,9 +74,9 @@ Whether you are designing a study, analyzing complex datasets, or trying to comm
 
 ### Allen Bush-Beaupré — Founder & Lead Statistician
 
-Allen is a research scientist at Université de Sherbrooke and Bishop's University with expertise in applied statistics and quantitative ecology. He holds an MSc and has extensive experience designing and analyzing studies across a broad range of ecological and agricultural research contexts.
+Allen is a research scientist at Université de Sherbrooke and Bishop's University with expertise in applied statistics and quantitative entomology. He holds an MSc and has extensive experience designing and analyzing studies across agricultural and ecological research contexts, with a particular focus on insect pests and integrated pest management.
 
-**Specialties:** GLMM, Bayesian methods, path analysis, ecological statistics, R programming, reproducible research
+**Specialties:** Agricultural statistics, insect pest data analysis, biodiversity assessments, GLMM, Bayesian methods, data visualization, R programming, reproducible research
 
 **Affiliations:**
 - Laboratoire Marc Bélisle, Université de Sherbrooke
@@ -72,10 +89,11 @@ Allen is a research scientist at Université de Sherbrooke and Bishop's Universi
 
 ModelAG works with:
 
-- **Graduate students** (MSc and PhD) navigating statistical challenges in their theses
+- **Agricultural researchers and producers** seeking rigorous analysis of field trial and monitoring data
+- **Graduate students** (MSc and PhD) working on entomology, agronomy, or ecology projects
 - **Academic researchers** seeking a statistical collaborator for grants, publications, or ongoing projects
-- **Non-profit organizations and government agencies** requiring rigorous data analysis
-- **Industry partners** in agriculture, ecology, and environmental sciences
+- **Government agencies and non-profits** involved in pest management, biodiversity monitoring, or agricultural sustainability
+- **Industry partners** in crop protection, integrated pest management, and environmental consulting
 
 ------------------------------------------------------------------------
 
