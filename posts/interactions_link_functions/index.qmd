@@ -1,0 +1,178 @@
+---
+title: "Understanding Interactions in Regression Models: Part 3 - Generalized Linear Models"
+description: "Second in a series on interactions: exploring numerical × numerical interactions, marginal effects, conditional effects, and distributional regression in R"
+author:
+  - name: Allen Bush-Beaupré
+    url: https://abushbeaupre.github.io/
+    orcid: 0000-0001-6989-9278
+date: 07-27-2026
+categories: [tutorial, interactions, marginaleffects, glmm, statistics, R, series]
+draft: false
+editor: source
+format:
+  html:
+    fig-width: 10
+    fig-height: 7
+    out-width: "100%"
+---
+# Introduction
+
+In this third part of my tutorial series on statistical interactions, we are going to push further on our understanding and reporting of interactions. Since we are going beyond the realm of linear models by exploring generalized linear models (GLMs) and their variants, I am assuming here that the reader has a basic understanding of how GLMs work especially concerning their use of link functions.
+
+I typically write up these tutorials based on bits and pieces of information I have gathered here and there but I will (in part) address topics covered by Spake et al. (2023) https://onlinelibrary.wiley.com/doi/full/10.1111/brv.12939 while giving examples of tools that can be used to report interaction effects on the additive and multiplicative scale.
+
+The case studies in this tutorial will focus on species occurence and abundance. We will first look at habitat suitability for a given species to occur in a given location. Second, we will explore factors that affect their abundance when they are present. Third, we will incorporate both these processes in a single model and learn how to extract as much information as possible from these types of analyses.
+
+## Setup
+
+First, we load the relevant packages and set up our ggplot2 theme for the rest of the document.
+
+```{r}
+#| output: false
+#| warning: false
+library(tidyverse)       # Data manipulation and plotting
+library(tidylog)         # Print a log of data manipulations done with tidyverse
+library(glmmTMB)         # Generalized linear (mixed) models
+library(marginaleffects) # Compute marginal/condition effects
+library(patchwork)       # Combine multiple plots
+library(distributional)  # Simulate distributions
+library(ggdist)          # Plot nice distributions
+library(GGally)
+
+# Set ggplot2 theme
+black_theme <- theme(
+  axis.line = element_line(linewidth = 2, lineend = "round", color = "white"),
+  panel.grid = element_blank(),
+  panel.background = element_rect(fill = "black", color = NA),
+  axis.ticks = element_blank(),
+  axis.text = element_text(size = 21, face = "bold", color = "white"),
+  axis.title = element_text(size = 21, face = "bold", color = "white"),
+  plot.title = element_text(size = 25, face = "bold", color = "white"),
+  plot.background = element_rect(fill = "black", color = NA),
+  legend.background = element_rect(fill = "black", color = NA),
+  legend.text = element_text(size = 21, color = "white"),
+  legend.title = element_text(size = 21, face = "bold", color = "white"),
+  legend.position = "bottom"
+)
+
+theme_set(black_theme)
+
+# Set global default for geom_point shape
+update_geom_defaults("point", list(shape = 1, size = 3, alpha = 0.8))
+
+# silence marginaleffects warnings about glmmTMB
+options(marginaleffects_safe = FALSE)
+
+set.seed(333)
+
+
+```
+
+# Case Study 1: Species occurence
+In this first case study, we are interested in species occurence in different habitats. Specifically, we want evaluate the the interacting effects of habitat composition and environmental variables on the probability of occurence in a given patch. 
+
+
+https://ben18785.shinyapps.io/distribution-zoo/ 
+
+```{r}
+n_plots <- 200
+
+tree_cover <- dist_mixture(dist_beta(4, 0.8), dist_beta(0.8, 4), weights = c(0.5, 0.5))
+
+avg_yearly_rain <- dist_gamma(shape = 3, rate = 0.7)
+
+avg_yearly_temp <- dist_normal(mu = 20, sd = 10)
+
+occurence_intercept <- plogis(-3)
+
+occurence_tree_effect <- 0.45
+
+occurence_rain_effect <- 0.01
+
+occurence_temp_effect <- 0.01
+
+tibble(
+  tree = generate(tree_cover, n_plots),
+  rain = generate(avg_yearly_rain, n_plots),
+  temp = generate(avg_yearly_temp, n_plots)
+) |> 
+  unnest(everything()) |>
+  mutate(occurence = rbinom(n_plots, size = 1, 
+                     prob = occurence_intercept +
+                            occurence_tree_effect * tree +
+                            occurence_rain_effect * rain +
+                            occurence_temp_effect * temp
+                            ))-> occ_data
+
+ggpairs(
+  occ_data,
+  diag  = list(continuous = wrap("densityDiag", fill = "white", alpha = 0.6, color = "white")),
+  lower = list(continuous = wrap("points", color = "white", alpha = 0.6, size = 2, shape = 1)),
+  upper = list(continuous = wrap("cor", color = "white", size = 5))
+) +
+  theme(
+    strip.text = element_text(color = "black", face = "bold", size = 12),
+    axis.text = element_text(color = "white", face = "bold", size = 12)
+  )
+```
+
+Some people might want to dichotomize tree cover
+```{r}
+occ_data |>
+  mutate(tree_cat = as.factor(ifelse(tree > 0.5, "high", "low"))) -> occ_data
+```
+
+Implicit interactions
+
+```{r}
+scale_x <- function(x){
+  x - mean(x) / sd(x)
+}
+
+occ_data |>
+  mutate(scl_tree = scale_x(tree),
+         scl_rain = scale_x(rain),
+         scl_temp = scale_x(temp)) -> occ_data
+
+mod_1 <- glmmTMB(occurence ~ tree + rain + temp, family = binomial(link = "logit"), data = occ_data)
+
+summary(mod_1)
+
+slopes(mod_1, variables = "tree", newdata = datagrid(temp = mean(occ_data$temp), rain = mean(occ_data$rain)))
+
+avg_slopes(mod_1, variables = "rain")
+
+avg_slopes(mod_1, variables = "temp")
+```
+
+```{r}
+slopes(mod_1, variables = "tree", newdata = datagrid(temp = fivenum, rain = fivenum)) -> t
+
+ggplot(t) + geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1), color = "white") +
+  geom_vline(xintercept = occurence_tree_effect, color = "white", alpha = .8) +
+  facet_grid(rain ~ temp)
+```
+
+
+```{r}
+predictions(mod_1, variables = "tree", newdata = datagrid(temp = fivenum, rain = fivenum)) -> pred_tree1
+
+ggplot(pred_tree1) +
+  geom_ribbon(aes(x = tree, ymin = conf.low, ymax = conf.high), fill = "white", alpha = 0.2) +
+  geom_line(aes(x = tree, y = estimate), color = "white") +
+  facet_grid(rain ~ temp)
+```
+
+
+```{r}
+avg_slopes(mod_1, variables = "tree")
+slopes(mod_1, variables = "tree", newdata = datagrid(temp = 0, rain = 0))
+slopes(mod_1, variables = "tree", newdata = datagrid(temp = mean(occ_data$temp), rain = mean(occ_data$rain)))
+
+avg_slopes(mod_1, variables = "rain")
+slopes(mod_1, variables = "rain", newdata = datagrid(temp = 0, tree = 0))
+slopes(mod_1, variables = "rain", newdata = datagrid(temp = mean(occ_data$temp), tree = mean(occ_data$tree)))
+
+
+avg_slopes(mod_1, variables = "temp")
+```

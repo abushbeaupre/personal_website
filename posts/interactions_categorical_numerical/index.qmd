@@ -22,7 +22,7 @@ format:
 ## Series: Understanding Interactions in Regression Models
 
 This is **Part 1** of a tutorial series on interactions in regression models. This part focuses on **categorical × numerical interactions**. Future parts will cover:
-- Part 2: Numerical × numerical interactions
+- [Part 2: Numerical × numerical interactions](../interactions_numerical_numerical/index.qmd)
 - Part 3: Interactions in generalized linear models (non-linear link functions)
 - Part 4: Interactions in generalized additive models
 :::
