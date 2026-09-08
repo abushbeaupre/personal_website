@@ -155,7 +155,11 @@ English
 
 </button>
 
-<button class="lang-toggle-btn" data-lang="fr">Français</button>
+<button class="lang-toggle-btn" data-lang="fr">
+
+Français
+
+</button>
 :::
 
 ::: lang-en
@@ -165,7 +169,6 @@ My research focuses on agricultural entomology, integrated pest management, and 
 ## Journal Articles {.lang-en}
 
 ::: lang-en
-
 ```{r display-pubs-en}
 #| results: asis
 if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
@@ -239,7 +242,6 @@ if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
 ## Preprints {.lang-en}
 
 ::: lang-en
-
 ```{r display-preprints-en}
 #| results: asis
 if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
@@ -293,7 +295,6 @@ if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
   cat("No preprints available.\n")
 }
 ```
-
 :::
 
 ::: lang-fr
@@ -303,7 +304,6 @@ Ma recherche se concentre sur l'entomologie agricole, la lutte intégrée et les
 ## Articles de revues {.lang-fr}
 
 ::: lang-fr
-
 ```{r display-pubs-fr}
 #| results: asis
 if (!is.null(pubs_data) && nrow(pubs_data) > 0) {
@@ -430,7 +430,6 @@ if (!is.null(preprints_data) && nrow(preprints_data) > 0) {
   cat("Aucune pré-publication disponible.\n")
 }
 ```
-
 :::
 
 ```{=html}
