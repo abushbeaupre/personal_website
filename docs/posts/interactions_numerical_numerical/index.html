@@ -386,7 +386,7 @@ window.Quarto = {
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>) <span class="ot">-&gt;</span> flower_measurements_1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>You may notice in the code above that, in contrast to how we simulated Bighorn Sheep data in the <a href="../../posts/interactions_categorical_numerical/index.html">first tutorial</a>, we have centered the values of the predictors. In other words, we have subtracted the average temperature or rain value from the observations. This has for effect of shifting the model intercept. Rather than the intercept being the average petal length when rain and temperature = 0, it represents the average petal length for flowers exposed to average temperature and rain conditions. This makes its value (debatably) more pertinent to our research topic.</p>
+<p>You may notice in the code above that, in contrast to how we simulated Bighorn Sheep data in the <a href="../../posts/interactions_categorical_numerical/index.html">first tutorial</a>, we have centered the values of the predictors. In other words, we have subtracted the average temperature or rain value from the observations. This has for effect of shifting the model intercept. Rather than the intercept being the average petal length when rain and temperature = 0, it represents the average petal length for flowers exposed to average temperature and rain conditions. This makes its value (debatably) more pertinent to some research topics.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GGally)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggpairs</span>(</span>
@@ -435,7 +435,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <p>We can see from the model output that the model estimates our parameters pretty well.</p>
 <p>Notice how we have gone straight to a model without having clearly defined our research questions. We now have a model output; every parameter has 3 stars which means we are significantly happy. But why? And, most importantly, what do these values mean?</p>
 <p>Since our vague research objective is to quantify the effect of environmental conditions on petal length, let’s break down our model and extract as many effects as possible. This will help us understand interactions better and formulate more specific research questions.</p>
-<p>Let us start with the Estimates for temp_centered and rain_centered. These are the slopes for temperature and rain when the other variable is set to zero. As we mean-centered these predictors, the estimates are the effect of one variable when the other is at its mean. Let’s validate this with the slopes() function.</p>
+<p>Let us start with the Estimates for temp_centered and rain_centered. These are the slopes for temperature and rain when the other variable is set to zero. As we mean-centered these predictors, the estimates are the effect of one variable when the other is at its mean. Let’s validate this with the <code style="background-color: #e0e0e0;">slopes()</code> function.</p>
 <p>Temperature effect when rain_centered = 0</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_flower_measurements_1,</span>
@@ -478,8 +478,8 @@ Comparison: dY/dX</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>slopes_by_temp <span class="ot">&lt;-</span> <span class="fu">slopes</span>(mod_flower_measurements_1,</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">temp_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">length.out =</span> <span class="dv">30</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">length.out =</span> <span class="dv">30</span></span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">variables =</span> <span class="st">"rain_centered"</span>,</span>
@@ -524,8 +524,8 @@ Comparison: dY/dX</code></pre>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>slopes_by_rain <span class="ot">&lt;-</span> <span class="fu">slopes</span>(mod_flower_measurements_1,</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">rain_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>rain_centered),</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>rain_centered),</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">length.out =</span> <span class="dv">30</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                                         <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>rain_centered),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">length.out =</span> <span class="dv">30</span></span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  )),</span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">variables =</span> <span class="st">"temp_centered"</span>,</span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">"rain_centered"</span></span>
@@ -564,15 +564,15 @@ Comparison: dY/dX</code></pre>
 </div>
 </div>
 <p>Temperature has a positive effect for all values of rain but that effect increases as rain increases.</p>
-<p>We can obtain similar plots using the plot_slopes() function https://marginaleffects.com/man/r/plot_slopes.html</p>
+<p>We can obtain similar plots using the <a href="https://marginaleffects.com/man/r/plot_slopes.html"><code style="background-color: #e0e0e0;">plot_slopes()</code></a> function.</p>
 <p>The slope obtained between the effect of one predictor and the values of the other is the interaction parameter we obtain in the model output. This is the <em>moderating</em> effect that the predictors have on one another. As we did not have a very specific research question, we can report both of the plots above as a description of how temperature and rain moderate each other’s effect on petal length. In many contexts, however, we have apriori hypotheses about how variables interact within a system. For example, if we study a drought-resistant plant, we may hypothesize that temperature (the <em>exposure</em> variable) is the most relevant factor that could affect petal length (the <em>outcome</em>) but its effect is moderated by rain (the <em>moderator</em>). If that is the case, let’s look at some ways to display the model predictions.</p>
-<p>We can start by looking at the predicted average petal length as a function of temperature for different values of rain. The choice of moderator values for which we generate predictions can vary depending on the research question. It is common to choose certain quantiles of the moderator. In this example, we will use the five-number summary (https://en.wikipedia.org/wiki/Five-number_summary) for rain values.</p>
+<p>We can start by looking at the predicted average petal length as a function of temperature for different values of rain. The choice of moderator values for which we generate predictions can vary depending on the research question. It is common to choose certain quantiles of the moderator. In this example, we will use the <a href="https://en.wikipedia.org/wiki/Five-number_summary">five-number summary</a> for rain values.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predictions</span>(mod_flower_measurements_1,</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">temp_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">length.out =</span> <span class="dv">30</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">length.out =</span> <span class="dv">30</span></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">rain_centered =</span> fivenum</span>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  )</span>
@@ -614,12 +614,12 @@ Comparison: dY/dX</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predictions</span>(mod_flower_measurements_1,</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">temp_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">length.out =</span> <span class="dv">30</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">length.out =</span> <span class="dv">30</span></span>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">rain_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>rain_centered),</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>rain_centered),</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">length.out =</span> <span class="dv">30</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>rain_centered),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>                        <span class="at">length.out =</span> <span class="dv">30</span></span>
 <span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
@@ -653,12 +653,12 @@ Comparison: dY/dX</code></pre>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">predictions</span>(mod_flower_measurements_1,</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">temp_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">length.out =</span> <span class="dv">30</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                        <span class="at">length.out =</span> <span class="dv">30</span></span>
 <span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
 <span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">rain_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>rain_centered),</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>rain_centered),</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">length.out =</span> <span class="dv">30</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>rain_centered),</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>                        <span class="at">length.out =</span> <span class="dv">30</span></span>
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
@@ -776,7 +776,7 @@ Expected dispersion intercept (log scale): 1.504077 </code></pre>
 </div>
 </div>
 <p>The model recovers our simulated parameters pretty well</p>
-<p>Let’s visualize how well the model recovers the variance structure: We do this by predicting the standard deviation values for all observed values of temperature via the type = “disp” argument in predictions()</p>
+<p>Let’s visualize how well the model recovers the variance structure: We do this by predicting the standard deviation values for all observed values of temperature via the <code style="background-color: #e0e0e0;">type = "disp"</code> argument in <code style="background-color: #e0e0e0;">predictions()</code></p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># estimate sd</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">predictions</span>(mod_flower_measurements_2, <span class="at">newdata =</span> flower_measurements_2, <span class="at">type =</span> <span class="st">"disp"</span>) <span class="sc">|&gt;</span> <span class="fu">as_tibble</span>() <span class="ot">-&gt;</span> pred_sd_temp</span>
@@ -1029,12 +1029,12 @@ Expected dispersion intercept (log scale): 1.504077 </code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predictions</span>(mod_flower_measurements_3,</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">temp_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_3<span class="sc">$</span>temp_centered),</span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">max</span>(flower_measurements_3<span class="sc">$</span>temp_centered),</span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">length.out =</span> <span class="dv">30</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">max</span>(flower_measurements_3<span class="sc">$</span>temp_centered),</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">length.out =</span> <span class="dv">30</span></span>
 <span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
 <span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">rain_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_3<span class="sc">$</span>rain_centered),</span>
-<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">max</span>(flower_measurements_3<span class="sc">$</span>rain_centered),</span>
-<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">length.out =</span> <span class="dv">30</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">max</span>(flower_measurements_3<span class="sc">$</span>rain_centered),</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>                        <span class="at">length.out =</span> <span class="dv">30</span></span>
 <span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>  ),</span>
 <span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"disp"</span></span>
@@ -1067,8 +1067,8 @@ Expected dispersion intercept (log scale): 1.504077 </code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>slopes_by_temp_sd <span class="ot">&lt;-</span> <span class="fu">slopes</span>(mod_flower_measurements_3,</span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">temp_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_3<span class="sc">$</span>temp_centered),</span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">max</span>(flower_measurements_3<span class="sc">$</span>temp_centered),</span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">length.out =</span> <span class="dv">30</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">max</span>(flower_measurements_3<span class="sc">$</span>temp_centered),</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">length.out =</span> <span class="dv">30</span></span>
 <span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
 <span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">variables =</span> <span class="st">"rain_centered"</span>,</span>
@@ -1105,8 +1105,8 @@ Expected dispersion intercept (log scale): 1.504077 </code></pre>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>slopes_by_rain_sd <span class="ot">&lt;-</span> <span class="fu">slopes</span>(mod_flower_measurements_3,</span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">rain_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_3<span class="sc">$</span>rain_centered),</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(flower_measurements_3<span class="sc">$</span>rain_centered),</span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">length.out =</span> <span class="dv">30</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>                                         <span class="fu">max</span>(flower_measurements_3<span class="sc">$</span>rain_centered),</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>                                         <span class="at">length.out =</span> <span class="dv">30</span></span>
 <span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  )),</span>
 <span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">variables =</span> <span class="st">"temp_centered"</span>,</span>
 <span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">"rain_centered"</span>,</span>
@@ -1137,7 +1137,7 @@ Expected dispersion intercept (log scale): 1.504077 </code></pre>
 </div>
 </div>
 </div>
-<p>While reporting the predictors’ effects on the average and standard deviation of petal length separately is informative, I personally find it difficult to interpret knowing that the two parameters of the Normal distribution act together to generate the observations. I suggest in this case to also create figures that communicate the predicted observations generated from the estimate values of the average and standard deviation. We can do so by predicting the average and standard deviation based on different values of temperature and rain. In the following code, we predict the average petal length using the type = “conditional” argument in predictions() and join these values to the predicted standard deviation using the type = “disp” argument. We then use the distributional package which I absolutely love to generate distributions. In this specific case, we use the dist_normal() function to which we give the predicted values of the average and standard deviation of petal length for every combination of predictor values. The result gives an entire distribution contained within a single cell in the dataset. In other words, every row of the pred_obs column is a distribution of predicted observations of petal length.</p>
+<p>While reporting the predictors’ effects on the average and standard deviation of petal length separately is informative, I personally find it difficult to interpret knowing that the two parameters of the Normal distribution act together to generate the observations. I suggest in this case to also create figures that communicate the predicted observations generated from the estimate values of the average and standard deviation. We can do so by predicting the average and standard deviation based on different values of temperature and rain. In the following code, we predict the average petal length using the <code style="background-color: #e0e0e0;">type = "conditional"</code> argument in <code style="background-color: #e0e0e0;">predictions()</code> and join these values to the predicted standard deviation using the <code style="background-color: #e0e0e0;">type = "disp"</code> argument. We then use the distributional package which I absolutely love to generate distributions. In this specific case, we use the <code style="background-color: #e0e0e0;">dist_normal()</code> function to which we give the predicted values of the average and standard deviation of petal length for every combination of predictor values. The result gives an entire distribution contained within a single cell in the dataset. In other words, every row of the pred_obs column is a distribution of predicted observations of petal length.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predictions</span>(mod_flower_measurements_3,</span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
@@ -1210,18 +1210,18 @@ mutate: changed 25 values (100%) of 'temp_centered' (0 new NAs)
 <ol type="1">
 <li><p><strong>Numerical × numerical interactions mean variable-dependent slopes</strong>: With an interaction, the slope of one predictor changes linearly with the value of the other. The interaction coefficient <span class="math inline">\(\beta_3\)</span> is the amount by which the slope of one predictor changes for a one-unit increase in the other.</p></li>
 <li><p><strong>Centering helps interpretation</strong>: When predictors are mean-centered, the “main effect” coefficients are the slopes of each predictor when the other is at its average, and the intercept is the predicted response under average conditions.</p></li>
-<li><p><strong>Plot the slopes, not just the coefficients</strong>: Plotting the slope of one predictor across the range of the other (with <code>slopes()</code>) shows where an effect is positive, negative, or indistinguishable from zero.</p></li>
+<li><p><strong>Plot the slopes, not just the coefficients</strong>: Plotting the slope of one predictor across the range of the other (with <code style="background-color: #e0e0e0;">slopes()</code>) shows where an effect is positive, negative, or indistinguishable from zero.</p></li>
 <li><p><strong>Choose visualizations for your question</strong>: Conditional prediction lines at chosen moderator values (e.g., the five-number summary) are usually easier to interpret than response surfaces, which lack uncertainty information and can encourage over-interpretation.</p></li>
-<li><p><strong>Interactions are not only for the mean</strong>: With distributional regression (e.g., <code>dispformula</code> in glmmTMB), predictors can interact in their effect on the standard deviation of the response. Visualizing the full predicted distributions (with the distributional and ggdist packages) helps interpret how the modeled parameters act together.</p></li>
+<li><p><strong>Interactions are not only for the mean</strong>: With distributional regression (e.g., <code style="background-color: #e0e0e0;">dispformula</code> in glmmTMB), predictors can interact in their effect on the standard deviation of the response. Visualizing the full predicted distributions (with the distributional and ggdist packages) helps interpret how the modeled parameters act together.</p></li>
 </ol>
 </section>
 <section id="tools-for-interpretation" class="level2">
 <h2 class="anchored" data-anchor-id="tools-for-interpretation">Tools for interpretation</h2>
 <ul>
-<li><code>slopes()</code> with <code>by =</code>: Get the slope of one predictor across values of the other</li>
-<li><code>predictions()</code> with <code>datagrid()</code>: Generate conditional predictions at chosen combinations of predictor values (e.g., <code>fivenum</code> for the moderator)</li>
-<li><code>type = "disp"</code>: Get predictions or slopes for the dispersion (standard deviation) model</li>
-<li><code>plot_slopes()</code> and <code>plot_predictions()</code>: Quick versions of the plots we built manually</li>
+<li><code style="background-color: #e0e0e0;">slopes()</code> with <code style="background-color: #e0e0e0;">by =</code>: Get the slope of one predictor across values of the other</li>
+<li><code style="background-color: #e0e0e0;">predictions()</code> with <code style="background-color: #e0e0e0;">datagrid()</code>: Generate conditional predictions at chosen combinations of predictor values (e.g., <code style="background-color: #e0e0e0;">fivenum</code> for the moderator)</li>
+<li><code style="background-color: #e0e0e0;">type = "disp"</code>: Get predictions or slopes for the dispersion (standard deviation) model</li>
+<li><code style="background-color: #e0e0e0;">plot_slopes()</code> and <code style="background-color: #e0e0e0;">plot_predictions()</code>: Quick versions of the plots we built manually</li>
 </ul>
 <p>In the next part of this series, we will look at interactions in generalized linear models, where non-linear link functions add another layer of complexity to interpretation.</p>
 

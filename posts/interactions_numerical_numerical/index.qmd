@@ -122,7 +122,7 @@ tibble(
 ) -> flower_measurements_1
 ```
 
-You may notice in the code above that, in contrast to how we simulated Bighorn Sheep data in the [first tutorial](../interactions_categorical_numerical/index.qmd), we have centered the values of the predictors. In other words, we have subtracted the average temperature or rain value from the observations. This has for effect of shifting the model intercept. Rather than the intercept being the average petal length when rain and temperature = 0, it represents the average petal length for flowers exposed to average temperature and rain conditions. This makes its value (debatably) more pertinent to our research topic.
+You may notice in the code above that, in contrast to how we simulated Bighorn Sheep data in the [first tutorial](../interactions_categorical_numerical/index.qmd), we have centered the values of the predictors. In other words, we have subtracted the average temperature or rain value from the observations. This has for effect of shifting the model intercept. Rather than the intercept being the average petal length when rain and temperature = 0, it represents the average petal length for flowers exposed to average temperature and rain conditions. This makes its value (debatably) more pertinent to some research topics.
 
 ```{r}
 library(GGally)
@@ -150,7 +150,7 @@ Notice how we have gone straight to a model without having clearly defined our r
 
 Since our vague research objective is to quantify the effect of environmental conditions on petal length, let's break down our model and extract as many effects as possible. This will help us understand interactions better and formulate more specific research questions.
 
-Let us start with the Estimates for temp_centered and rain_centered. These are the slopes for temperature and rain when the other variable is set to zero. As we mean-centered these predictors, the estimates are the effect of one variable when the other is at its mean. Let's validate this with the slopes() function.
+Let us start with the Estimates for temp_centered and rain_centered. These are the slopes for temperature and rain when the other variable is set to zero. As we mean-centered these predictors, the estimates are the effect of one variable when the other is at its mean. Let's validate this with the `slopes()`{style="background-color: #e0e0e0;"} function.
 
 Temperature effect when rain_centered = 0
 ```{r}
@@ -179,8 +179,8 @@ Effect of rain:
 slopes_by_temp <- slopes(mod_flower_measurements_1,
   newdata = datagrid(
     temp_centered = seq(min(flower_measurements_1$temp_centered),
-      max(flower_measurements_1$temp_centered),
-      length.out = 30
+                        max(flower_measurements_1$temp_centered),
+                        length.out = 30
     )
   ),
   variables = "rain_centered",
@@ -220,8 +220,8 @@ Effect of temperature:
 ```{r}
 slopes_by_rain <- slopes(mod_flower_measurements_1,
   newdata = datagrid(rain_centered = seq(min(flower_measurements_1$rain_centered),
-    max(flower_measurements_1$rain_centered),
-    length.out = 30
+                                         max(flower_measurements_1$rain_centered),
+                                         length.out = 30
   )),
   variables = "temp_centered",
   by = "rain_centered"
@@ -255,18 +255,18 @@ slopes_by_rain |>
 
 Temperature has a positive effect for all values of rain but that effect increases as rain increases.
 
-We can obtain similar plots using the plot_slopes() function https://marginaleffects.com/man/r/plot_slopes.html
+We can obtain similar plots using the [`plot_slopes()`{style="background-color: #e0e0e0;"}](https://marginaleffects.com/man/r/plot_slopes.html) function.
 
 The slope obtained between the effect of one predictor and the values of the other is the interaction parameter we obtain in the model output. This is the *moderating* effect that the predictors have on one another. As we did not have a very specific research question, we can report both of the plots above as a description of how temperature and rain moderate each other's effect on petal length. In many contexts, however, we have apriori hypotheses about how variables interact within a system. For example, if we study a drought-resistant plant, we may hypothesize that temperature (the *exposure* variable) is the most relevant factor that could affect petal length (the *outcome*) but its effect is moderated by rain (the *moderator*). If that is the case, let's look at some ways to display the model predictions.
 
-We can start by looking at the predicted average petal length as a function of temperature for different values of rain. The choice of moderator values for which we generate predictions can vary depending on the research question. It is common to choose certain quantiles of the moderator. In this example, we will use the five-number summary (https://en.wikipedia.org/wiki/Five-number_summary) for rain values.
+We can start by looking at the predicted average petal length as a function of temperature for different values of rain. The choice of moderator values for which we generate predictions can vary depending on the research question. It is common to choose certain quantiles of the moderator. In this example, we will use the [five-number summary](https://en.wikipedia.org/wiki/Five-number_summary) for rain values.
 
 ```{r}
 predictions(mod_flower_measurements_1,
   newdata = datagrid(
     temp_centered = seq(min(flower_measurements_1$temp_centered),
-      max(flower_measurements_1$temp_centered),
-      length.out = 30
+                        max(flower_measurements_1$temp_centered),
+                        length.out = 30
     ),
     rain_centered = fivenum
   )
@@ -301,12 +301,12 @@ Another way to visualize these trends is to generate a response surface.
 predictions(mod_flower_measurements_1,
   newdata = datagrid(
     temp_centered = seq(min(flower_measurements_1$temp_centered),
-      max(flower_measurements_1$temp_centered),
-      length.out = 30
+                        max(flower_measurements_1$temp_centered),
+                        length.out = 30
     ),
     rain_centered = seq(min(flower_measurements_1$rain_centered),
-      max(flower_measurements_1$rain_centered),
-      length.out = 30
+                        max(flower_measurements_1$rain_centered),
+                        length.out = 30
     )
   )
 ) |>
@@ -333,12 +333,12 @@ library(ggcube)
 predictions(mod_flower_measurements_1,
   newdata = datagrid(
     temp_centered = seq(min(flower_measurements_1$temp_centered),
-      max(flower_measurements_1$temp_centered),
-      length.out = 30
+                        max(flower_measurements_1$temp_centered),
+                        length.out = 30
     ),
     rain_centered = seq(min(flower_measurements_1$rain_centered),
-      max(flower_measurements_1$rain_centered),
-      length.out = 30
+                        max(flower_measurements_1$rain_centered),
+                        length.out = 30
     )
   )
 ) |>
@@ -417,7 +417,7 @@ cat("Expected dispersion slope:", log_sd_temp_slope, "\n")
 The model recovers our simulated parameters pretty well
 
 Let's visualize how well the model recovers the variance structure:
-We do this by predicting the standard deviation values for all observed values of temperature via the type = "disp" argument in predictions()
+We do this by predicting the standard deviation values for all observed values of temperature via the `type = "disp"`{style="background-color: #e0e0e0;"} argument in `predictions()`{style="background-color: #e0e0e0;"}
 ```{r}
 # estimate sd
 predictions(mod_flower_measurements_2, newdata = flower_measurements_2, type = "disp") |> as_tibble() -> pred_sd_temp
@@ -610,12 +610,12 @@ Now, with a response surface
 predictions(mod_flower_measurements_3,
   newdata = datagrid(
     temp_centered = seq(min(flower_measurements_3$temp_centered),
-      max(flower_measurements_3$temp_centered),
-      length.out = 30
+                        max(flower_measurements_3$temp_centered),
+                        length.out = 30
     ),
     rain_centered = seq(min(flower_measurements_3$rain_centered),
-      max(flower_measurements_3$rain_centered),
-      length.out = 30
+                        max(flower_measurements_3$rain_centered),
+                        length.out = 30
     )
   ),
   type = "disp"
@@ -640,8 +640,8 @@ We can also look at the moderating effect of temperature on the effect of rain o
 slopes_by_temp_sd <- slopes(mod_flower_measurements_3,
   newdata = datagrid(
     temp_centered = seq(min(flower_measurements_3$temp_centered),
-      max(flower_measurements_3$temp_centered),
-      length.out = 30
+                        max(flower_measurements_3$temp_centered),
+                        length.out = 30
     )
   ),
   variables = "rain_centered",
@@ -673,8 +673,8 @@ And the inverse, the moderating effect of rain on the effect of temperature on p
 ```{r}
 slopes_by_rain_sd <- slopes(mod_flower_measurements_3,
   newdata = datagrid(rain_centered = seq(min(flower_measurements_3$rain_centered),
-    max(flower_measurements_3$rain_centered),
-    length.out = 30
+                                         max(flower_measurements_3$rain_centered),
+                                         length.out = 30
   )),
   variables = "temp_centered",
   by = "rain_centered",
@@ -699,8 +699,8 @@ slopes_by_rain_sd |>
   )
 ```
 
-While reporting the predictors' effects on the average and standard deviation of petal length separately is informative, I personally find it difficult to interpret knowing that the two parameters of the Normal distribution act together to generate the observations. I suggest in this case to also create figures that communicate the predicted observations generated from the estimate values of the average and standard deviation. We can do so by predicting the average and standard deviation based on different values of temperature and rain. In the following code, we predict the average petal length using the type = "conditional" argument in predictions() and join these values to the predicted standard deviation using the type = "disp" argument. 
-We then use the distributional package which I absolutely love to generate distributions. In this specific case, we use the dist_normal() function to which we give the predicted values of the average and standard deviation of petal length for every combination of predictor values. The result gives an entire distribution contained within a single cell in the dataset. In other words, every row of the pred_obs column is a distribution of predicted observations of petal length.
+While reporting the predictors' effects on the average and standard deviation of petal length separately is informative, I personally find it difficult to interpret knowing that the two parameters of the Normal distribution act together to generate the observations. I suggest in this case to also create figures that communicate the predicted observations generated from the estimate values of the average and standard deviation. We can do so by predicting the average and standard deviation based on different values of temperature and rain. In the following code, we predict the average petal length using the `type = "conditional"`{style="background-color: #e0e0e0;"} argument in `predictions()`{style="background-color: #e0e0e0;"} and join these values to the predicted standard deviation using the `type = "disp"`{style="background-color: #e0e0e0;"} argument. 
+We then use the distributional package which I absolutely love to generate distributions. In this specific case, we use the `dist_normal()`{style="background-color: #e0e0e0;"} function to which we give the predicted values of the average and standard deviation of petal length for every combination of predictor values. The result gives an entire distribution contained within a single cell in the dataset. In other words, every row of the pred_obs column is a distribution of predicted observations of petal length.
 
 ```{r}
 predictions(mod_flower_measurements_3,
@@ -754,17 +754,17 @@ This type of figure provides a richer understanding of the model, in my opinion.
 
 2.  **Centering helps interpretation**: When predictors are mean-centered, the "main effect" coefficients are the slopes of each predictor when the other is at its average, and the intercept is the predicted response under average conditions.
 
-3.  **Plot the slopes, not just the coefficients**: Plotting the slope of one predictor across the range of the other (with `slopes()`) shows where an effect is positive, negative, or indistinguishable from zero.
+3.  **Plot the slopes, not just the coefficients**: Plotting the slope of one predictor across the range of the other (with `slopes()`{style="background-color: #e0e0e0;"}) shows where an effect is positive, negative, or indistinguishable from zero.
 
 4.  **Choose visualizations for your question**: Conditional prediction lines at chosen moderator values (e.g., the five-number summary) are usually easier to interpret than response surfaces, which lack uncertainty information and can encourage over-interpretation.
 
-5.  **Interactions are not only for the mean**: With distributional regression (e.g., `dispformula` in glmmTMB), predictors can interact in their effect on the standard deviation of the response. Visualizing the full predicted distributions (with the distributional and ggdist packages) helps interpret how the modeled parameters act together.
+5.  **Interactions are not only for the mean**: With distributional regression (e.g., `dispformula`{style="background-color: #e0e0e0;"} in glmmTMB), predictors can interact in their effect on the standard deviation of the response. Visualizing the full predicted distributions (with the distributional and ggdist packages) helps interpret how the modeled parameters act together.
 
 ## Tools for interpretation
 
--   `slopes()` with `by =`: Get the slope of one predictor across values of the other
--   `predictions()` with `datagrid()`: Generate conditional predictions at chosen combinations of predictor values (e.g., `fivenum` for the moderator)
--   `type = "disp"`: Get predictions or slopes for the dispersion (standard deviation) model
--   `plot_slopes()` and `plot_predictions()`: Quick versions of the plots we built manually
+-   `slopes()`{style="background-color: #e0e0e0;"} with `by =`{style="background-color: #e0e0e0;"}: Get the slope of one predictor across values of the other
+-   `predictions()`{style="background-color: #e0e0e0;"} with `datagrid()`{style="background-color: #e0e0e0;"}: Generate conditional predictions at chosen combinations of predictor values (e.g., `fivenum`{style="background-color: #e0e0e0;"} for the moderator)
+-   `type = "disp"`{style="background-color: #e0e0e0;"}: Get predictions or slopes for the dispersion (standard deviation) model
+-   `plot_slopes()`{style="background-color: #e0e0e0;"} and `plot_predictions()`{style="background-color: #e0e0e0;"}: Quick versions of the plots we built manually
 
 In the next part of this series, we will look at interactions in generalized linear models, where non-linear link functions add another layer of complexity to interpretation.

@@ -7,7 +7,7 @@ author:
     orcid: 0000-0001-6989-9278
 date: 07-27-2026
 categories: [tutorial, interactions, marginaleffects, glmm, statistics, R, series]
-draft: false
+draft: true
 editor: source
 format:
   html:
@@ -33,7 +33,7 @@ First, we load the relevant packages and set up our ggplot2 theme for the rest o
 library(tidyverse)       # Data manipulation and plotting
 library(tidylog)         # Print a log of data manipulations done with tidyverse
 library(glmmTMB)         # Generalized linear (mixed) models
-library(marginaleffects) # Compute marginal/condition effects
+library(marginaleffects) # Compute marginal/conditional effects
 library(patchwork)       # Combine multiple plots
 library(distributional)  # Simulate distributions
 library(ggdist)          # Plot nice distributions
@@ -126,7 +126,7 @@ Implicit interactions
 
 ```{r}
 scale_x <- function(x){
-  x - mean(x) / sd(x)
+  ( x - mean(x) ) / sd(x)
 }
 
 occ_data |>
@@ -139,6 +139,10 @@ mod_1 <- glmmTMB(occurence ~ tree + rain + temp, family = binomial(link = "logit
 summary(mod_1)
 
 slopes(mod_1, variables = "tree", newdata = datagrid(temp = mean(occ_data$temp), rain = mean(occ_data$rain)))
+
+slopes(mod_1, variables = "tree")
+
+avg_slopes(mod_1, variables = "tree")
 
 avg_slopes(mod_1, variables = "rain")
 

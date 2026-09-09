@@ -258,7 +258,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)       <span class="co"># Data manipulation and plotting</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidylog)         <span class="co"># Print a log of data manipulations done with tidyverse</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmmTMB)         <span class="co"># Generalized linear (mixed) models</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(marginaleffects) <span class="co"># Compute marginal/condition effects</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(marginaleffects) <span class="co"># Compute marginal/conditional effects</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)       <span class="co"># Combine multiple plots</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(distributional)  <span class="co"># Simulate distributions</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggdist)          <span class="co"># Plot nice distributions</span></span>
@@ -357,7 +357,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Implicit interactions</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>scale_x <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  x <span class="sc">-</span> <span class="fu">mean</span>(x) <span class="sc">/</span> <span class="fu">sd</span>(x)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  ( x <span class="sc">-</span> <span class="fu">mean</span>(x) ) <span class="sc">/</span> <span class="fu">sd</span>(x)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>occ_data <span class="sc">|&gt;</span></span>
@@ -400,7 +400,36 @@ Term: tree
 Type: response
 Comparison: dY/dX</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"rain"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
+    0.456     0.0926 4.92   &lt;0.001 20.1 0.274  0.637
+    0.285     0.0764 3.74   &lt;0.001 12.4 0.136  0.435
+    0.465     0.1017 4.58   &lt;0.001 17.7 0.266  0.665
+    0.377     0.0673 5.60   &lt;0.001 25.5 0.245  0.509
+    0.354     0.0746 4.75   &lt;0.001 18.9 0.208  0.501
+--- 190 rows omitted. See ?print.marginaleffects ---
+    0.466     0.1016 4.58   &lt;0.001 17.7 0.267  0.665
+    0.467     0.1037 4.50   &lt;0.001 17.2 0.264  0.670
+    0.336     0.0666 5.05   &lt;0.001 21.1 0.206  0.467
+    0.464     0.1016 4.57   &lt;0.001 17.6 0.265  0.663
+    0.301     0.0783 3.84   &lt;0.001 13.0 0.147  0.454
+Term: tree
+Type: response
+Comparison: dY/dX</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
+    0.391     0.0715 5.46   &lt;0.001 24.3  0.25  0.531
+
+Term: tree
+Type: response
+Comparison: dY/dX</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"rain"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Estimate Std. Error     z Pr(&gt;|z|)   S   2.5 % 97.5 %
@@ -410,7 +439,7 @@ Term: rain
 Type: response
 Comparison: dY/dX</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"temp"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"temp"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Estimate Std. Error   z Pr(&gt;|z|)    S   2.5 % 97.5 %
@@ -422,11 +451,11 @@ Comparison: dY/dX</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> fivenum, <span class="at">rain =</span> fivenum)) <span class="ot">-&gt;</span> t</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(t) <span class="sc">+</span> <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">xmin =</span> conf.low, <span class="at">xmax =</span> conf.high, <span class="at">y =</span> <span class="dv">1</span>), <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> occurence_tree_effect, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> .<span class="dv">8</span>) <span class="sc">+</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> fivenum, <span class="at">rain =</span> fivenum)) <span class="ot">-&gt;</span> t</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(t) <span class="sc">+</span> <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">xmin =</span> conf.low, <span class="at">xmax =</span> conf.high, <span class="at">y =</span> <span class="dv">1</span>), <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> occurence_tree_effect, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> .<span class="dv">8</span>) <span class="sc">+</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -436,12 +465,12 @@ Comparison: dY/dX</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predictions</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> fivenum, <span class="at">rain =</span> fivenum)) <span class="ot">-&gt;</span> pred_tree1</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pred_tree1) <span class="sc">+</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">fill =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predictions</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> fivenum, <span class="at">rain =</span> fivenum)) <span class="ot">-&gt;</span> pred_tree1</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pred_tree1) <span class="sc">+</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">fill =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -451,7 +480,7 @@ Comparison: dY/dX</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
@@ -461,7 +490,7 @@ Term: tree
 Type: response
 Comparison: dY/dX</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> <span class="dv">0</span>, <span class="at">rain =</span> <span class="dv">0</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> <span class="dv">0</span>, <span class="at">rain =</span> <span class="dv">0</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  temp rain Estimate Std. Error    z Pr(&gt;|z|)   S 2.5 % 97.5 %
@@ -471,7 +500,7 @@ Term: tree
 Type: response
 Comparison: dY/dX</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>temp), <span class="at">rain =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>rain)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>temp), <span class="at">rain =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>rain)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  temp rain Estimate Std. Error   z Pr(&gt;|z|)    S 2.5 % 97.5 %
@@ -481,7 +510,7 @@ Term: tree
 Type: response
 Comparison: dY/dX</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"rain"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"rain"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Estimate Std. Error     z Pr(&gt;|z|)   S   2.5 % 97.5 %
@@ -491,7 +520,7 @@ Term: rain
 Type: response
 Comparison: dY/dX</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"rain"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> <span class="dv">0</span>, <span class="at">tree =</span> <span class="dv">0</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"rain"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> <span class="dv">0</span>, <span class="at">tree =</span> <span class="dv">0</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  temp tree Estimate Std. Error     z Pr(&gt;|z|)   S    2.5 % 97.5 %
@@ -501,7 +530,7 @@ Term: rain
 Type: response
 Comparison: dY/dX</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"rain"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>temp), <span class="at">tree =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>tree)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"rain"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>temp), <span class="at">tree =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>tree)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  temp tree Estimate Std. Error    z Pr(&gt;|z|)   S   2.5 % 97.5 %
@@ -511,7 +540,7 @@ Term: rain
 Type: response
 Comparison: dY/dX</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"temp"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"temp"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Estimate Std. Error   z Pr(&gt;|z|)    S   2.5 % 97.5 %
