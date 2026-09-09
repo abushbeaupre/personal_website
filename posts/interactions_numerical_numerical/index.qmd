@@ -744,7 +744,7 @@ ggplot(predicted_observations, aes(xdist = pred_obs, color = as.factor(rain_cent
         strip.text = element_text(color = "black", face = "bold", size = 12))
 ```
 
-This type of figure provides a richer understanding of the model, in my opinion. We can see that petal length is generally similar across values of temperature and rain except when rain is in extremely high values.
+This type of figure provides a richer understanding of the model, in my opinion. We can see that petal length is generally similar across values of temperature and rain except when rain is in extremely high values. For example, the blue curve (high rain) is wider and/or shifted from the other curves for different values of temperature (panels).
 
 # Summary and Key Takeaways
 
