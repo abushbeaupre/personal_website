@@ -1,0 +1,57 @@
+/* The revealjs "black" theme background is dark grey, not true black,
+   which looks mismatched against the figures' pure black panel
+   background. Force true black everywhere. */
+.reveal,
+.reveal-viewport,
+.reveal .slides,
+.reveal .slides section,
+.reveal .backgrounds,
+.reveal .slide-background {
+  background-color: #000 !important;
+}
+
+/* Make code input and printed R output the same, large font size so both
+   are readable from the back of a room during live workshops. Reveal's
+   defaults shrink .cell-output much more than code blocks; override both
+   to a single shared size instead of relying on relative (em) scaling.
+   Printed R tables (e.g. summary() coefficient matrices) rely on fixed-
+   width alignment, so wrapping at the large font size breaks columns;
+   force no-wrap with horizontal scroll instead. */
+.reveal div.sourceCode pre,
+.reveal div.sourceCode pre code,
+.reveal .cell-output pre,
+.reveal .cell-output-stdout pre,
+.reveal .cell-output pre code {
+  font-size: 28px;
+  line-height: 1.3;
+  white-space: pre !important;
+  overflow-x: auto;
+}
+
+/* On slides that also show a figure, the code is collapsed by default
+   (via `#| code-fold: true` on the chunk) so the plot gets nearly the
+   full slide. When expanded, cap and shrink the code so it doesn't push
+   the figure off-slide. Add class="fig-slide" to the slide heading
+   (e.g. `## Title {.fig-slide}`) for any slide whose code chunk produces
+   a plot. */
+.reveal .slide.fig-slide div.sourceCode pre,
+.reveal .slide.fig-slide div.sourceCode pre code {
+  font-size: 16px;
+  line-height: 1.15;
+}
+
+.reveal .slide.fig-slide details[class="code-fold"] {
+  max-height: 30vh;
+  overflow-y: auto;
+}
+
+.reveal .slide.fig-slide .cell-output-display {
+  display: flex;
+  justify-content: center;
+}
+
+.reveal .slide.fig-slide .cell-output-display img {
+  max-height: 70vh;
+  width: auto;
+  max-width: 100%;
+}
