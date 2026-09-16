@@ -1,0 +1,100 @@
+---
+title: "Teaching"
+listing:
+  - id: class-listing
+    contents:
+      - "classes/**/index.qmd"
+    type: grid
+    sort: "date desc"
+    categories: true
+  - id: workshop-listing
+    contents:
+      - "workshops/**/index.qmd"
+    type: grid
+    sort: "date desc"
+    categories: true
+---
+
+::: lang-toggle
+<button class="lang-toggle-btn active" data-lang="en">
+
+English
+
+</button>
+
+<button class="lang-toggle-btn" data-lang="fr">
+
+Français
+
+</button>
+:::
+
+::: lang-en
+## Classes {.lang-en}
+
+Material for courses I have taught or will be teaching.
+:::
+
+::: lang-fr
+## Cours {.lang-fr}
+
+Matériel pour les cours que j'ai enseignés ou que j'enseignerai.
+:::
+
+::: {#class-listing}
+:::
+
+------------------------------------------------------------------------
+
+::: lang-en
+## Workshops {.lang-en}
+
+Hands-on workshops developed from common consultation topics and tutorials. Each workshop includes materials you can follow along with (slides, code, exercises).
+:::
+
+::: lang-fr
+## Ateliers {.lang-fr}
+
+Ateliers pratiques développés à partir de sujets de consultation et de tutoriels courants. Chaque atelier inclut du matériel que vous pouvez suivre (diapositives, code, exercices).
+:::
+
+::: {#workshop-listing}
+:::
+
+```{=html}
+<script>
+// Language toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+  let currentLang = localStorage.getItem('language') || 'en';
+  setLanguage(currentLang);
+
+  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const lang = this.dataset.lang;
+      setLanguage(lang);
+      localStorage.setItem('language', lang);
+    });
+  });
+});
+
+function setLanguage(lang) {
+  document.querySelectorAll('.lang-en, .lang-fr').forEach(el => {
+    el.style.display = 'none';
+  });
+
+  document.querySelectorAll('.lang-' + lang).forEach(el => {
+    el.style.display = 'block';
+  });
+
+  document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.lang === lang) {
+      btn.classList.add('active');
+      btn.style.display = 'none';
+    } else {
+      btn.style.display = 'inline-block';
+    }
+  });
+}
+</script>
+```

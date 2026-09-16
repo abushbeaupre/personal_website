@@ -1,0 +1,380 @@
+---
+title: "Analyse spatio-temporelle de données entomologiques"
+subtitle: "Template de rapport de laboratoire"
+author: "Votre nom"
+date: "`r Sys.Date()`"
+format: 
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    toc-title: "Table des matières"
+    number-sections: true
+    code-fold: false
+    fig-cap-location: bottom
+    fig-align: center
+    fig-width: 8
+    fig-height: 6
+    embed-resources: true
+execute:
+  eval: false
+---
+
+::: {.callout-note}
+Ce document est un **gabarit** destiné à être complété et exécuté par les étudiant(e)s avec leurs propres données. Le code n'est pas exécuté ici (`eval: false`) puisqu'il repose sur des données fictives/à remplacer.
+:::
+
+# Introduction
+
+Ce rapport présente une analyse spatio-temporelle de données d'échantillonnage entomologique collectées sur le campus de l'Université de Sherbrooke. L'objectif est de caractériser la diversité des arthropodes en fonction des conditions environnementales et météorologiques.
+
+## Objectifs
+
+- Analyser la distribution spatiale des sites d'échantillonnage
+- Intégrer les données météorologiques pour chaque site
+- Comparer l'abondance des captures entre sites et types de pièges
+- Produire des visualisations scientifiques de qualité
+
+# Méthodologie
+
+## Configuration de l'environnement
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+# Chargement des packages nécessaires
+library(tidyverse)    # Manipulation et visualisation de données
+library(sf)           # Données spatiales
+library(ggspatial)    # Extensions cartographiques
+library(nasapower)    # Données météorologiques NASA POWER
+library(patchwork)    # Combinaison de graphiques
+library(readxl)       # Lecture de fichiers Excel
+library(janitor)      # Nettoyage des données
+library(tinytable)    # Tableaux professionnels
+```
+
+## Chargement des données spatiales
+
+```{r}
+#| label: load-spatial
+#| message: false
+#| warning: false
+
+# Chargement des données spatiales (.gpkg)
+pieges <- st_read("pieges.gpkg") |>
+  st_transform(crs = 4326)  # Transformation vers WGS84
+
+recoltes_actives <- st_read("recoltes_actives.gpkg") |>
+  st_transform(crs = 4326)
+
+# Affichage des premières lignes
+glimpse(pieges)
+```
+
+## Chargement des données de captures
+
+```{r}
+#| label: load-trapping-data
+#| message: false
+#| warning: false
+
+# Chargement des données de captures (remplacez par votre fichier)
+# captures <- read_xlsx("donnees_captures.xlsx") |>
+#   clean_names()  # Nettoyage automatique des noms de colonnes
+
+# Pour la démonstration, création de données fictives
+set.seed(123)
+captures <- data.frame(
+  site = sample(1:2, 100, replace = TRUE),
+  type_piege = sample(c("malaise", "bol_jaune"), 100, replace = TRUE),
+  date_capture = seq.Date(from = as.Date("2024-05-01"), 
+                         to = as.Date("2024-09-30"), 
+                         length.out = 100),
+  nb_individus = rpois(100, lambda = 5),
+  ordre = sample(c("Diptera", "Coleoptera", "Hymenoptera", "Lepidoptera"), 
+                100, replace = TRUE)
+)
+
+glimpse(captures)
+```
+
+# Résultats
+
+## Carte de la zone d'étude
+
+```{r}
+#| label: fig-study-area
+#| fig-cap: "Localisation des sites d'échantillonnage entomologique avec les pièges et transects de récolte active."
+#| fig-width: 10
+#| fig-height: 8
+
+# Classification des sites selon l'habitat
+pieges <- pieges |>
+  mutate(habitat = ifelse(couverture_arborescente > 40, "Forestier", "Ouvert"))
+
+recoltes_actives <- recoltes_actives |>
+  mutate(habitat = ifelse(couverture_arborescente > 40, "Forestier", "Ouvert"))
+
+# Création de la carte principale
+main_map <- ggplot() +
+  # Fond de carte OpenStreetMap
+  annotation_map_tile(type = "osm", zoom = 18) +
+  
+  # Ajout des transects de récolte
+  geom_sf(data = recoltes_actives,
+          aes(color = as.factor(site), linetype = type_recolte),
+          linewidth = 1.5, alpha = 0.7) +
+  
+  # Ajout des pièges
+  geom_sf(data = pieges,
+          aes(color = as.factor(site), shape = type_de_piege),
+          size = 3, alpha = 0.8) +
+  
+  # Configuration des couleurs et formes
+  scale_color_manual(values = c("royalblue3", "mediumorchid3"),
+                     name = "Site",
+                     labels = c("Site 1 (Forestier)", "Site 2 (Ouvert)")) +
+  scale_shape_manual(values = c(15, 18),
+                     labels = c("Bol Jaune", "Malaise"),
+                     name = "Type de piège") +
+  scale_linetype_manual(values = c("dashed"),
+                        labels = c("Filet Fauchoir"),
+                        name = "Récoltes actives") +
+  
+  labs(title = "Sites d'échantillonnage entomologique") +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.direction = "horizontal",
+        plot.title = element_text(hjust = 0.5, size = 14))
+
+main_map
+```
+
+## Données météorologiques
+
+```{r}
+#| label: get-weather-data
+#| message: false
+#| warning: false
+
+# Extraction des coordonnées des pièges malaise
+malaise_coords <- pieges |>
+  filter(type_de_piege == "malaise") |>
+  st_coordinates() |>
+  as_tibble() |>
+  rename(longitude = X, latitude = Y) |>
+  mutate(site = c(1, 2))  # Assignation des sites
+
+# Récupération des données météo pour la période d'échantillonnage
+weather_data <- get_power(
+  community = "ag",
+  lonlat = c(malaise_coords$longitude[1], malaise_coords$latitude[1]),
+  pars = c("T2M", "PRECTOTCORR"),
+  dates = c("2024-05-01", "2024-09-30"),
+  temporal_api = "daily"
+) |>
+  mutate(site = 1) |>
+  select(site, YYYYMMDD, T2M, PRECTOTCORR) |>
+  rename(date = YYYYMMDD, temperature = T2M, precipitation = PRECTOTCORR)
+
+# Données pour le site 2 (simplifiées pour l'exemple)
+weather_site2 <- weather_data |>
+  mutate(site = 2,
+         temperature = temperature + rnorm(nrow(weather_data), 0, 1),
+         precipitation = precipitation * runif(nrow(weather_data), 0.8, 1.2))
+
+# Combinaison des données météo
+weather_combined <- bind_rows(weather_data, weather_site2) |>
+  mutate(date = as.Date(as.character(date), format = "%Y%m%d"))
+```
+
+## Visualisation des données météorologiques
+
+```{r}
+#| label: fig-weather
+#| fig-cap: "Conditions météorologiques durant la période d'échantillonnage pour les deux sites."
+#| fig-width: 12
+#| fig-height: 8
+
+# Graphique de température
+temp_plot <- weather_combined |>
+  ggplot(aes(x = date, y = temperature, color = as.factor(site))) +
+  geom_line(linewidth = 0.8) +
+  geom_smooth(method = "loess", se = FALSE, linewidth = 1.2) +
+  scale_color_manual(values = c("royalblue3", "mediumorchid3"),
+                     name = "Site") +
+  labs(title = "Température moyenne journalière",
+       x = "Date", y = "Température (°C)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# Graphique de précipitation
+precip_plot <- weather_combined |>
+  ggplot(aes(x = date, y = precipitation, fill = as.factor(site))) +
+  geom_col(alpha = 0.7, position = "dodge") +
+  scale_fill_manual(values = c("royalblue3", "mediumorchid3"),
+                    name = "Site") +
+  labs(title = "Précipitations journalières",
+       x = "Date", y = "Précipitations (mm)") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# Combinaison des graphiques
+temp_plot / precip_plot
+```
+
+## Traitement et jointure des données
+
+```{r}
+#| label: data-processing
+#| message: false
+#| warning: false
+
+# Nettoyage et préparation des données de captures
+captures_clean <- captures |>
+  # Conversion des types
+  mutate(
+    site = as.factor(site),
+    type_piege = as.factor(type_piege),
+    ordre = as.factor(ordre),
+    date_capture = as.Date(date_capture)
+  ) |>
+  # Filtrage des données valides
+  filter(
+    !is.na(nb_individus),
+    nb_individus >= 0,
+    site %in% c(1, 2)
+  )
+
+# Résumé par site et type de piège
+captures_summary <- captures_clean |>
+  group_by(site, type_piege, ordre) |>
+  summarise(
+    total_individus = sum(nb_individus, na.rm = TRUE),
+    nb_echantillons = n(),
+    moyenne_par_echantillon = round(mean(nb_individus, na.rm = TRUE), 2),
+    .groups = "drop"
+  )
+
+# Jointure avec les données spatiales
+captures_geo <- pieges |>
+  st_drop_geometry() |>
+  select(site, type_de_piege, habitat) |>
+  rename(type_piege = type_de_piege) |>
+  mutate(
+    site = as.factor(site),
+    type_piege = recode(type_piege, "bol_jaune" = "bol_jaune")
+  ) |>
+  right_join(captures_summary, by = c("site", "type_piege"))
+
+glimpse(captures_geo)
+```
+
+## Graphiques en sucettes (lollipop) par site et type de piège
+
+```{r}
+#| label: fig-lollipop
+#| fig-cap: "Abondance totale des ordres d'arthropodes par site et type de piège. Les graphiques en sucettes permettent une comparaison claire entre groupes taxonomiques."
+#| fig-width: 12
+#| fig-height: 10
+
+# Création des graphiques lollipop par site
+lollipop_data <- captures_geo |>
+  group_by(site, habitat) |>
+  slice_max(total_individus, n = 8) |>  # Top 8 ordres par site
+  ungroup()
+
+# Graphique pour le Site 1
+plot_site1 <- lollipop_data |>
+  filter(site == 1) |>
+  ggplot(aes(x = reorder(ordre, total_individus), y = total_individus)) +
+  geom_segment(aes(x = ordre, xend = ordre, y = 0, yend = total_individus),
+               color = "royalblue3", linewidth = 1.2) +
+  geom_point(aes(color = type_piege), size = 4) +
+  scale_color_manual(values = c("darkblue", "lightblue"),
+                     name = "Type de piège") +
+  coord_flip() +
+  labs(title = "Site 1 (Forestier)",
+       x = "Ordre taxonomique",
+       y = "Nombre total d'individus") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# Graphique pour le Site 2
+plot_site2 <- lollipop_data |>
+  filter(site == 2) |>
+  ggplot(aes(x = reorder(ordre, total_individus), y = total_individus)) +
+  geom_segment(aes(x = ordre, xend = ordre, y = 0, yend = total_individus),
+               color = "mediumorchid3", linewidth = 1.2) +
+  geom_point(aes(color = type_piege), size = 4) +
+  scale_color_manual(values = c("purple4", "plum"),
+                     name = "Type de piège") +
+  coord_flip() +
+  labs(title = "Site 2 (Ouvert)",
+       x = "Ordre taxonomique",
+       y = "Nombre total d'individus") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# Combinaison des graphiques
+plot_site1 | plot_site2
+```
+
+## Tableau de synthèse des captures
+
+```{r}
+#| label: tbl-summary
+#| tbl-cap: "Synthèse des captures d'arthropodes par site, type de piège et ordre taxonomique."
+
+# Création du tableau de synthèse
+tableau_synthese <- captures_geo |>
+  select(site, habitat, type_piege, ordre, total_individus, nb_echantillons, moyenne_par_echantillon) |>
+  arrange(site, type_piege, desc(total_individus))
+
+# Affichage avec tinytable
+tableau_synthese |>
+  head(20) |>  # Affichage des 20 premières lignes
+  tt() |>
+  format_tt(digits = 2) |>
+  style_tt(
+    bootstrap_css = "table table-striped table-hover",
+    align = "center"
+  )
+```
+
+# Discussion
+
+## Comparaison entre sites
+
+Les résultats montrent des différences notables entre les deux sites d'échantillonnage :
+
+- **Site 1 (Forestier)** : Caractérisé par une couverture arborescente élevée (>40%)
+- **Site 2 (Ouvert)** : Environnement plus ouvert avec une faible couverture arborescente (≤40%)
+
+## Efficacité des méthodes de capture
+
+La comparaison entre les pièges malaise et les bols jaunes révèle des patterns de capture différents selon les ordres taxonomiques, reflétant les préférences comportementales et écologiques des différents groupes d'arthropodes.
+
+## Influence des conditions météorologiques
+
+Les données météorologiques obtenues via l'API NASA POWER permettent de contextualiser les variations d'abondance observées et d'identifier les périodes favorables à l'activité des arthropodes.
+
+# Conclusion
+
+Cette analyse spatio-temporelle démontre l'importance de considérer à la fois les facteurs environnementaux locaux (type d'habitat) et les conditions météorologiques dans l'étude des communautés d'arthropodes. Les méthodes de visualisation employées facilitent l'interprétation des patterns écologiques et constituent des outils précieux pour la communication scientifique.
+
+## Recommandations pour de futures études
+
+1. Étendre la période d'échantillonnage pour capturer la variabilité saisonnière
+2. Inclure des variables environnementales supplémentaires (humidité du sol, pH)
+3. Analyser la diversité taxonomique au niveau spécifique
+4. Intégrer des analyses statistiques pour tester la significativité des différences observées
+
+# Références
+
+- NASA Prediction of Worldwide Energy Resources (POWER). https://power.larc.nasa.gov/
+- Pebesma, E. (2018). Simple Features for R: Standardized Support for Spatial Vector Data. The R Journal, 10(1), 439-446.
+- Wickham, H. et al. (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686.

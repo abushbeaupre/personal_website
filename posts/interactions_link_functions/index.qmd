@@ -92,14 +92,14 @@ occurence_rain_effect <- 0.01
 occurence_temp_effect <- 0.01
 
 tibble(
-  tree = generate(tree_cover, n_plots),
+  tree_cov = generate(tree_cover, n_plots),
   rain = generate(avg_yearly_rain, n_plots),
   temp = generate(avg_yearly_temp, n_plots)
 ) |> 
   unnest(everything()) |>
   mutate(occurence = rbinom(n_plots, size = 1, 
                      prob = occurence_intercept +
-                            occurence_tree_effect * tree +
+                            occurence_tree_effect * tree_cov +
                             occurence_rain_effect * rain +
                             occurence_temp_effect * temp
                             ))-> occ_data
@@ -118,39 +118,78 @@ ggpairs(
 
 Some people might want to dichotomize tree cover
 ```{r}
+scale_x <- function(x){
+  ( x - mean(x) ) / sd(x)
+}
+
+
 occ_data |>
-  mutate(tree_cat = as.factor(ifelse(tree > 0.5, "high", "low"))) -> occ_data
+  mutate(tree_cat = as.factor(ifelse(tree_cov > 0.5, "high", "low")),
+         scl_tree = scale_x(tree_cov),
+         scl_rain = scale_x(rain),
+         scl_temp = scale_x(temp)) -> occ_data
 ```
 
 Implicit interactions
 
 ```{r}
-scale_x <- function(x){
-  ( x - mean(x) ) / sd(x)
-}
-
-occ_data |>
-  mutate(scl_tree = scale_x(tree),
-         scl_rain = scale_x(rain),
-         scl_temp = scale_x(temp)) -> occ_data
-
-mod_1 <- glmmTMB(occurence ~ tree + rain + temp, family = binomial(link = "logit"), data = occ_data)
+mod_1 <- glmmTMB(occurence ~ tree_cov + rain + temp, family = binomial(link = "logit"), data = occ_data)
 
 summary(mod_1)
 
-slopes(mod_1, variables = "tree", newdata = datagrid(temp = mean(occ_data$temp), rain = mean(occ_data$rain)))
-
-slopes(mod_1, variables = "tree")
-
-avg_slopes(mod_1, variables = "tree")
-
-avg_slopes(mod_1, variables = "rain")
-
-avg_slopes(mod_1, variables = "temp")
+slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = mean(occ_data$temp), rain = mean(occ_data$rain)))
 ```
 
+Notice something strange: we simulated the effect of tree cover on occurrence to be 0.45, but `summary(mod_1)` reports a slope of about 1.87 for `tree_cov`. Did the model get it wrong? No — it's reporting the effect on a different scale.
+
+When we fit a binomial GLM with a logit link, the model isn't drawing a straight line through probabilities. Instead, it draws a straight line through the *log-odds* of occurrence, and then bends that line into an S-shape (between 0 and 1) to get back to a probability. The number 1.87 is the slope on that log-odds scale. It's a real, meaningful number, but it's not directly comparable to our simulated 0.45, which was the slope on the probability scale.
+
+Here's the key idea: because the logit link bends the line, how much a one-unit increase in tree cover changes the *probability* of occurrence depends on where you are on the curve. Near the middle of the S-shape (probability around 50%), a small push on the log-odds scale translates into a fairly large push on the probability scale. Near the top or bottom of the S-shape (probability near 0% or 100%), that same push on the log-odds scale barely moves the probability at all, because the curve has flattened out.
+
+This is exactly why `slopes(mod_1, variables = "tree", newdata = datagrid(temp = mean(occ_data$temp), rain = mean(occ_data$rain)))` gives us back something close to 0.45. Rather than reporting the abstract log-odds slope, `slopes()` asks: "at these specific values of temp and rain, how much does the predicted *probability* change when tree cover increases a little?" That's a probability-scale answer, so it's directly comparable to the number we used to simulate the data.
+
+There's a subtle but important consequence here: because the amount of "bending" depends on where you are on the S-curve, the probability-scale effect of tree cover also depends on the values of rain and temp — even though we never told the model to include an interaction between them! This is what we mean by an *implicit interaction*. The logit link function automatically makes every predictor's effect (on the probability scale) depend on the values of all the other predictors, simply because of the shape of the S-curve. We'll see this play out visually below, where the estimated slope for tree cover changes depending on the combination of rain and temp we plug in.
+
+Spake et al. (2023, *Biological Reviews*) make a related point in the ecology literature: when we ask "does an interaction exist?", the answer can depend on which *measurement scale* we ask the question on — additive (e.g., probability, or log-odds treated as a straight difference) versus multiplicative (e.g., ratios, or a logarithmic scale). Getting the scale question wrong is one of the ways they describe interactions being mis-detected or mis-sized (what they call a "Type-D" error). Our tree-cover example is a small, concrete illustration of exactly this idea: there is no interaction term of any kind in `mod_1`'s formula, yet whether or not you can *see* an interaction between tree cover and the other predictors depends entirely on whether you're looking at the log-odds scale (no interaction, by construction) or the probability scale (an interaction appears, because of the S-curve).
+
 ```{r}
-slopes(mod_1, variables = "tree", newdata = datagrid(temp = fivenum, rain = fivenum)) -> t
+#| echo: false
+#| fig-height: 5
+tibble(log_odds = seq(-6, 6, length.out = 400)) |>
+  mutate(probability = plogis(log_odds)) -> logistic_curve
+
+tibble(
+  log_odds = c(0, -4.2, 4.2),
+  probability = plogis(log_odds),
+  label = c("steep middle:\na small push here\nmoves probability a lot",
+            "flat end:\na push here barely\nmoves probability",
+            "flat end:\na push here barely\nmoves probability")
+) -> annot
+
+ggplot(logistic_curve, aes(x = log_odds, y = probability)) +
+  geom_line(color = "white", linewidth = 1.2) +
+  geom_point(data = annot, color = "white", size = 3) +
+  geom_text(
+    data = annot,
+    aes(label = label),
+    color = "white",
+    size = 4.5,
+    fontface = "bold",
+    lineheight = 0.9,
+    vjust = c(-0.4, -0.6, 1.6),
+    hjust = c(0.5, 0.5, 0.5)
+  ) +
+  scale_y_continuous(limits = c(-0.1, 1.05)) +
+  labs(
+    x = "log-odds scale (what the model's coefficient describes)",
+    y = "probability scale (what we actually care about)",
+    title = "The logit link bends a straight line into an S-shape"
+  )
+```
+
+
+```{r}
+slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = fivenum)) -> t
 
 ggplot(t) + geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1), color = "white") +
   geom_vline(xintercept = occurence_tree_effect, color = "white", alpha = .8) +
@@ -159,24 +198,88 @@ ggplot(t) + geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high,
 
 
 ```{r}
-predictions(mod_1, variables = "tree", newdata = datagrid(temp = fivenum, rain = fivenum)) -> pred_tree1
+predictions(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = fivenum)) -> pred_tree1
 
 ggplot(pred_tree1) +
-  geom_ribbon(aes(x = tree, ymin = conf.low, ymax = conf.high), fill = "white", alpha = 0.2) +
-  geom_line(aes(x = tree, y = estimate), color = "white") +
+  geom_ribbon(aes(x = tree_cov, ymin = conf.low, ymax = conf.high), fill = "white", alpha = 0.2) +
+  geom_line(aes(x = tree_cov, y = estimate), color = "white") +
+  facet_grid(rain ~ temp)
+```
+
+# Case Study 2: Species abundance
+
+Now let's look at the same three predictors, but for a different question: given that the species is present in a patch, how many individuals do we expect to find there? Counts like this (0, 1, 2, 3, ...) are commonly modeled with a Poisson distribution, using a **log link** instead of the logit link we used for occurrence.
+
+```{r}
+abundance_intercept <- exp(1)
+
+abundance_tree_effect <- 4.5
+
+abundance_rain_effect <- 0.1
+
+abundance_temp_effect <- 0.1
+
+tibble(
+  tree_cov = generate(tree_cover, n_plots),
+  rain = generate(avg_yearly_rain, n_plots),
+  temp = generate(avg_yearly_temp, n_plots)
+) |> 
+  unnest(everything()) |>
+  mutate(abundance = rpois(n_plots, lambda = 
+                     abundance_intercept +
+                     abundance_tree_effect * tree_cov +
+                     abundance_rain_effect * rain +
+                     abundance_temp_effect * temp
+                     ))-> abund_data
+
+ggpairs(
+  abund_data,
+  diag  = list(continuous = wrap("densityDiag", fill = "white", alpha = 0.6, color = "white")),
+  lower = list(continuous = wrap("points", color = "white", alpha = 0.6, size = 2, shape = 1)),
+  upper = list(continuous = wrap("cor", color = "white", size = 5))
+) +
+  theme(
+    strip.text = element_text(color = "black", face = "bold", size = 12),
+    axis.text = element_text(color = "white", face = "bold", size = 12)
+  )
+```
+
+Just like before, we simulated the effect of tree cover on abundance to be additive and equal to 4.5 (expected count-scale slope), but we're about to fit a model that assumes an *additive* relationship on the log scale.
+
+```{r}
+mod_2 <- glmmTMB(abundance ~ tree_cov + rain + temp, family = poisson(link = "log"), data = abund_data)
+
+summary(mod_2)
+
+slopes(mod_2, variables = "tree_cov", newdata = datagrid(temp = mean(abund_data$temp), rain = mean(abund_data$rain)))
+```
+
+The same story repeats itself. `summary(mod_2)` reports a `tree_cov` coefficient that is not 4.5 — because a Poisson GLM with a log link draws a straight line through the *log* of the expected count, not through the expected count itself. To turn a log-scale prediction back into an actual expected count, we exponentiate it, and that exponentiation is what bends a straight line into a curve that always stays positive (counts can never be negative).
+
+Because of that curve, a fixed log-scale coefficient translates into a *different* count-scale slope depending on where you evaluate it — exactly the same phenomenon we saw with the logistic curve. This time, the local rate of change works out to $$\lambda \cdot \beta$$ (the expected count itself, times the log-scale coefficient), instead of $$p(1-p) \cdot \beta$$. When we plug in the average `rain` and `temp` values via `slopes()`, we get back a count-scale slope for `tree_cov` close to our simulated 4.5.
+
+And once again, this produces an *implicit interaction*: the count-scale effect of tree cover depends on the values of rain and temp (through their influence on the expected count $$\lambda$$), even though the model formula never specified an interaction term. Any log-link GLM will behave this way — additive on the log scale automatically becomes multiplicative (and interaction-like) on the response scale.
+
+This is the same additive-versus-multiplicative distinction that Spake et al. (2023, *Biological Reviews*) highlight as a routinely overlooked property of statistical interactions: whether a response is being analyzed on an additive scale or a multiplicative one (such as a ratio or logarithmic scale). A log-link Poisson model is additive on the log scale by construction — that's the whole point of the link function — but that same additivity becomes multiplicative on the count scale, since exponentiating a sum turns it into a product ($$e^{a+b} = e^a \times e^b$$). Two predictors that don't interact at all on the log scale will therefore appear to interact on the count scale, for the same reason the abstract flags as a source of "Type-D" errors: judging whether or how strongly an interaction exists depends on which scale you're looking at.
+
+```{r}
+slopes(mod_2, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = fivenum)) -> t2
+
+ggplot(t2) + geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1), color = "white") +
+  geom_vline(xintercept = abundance_tree_effect, color = "white", alpha = .8) +
+  facet_grid(rain ~ temp)
+```
+
+```{r}
+predictions(mod_2, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = fivenum)) -> pred_tree2
+
+ggplot(pred_tree2) +
+  geom_ribbon(aes(x = tree_cov, ymin = conf.low, ymax = conf.high), fill = "white", alpha = 0.2) +
+  geom_line(aes(x = tree_cov, y = estimate), color = "white") +
   facet_grid(rain ~ temp)
 ```
 
 
-```{r}
-avg_slopes(mod_1, variables = "tree")
-slopes(mod_1, variables = "tree", newdata = datagrid(temp = 0, rain = 0))
-slopes(mod_1, variables = "tree", newdata = datagrid(temp = mean(occ_data$temp), rain = mean(occ_data$rain)))
-
-avg_slopes(mod_1, variables = "rain")
-slopes(mod_1, variables = "rain", newdata = datagrid(temp = 0, tree = 0))
-slopes(mod_1, variables = "rain", newdata = datagrid(temp = mean(occ_data$temp), tree = mean(occ_data$tree)))
 
 
-avg_slopes(mod_1, variables = "temp")
-```
+

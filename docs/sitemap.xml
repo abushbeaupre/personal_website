@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://www.allenbushbeaupre.com/classes/ent101_2025/template_rapport_etudiant.html</loc>
+    <lastmod>2026-09-16T12:48:26.584Z</lastmod>
+  </url>
+  <url>
     <loc>https://www.allenbushbeaupre.com/code_structure_tutorial.html</loc>
     <lastmod>2026-01-19T18:07:19.146Z</lastmod>
   </url>
@@ -17,32 +21,28 @@
     <lastmod>2026-09-09T13:29:10.568Z</lastmod>
   </url>
   <url>
-    <loc>https://www.allenbushbeaupre.com/consultation.html</loc>
-    <lastmod>2026-01-19T20:08:00.417Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.allenbushbeaupre.com/index.html</loc>
-    <lastmod>2026-09-08T13:58:33.527Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.allenbushbeaupre.com/PUBLICATIONS_AUTOMATION_README.html</loc>
-    <lastmod>2026-01-19T15:10:44.990Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.allenbushbeaupre.com/posts.html</loc>
-    <lastmod>2026-01-13T14:57:35.995Z</lastmod>
+    <loc>https://www.allenbushbeaupre.com/teaching.html</loc>
+    <lastmod>2026-09-16T12:43:29.436Z</lastmod>
   </url>
   <url>
     <loc>https://www.allenbushbeaupre.com/PUBLICATIONS_README.html</loc>
     <lastmod>2026-01-19T14:41:58.900Z</lastmod>
   </url>
   <url>
-    <loc>https://www.allenbushbeaupre.com/posts/indirect_effects/index.html</loc>
-    <lastmod>2026-09-09T13:32:55.506Z</lastmod>
+    <loc>https://www.allenbushbeaupre.com/posts.html</loc>
+    <lastmod>2026-01-13T14:57:35.995Z</lastmod>
   </url>
   <url>
-    <loc>https://www.allenbushbeaupre.com/posts/interactions_link_functions/index.html</loc>
-    <lastmod>2026-09-09T13:33:16.546Z</lastmod>
+    <loc>https://www.allenbushbeaupre.com/PUBLICATIONS_AUTOMATION_README.html</loc>
+    <lastmod>2026-01-19T15:10:44.990Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.allenbushbeaupre.com/index.html</loc>
+    <lastmod>2026-09-08T13:58:33.527Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.allenbushbeaupre.com/consultation.html</loc>
+    <lastmod>2026-01-19T20:08:00.417Z</lastmod>
   </url>
   <url>
     <loc>https://www.allenbushbeaupre.com/about.html</loc>
@@ -51,5 +51,9 @@
   <url>
     <loc>https://www.allenbushbeaupre.com/research.html</loc>
     <lastmod>2026-01-19T20:22:45.402Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.allenbushbeaupre.com/classes/ent101_2025/index.html</loc>
+    <lastmod>2026-09-16T12:43:59.933Z</lastmod>
   </url>
 </urlset>

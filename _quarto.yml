@@ -20,6 +20,8 @@ website:
         file: index.qmd
       - text: "Consultations CREUS"
         file: consultation.qmd
+      - text: "Teaching"
+        file: teaching.qmd
       - posts.qmd
       - text: "Publications"
         file: publications.qmd

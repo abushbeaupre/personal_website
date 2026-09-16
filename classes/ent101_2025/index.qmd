@@ -1,0 +1,2755 @@
+---
+title: "ENT101: Échantillonnage du campus UdS"
+subtitle: "Guide complet pour le traitement de données entomologiques avec R"
+description: "Matériel de cours pour ENT101 - Travaux pratiques en Entomologie (Université de Sherbrooke, été 2025) : manipulation de données spatiales, cartographie, intégration de données climatiques (NASA POWER) et visualisation de données entomologiques avec R."
+author: "Allen Bush-Beaupré"
+date: 07-13-2025
+categories: [R, entomologie, données spatiales, ENT101]
+image: logo_udes.png
+title-block-banner: true
+title-block-banner-color: "#2c3e50"
+format: 
+  html:
+    theme: cosmo
+    logo: "udes_logo.jpg"
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    toc-title: "Table des matières"
+    number-sections: true
+    code-fold: false
+    code-tools: true
+    code-line-numbers: false
+    fig-cap-location: bottom
+    fig-align: center
+    fig-width: 8
+    fig-height: 6
+    embed-resources: true
+    smooth-scroll: true
+    css: |
+      .navbar-brand img {
+        max-height: 60px;
+        width: auto;
+      }
+      .quarto-title-banner {
+        position: relative;
+        padding-right: 140px;
+      }
+      .quarto-title-banner::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        width: 120px;
+        height: 80px;
+        background-image: url('udes_logo.jpg');
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center;
+      }
+      .figure-caption {
+        font-style: italic;
+        color: #666;
+        font-size: 0.9em;
+      }
+      .callout-tip {
+        border-left: 4px solid #17a2b8;
+        background-color: #e8f7ff;
+      }
+      .callout-note {
+        border-left: 4px solid #6c757d;
+        background-color: #f8f9fa;
+      }
+      .callout-warning {
+        border-left: 4px solid #ffc107;
+        background-color: #fff3cd;
+      }
+      h1, h2, h3 {
+        color: #2c3e50;
+      }
+      .code-block-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 0.5rem 1rem;
+        font-weight: bold;
+        color: #495057;
+      }
+      .large-figure img {
+        max-width: 100% !important;
+        width: 100% !important;
+        height: auto !important;
+      }
+---
+
+<div style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
+<img src="udes_logo.jpg" alt="UdeS Logo" style="width: 280px; height: auto;">
+</div>
+
+# Introduction {#sec-introduction}
+
+::: {.callout-tip}
+## Objectifs d'apprentissage
+À la fin de ce tutoriel, vous serez capable de :
+
+- Organiser un projet R reproductible pour l'analyse de données entomologiques
+- Manipuler et visualiser des données spatiales avec le package `sf`
+- Créer des cartes professionnelles avec `ggplot2` et `ggspatial`
+- Intégrer des données climatiques via l'API NASA POWER
+- Nettoyer et transformer des données biologiques
+- Créer des visualisations avancées pour la communication scientifique
+:::
+
+Ce tutoriel vous guidera à travers une analyse complète de données entomologiques incluant :
+
+- **Manipulation de données spatiales** : pièges et zones d'échantillonnage
+- **Visualisation cartographique** : cartes de fond contextuelles
+- **Intégration de données climatiques** : API NASA POWER pour les conditions météorologiques
+- **Analyse temporelle** : traitement des dates et fuseaux horaires
+- **Visualisations avancées** : graphiques publication-ready
+- **Workflow reproductible** : bonnes pratiques de recherche
+
+::: {.callout-note}
+## Prérequis
+- Connaissance de base de R et RStudio
+- Installation de R (≥ 4.0) et RStudio
+:::
+
+## Vue d'ensemble du workflow {#sec-workflow-overview}
+
+```{mermaid}
+%%| label: fig-workflow
+%%| fig-cap: "Workflow général du tutoriel d'analyse spatio-temporelle en entomologie."
+flowchart TD
+    A[Organisation du projet R] --> B[Chargement des données spatiales]
+    B --> C[Exploration et classification des sites]
+    C --> D[Création de cartes contextuelles]
+    D --> E[Extraction des coordonnées]
+    E --> F[Intégration des données climatiques]
+    F --> G[Traitement des données biologiques]
+    G --> H[Nettoyage et transformation]
+    H --> I[Visualisations avancées]
+    I --> J[Tableaux et export]
+    J --> K[Rapport final]
+```
+
+
+# Configuration de l'environnement et outils {#sec-setup}
+
+## Chargement des librairies {#sec-libraries}
+
+::: {.callout-note}
+## Configuration de l'environnement R
+Avant de commencer l'analyse, nous devons configurer notre environnement R avec toutes les librairies nécessaires. Cette section installe et charge tous les packages requis pour le tutoriel.
+:::
+
+### Installation des packages (si nécessaire) {#sec-installation}
+
+```{r}
+#| label: install-packages
+#| eval: false
+#| code-summary: "Code d'installation des packages"
+
+# Installation des packages nécessaires (exécuter seulement si besoin)
+packages_needed <- c(
+  "tidyverse", "nasapower", "readxl", "sf", 
+  "ggspatial", "patchwork", "janitor", "lubridate",
+  "tinytable", "here", "cowplot"
+)
+
+# Vérifier et installer les packages manquants
+packages_to_install <- packages_needed[!(packages_needed %in% installed.packages()[,"Package"])]
+if(length(packages_to_install)) install.packages(packages_to_install)
+```
+
+### Chargement des librairies principales {#sec-main-libraries}
+
+```{r}
+#| label: load-core-libraries
+#| message: false
+#| warning: false
+
+# ========================================
+# PACKAGES PRINCIPAUX POUR L'ANALYSE
+# ========================================
+
+# Manipulation et visualisation de données
+library(tidyverse)    # Collection complète : dplyr, ggplot2, tidyr, etc.
+library(lubridate)    # Manipulation des dates et heures
+
+# Données spatiales et cartographie
+library(sf)           # Simple Features pour les données spatiales
+library(ggspatial)    # Extensions cartographiques pour ggplot2
+
+# Lecture et écriture de données
+library(readxl)       # Import de fichiers Excel
+library(janitor)      # Nettoyage automatique des données
+```
+
+### Chargement des librairies spécialisées {#sec-specialized-libraries}
+
+```{r}
+#| label: load-specialized-libraries
+#| message: false
+#| warning: false
+
+# ========================================
+# PACKAGES SPÉCIALISÉS
+# ========================================
+
+# Données climatiques
+library(nasapower)    # Accès aux données météorologiques NASA POWER
+
+# Visualisation avancée
+library(patchwork)    # Combinaison de graphiques
+library(cowplot)      # Manipulation avancée de graphiques
+
+# Tableaux et export
+library(tinytable)    # Tableaux professionnels
+
+# Gestion des chemins de fichiers
+library(here)         # Chemins relatifs reproductibles
+```
+
+### Vérification de l'installation {#sec-verify-installation}
+
+```{r}
+#| label: verify-installation
+#| echo: false
+
+# Vérification que tous les packages sont correctement chargés
+packages_loaded <- c("tidyverse", "sf", "ggspatial", "nasapower", 
+                    "readxl", "janitor", "patchwork", "lubridate",
+                    "tinytable", "here", "cowplot")
+
+verification <- data.frame(
+  Package = packages_loaded,
+  Loaded = sapply(packages_loaded, function(x) x %in% (.packages())),
+  Version = sapply(packages_loaded, function(x) {
+    if(x %in% (.packages())) as.character(packageVersion(x)) else "Non chargé"
+  })
+)
+```
+
+```{r}
+#| echo: false
+print("Statut des packages :")
+```
+
+```{r}
+#| echo: false
+verification
+```
+
+::: {.callout-tip}
+## Rôle de chaque package
+
+- **`tidyverse`** : Écosystème complet pour la manipulation et visualisation de données
+- **`sf`** : Standard moderne pour les données spatiales (remplace `sp`)
+- **`ggspatial`** : Extensions cartographiques pour créer des cartes avec ggplot2
+- **`nasapower`** : Accès direct aux données météorologiques satellites NASA
+- **`patchwork`** : Combinaison élégante de multiples graphiques
+- **`janitor`** : Nettoyage automatique des noms de colonnes et données
+- **`tinytable`** : Création de tableaux professionnels pour publication
+:::
+
+## Introduction au tidyverse {#sec-tidyverse-intro}
+
+Le **tidyverse** est une collection cohérente de packages R conçus pour la science des données. Il révolutionne la façon dont nous travaillons avec les données en R en offrant une syntaxe claire, lisible et cohérente.
+
+### Principes fondamentaux du tidyverse {#sec-tidy-principles}
+
+Le tidyverse repose sur la philosophie des **"tidy data"** (données bien organisées) :
+
+1. **Chaque variable forme une colonne** : Une seule variable par colonne
+2. **Chaque observation forme une ligne** : Une seule observation par ligne  
+3. **Chaque valeur a sa propre cellule** : Une seule valeur par cellule
+4. **Un type d'unité d'observation par tableau** : Ne pas mélanger différents types de données
+
+#### L'opérateur pipe (`|>`)
+
+L'opérateur pipe (`|>`) est l'un des outils les plus puissants du tidyverse. Il permet de :
+
+**Principe de base :**
+```r
+# Au lieu d'écrire : fonction2(fonction1(donnees, argument1), argument2)
+# On peut écrire : donnees |> fonction1(argument1) |> fonction2(argument2)
+```
+
+**Exemple concret :**
+```{r}
+# Méthode traditionnelle (difficile à lire)
+# resultat <- filter(select(mutate(pieges, nouveau = ancienne * 2), nouveau, site), site == 1)
+
+# Méthode avec pipe (facile à lire et comprendre)
+# resultat <- pieges |>
+#   mutate(nouveau = ancienne * 2) |>
+#   select(nouveau, site) |>
+#   filter(site == 1)
+```
+
+#### Avantages du pipe
+
+1. **Lisibilité améliorée** : Le code se lit de gauche à droite, comme une phrase
+2. **Moins d'objets intermédiaires** : Évite de créer des variables temporaires
+3. **Débogage facilité** : On peut exécuter le code ligne par ligne
+4. **Logique claire** : Chaque étape de transformation est explicite
+
+#### Packages principaux du tidyverse utilisés dans ce tutoriel
+
+- **`dplyr`** : Manipulation de données (filter, select, mutate, summarise)
+- **`ggplot2`** : Création de graphiques élégants
+- **`tidyr`** : Restructuration des données (pivot_longer, pivot_wider)
+- **`readr`** : Lecture de fichiers de données
+- **`purrr`** : Programmation fonctionnelle
+- **`stringr`** : Manipulation de chaînes de caractères
+
+#### Exemple pratique de workflow tidyverse
+
+```{r}
+# Exemple typique d'un workflow tidyverse (sera détaillé plus tard)
+# donnees |>                           # Prendre les données
+#   filter(condition) |>               # Filtrer selon une condition
+#   mutate(nouvelle_variable = ...) |> # Créer une nouvelle variable
+#   group_by(groupe) |>                # Grouper par une variable
+#   summarise(moyenne = mean(...)) |>  # Calculer des statistiques
+#   ggplot(aes(x = ..., y = ...)) +    # Créer un graphique
+#   geom_point()                       # Ajouter des points
+```
+
+**Pourquoi adopter cette approche ?**
+- **Efficacité** : Moins de code, plus de clarté
+- **Reproductibilité** : Code plus facile à comprendre et à maintenir
+- **Apprentissage** : Syntaxe cohérente entre tous les packages
+- **Collaboration** : Standard adopté par la communauté R
+
+Cette philosophie sera omniprésente dans tout le tutoriel. Chaque manipulation de données utilisera cette approche pour maximiser la clarté et la reproductibilité du code.
+
+### Avantages de travailler avec des documents Quarto/R Markdown
+
+Ce tutoriel utilise le format **Quarto** (extension `.qmd`), une évolution moderne de R Markdown. Ces formats offrent de nombreux avantages pour l'analyse de données scientifiques :
+
+#### Recherche reproductible
+
+**Intégration code-texte :**
+- **Code et explications ensemble** : Le code, les résultats et les explications sont dans le même document
+- **Exécution automatique** : Les graphiques et tableaux sont générés automatiquement à partir du code
+- **Pas de copier-coller** : Élimination des erreurs de transfert manuel entre logiciels
+
+#### Documentation vivante
+
+**Mise à jour automatique :**
+- **Résultats toujours à jour** : Quand les données changent, tout le document se met à jour
+- **Traçabilité complète** : Chaque résultat peut être retracé jusqu'au code qui l'a généré
+- **Versions cohérentes** : Impossible d'avoir des résultats qui ne correspondent pas au code
+
+#### Flexibilité de sortie
+
+**Formats multiples :**
+- **HTML** : Pour la visualisation interactive et le partage web
+- **PDF** : Pour les rapports formels et publications
+- **Word** : Pour la collaboration avec des collègues non-techniques
+- **Présentations** : Slides directement à partir du même code
+
+#### Avantages pédagogiques
+
+**Apprentissage structuré :**
+- **Progression logique** : Code et explications s'enchaînent naturellement
+- **Contexte immédiat** : Chaque bout de code est expliqué dans son contexte
+- **Expérimentation facile** : Modifier le code et voir immédiatement les résultats
+
+#### Collaboration scientifique
+
+**Partage efficace :**
+- **Tout inclus** : Un seul fichier contient analyse, méthodes et résultats
+- **Contrôle de version** : Compatible avec Git pour le travail d'équipe
+- **Transparence** : Les méthodes sont explicites et vérifiables
+
+#### Exemple pratique
+
+```{r}
+# Ce bloc de code sera exécuté et ses résultats affichés automatiquement
+# Exemple simple pour démontrer l'intégration
+exemple_donnees <- data.frame(
+  x = 1:5,
+  y = c(2, 4, 6, 8, 10)
+)
+
+# Le graphique apparaîtra directement dans le document final
+# ggplot(exemple_donnees, aes(x = x, y = y)) +
+#   geom_point() +
+#   labs(title = "Exemple d'intégration code-résultats")
+```
+
+**Pourquoi c'est révolutionnaire :**
+- **Fin des "ça marchait sur mon ordinateur"** : L'environnement est documenté
+- **Science ouverte** : Méthodes complètement transparentes et reproductibles
+- **Gain de temps** : Plus besoin de refaire manuellement les graphiques après modifications
+- **Qualité** : Moins d'erreurs, plus de cohérence
+
+Ce format est devenu la norme en science des données et recherche reproductible. Vous constaterez ces avantages tout au long de ce tutoriel !
+
+## Gestion des projets R et bonnes pratiques de reproductibilité
+
+### Importance des projets R (R Projects)
+
+Avant de commencer l'analyse, il est crucial de comprendre l'importance d'organiser son travail dans un **projet R**. Un projet R crée un environnement de travail isolé et portable qui facilite la collaboration et la reproductibilité.
+
+#### Problèmes avec `setwd()` et chemins absolus
+
+**❌ Mauvaise pratique :**
+```r
+# Ne jamais faire cela !
+setwd("/Users/MonNom/Documents/projet_entomo/")
+donnees <- read_csv("donnees/mes_donnees.csv")
+```
+
+**Problèmes causés par `setwd()` :**
+
+1. **Non-reproductible** : Le chemin `/Users/MonNom/Documents/` n'existe que sur un ordinateur spécifique
+2. **Fragile** : Si le dossier est déplacé, le code ne fonctionne plus
+3. **Collaboration impossible** : Vos collègues ne peuvent pas exécuter votre code
+4. **Maintenance difficile** : Difficile de réorganiser les fichiers
+5. **Erreurs fréquentes** : Changements de répertoire non intentionnels
+
+#### Solutions avec les projets R
+
+**✅ Bonne pratique :**
+```r
+# Avec un projet R, tous les chemins sont relatifs
+donnees <- read_csv("donnees/mes_donnees.csv")
+# ou
+donnees <- read_csv(here::here("donnees", "mes_donnees.csv"))
+```
+
+**Avantages des projets R :**
+
+1. **Reproductibilité** : Le code fonctionne sur n'importe quel ordinateur
+2. **Portabilité** : Facile de déplacer ou partager tout le projet
+3. **Organisation** : Structure claire et logique des fichiers
+4. **Collaboration** : Plusieurs personnes peuvent travailler sur le même projet
+5. **Versionning** : Compatible avec Git pour le contrôle de version
+
+#### Structure recommandée d'un projet d'entomologie
+
+```
+projet_entomo/
+├── projet_entomo.Rproj        # Fichier de projet R
+├── README.md                  # Documentation du projet
+├── donnees/                   # Données brutes (ne jamais modifier)
+│   ├── spatiales/
+│   │   ├── pieges.gpkg
+│   │   └── sites.gpkg
+│   └── biologiques/
+│       └── captures.xlsx
+├── donnees_traitees/          # Données nettoyées/transformées
+├── scripts/                   # Scripts R d'analyse
+│   ├── 01_nettoyage.R
+│   ├── 02_analyses.R
+│   └── 03_visualisations.R
+├── graphiques/                # Graphiques exportés
+├── rapports/                  # Rapports et documents
+└── fonctions/                 # Fonctions personnalisées
+```
+
+#### Le package `here` pour les chemins
+
+Le package `here` résout élégamment les problèmes de chemins :
+
+```r
+# Installation et chargement
+install.packages("here")
+library(here)
+
+# Utilisation
+donnees <- read_csv(here("donnees", "spatiales", "pieges.gpkg"))
+ggsave(here("graphiques", "carte_sites.png"), plot = ma_carte)
+```
+
+**Avantages de `here()` :**
+- Trouve automatiquement la racine du projet
+- Fonctionne sur tous les systèmes d'exploitation
+- Chemins toujours relatifs au projet
+- Compatible avec RStudio et autres IDE
+
+### Workflow reproductible recommandé
+
+1. **Créer un nouveau projet R** dans RStudio
+2. **Organiser les dossiers** selon la structure recommandée
+3. **Utiliser des chemins relatifs** avec `here()`
+4. **Documenter le projet** avec un README.md
+5. **Versionner avec Git** pour suivre les modifications
+6. **Tester la reproductibilité** sur un autre ordinateur
+
+### Exemple pratique pour ce tutoriel
+
+```r
+# Ce tutoriel assume que vous travaillez dans un projet R
+# Tous les chemins seront relatifs, comme :
+pieges <- st_read(here("donnees", "spatiales", "pieges.gpkg"))
+captures <- read_xlsx(here("donnees", "biologiques", "captures.xlsx"))
+
+# Au lieu de chemins absolus problématiques :
+# pieges <- st_read("/Users/MonNom/projet/donnees/spatiales/pieges.gpkg")
+```
+
+**Message important :** Si vous voyez `setwd()` dans du code R, considérez-le comme un **signal d'alarme** pour les problèmes de reproductibilité. Préférez toujours l'approche par projets R !
+
+# Visualisation et personnalisation graphique {#sec-visualization}
+
+## Introduction à ggplot2 et personnalisation des graphiques
+
+### La grammaire des graphiques avec ggplot2
+
+**ggplot2** est l'un des packages les plus puissants et populaires de R pour la création de visualisations. Il est basé sur la **"Grammar of Graphics"**, une approche systématique pour construire des graphiques par couches.
+
+#### Anatomie d'un graphique ggplot2
+
+```r
+# Structure de base d'un graphique ggplot2
+ggplot(data = mes_donnees, aes(x = variable_x, y = variable_y)) +
+  geom_point() +                    # Couche géométrique (points)
+  scale_x_continuous() +            # Échelle pour l'axe X
+  scale_y_continuous() +            # Échelle pour l'axe Y
+  labs(title = "Mon titre") +       # Étiquettes
+  theme_minimal()                   # Thème graphique
+```
+
+**Composants principaux :**
+1. **Données** (`data`) : Le jeu de données à visualiser
+2. **Esthétiques** (`aes`) : Mapping des variables aux propriétés visuelles
+3. **Géométries** (`geom_*`) : Type de représentation (points, lignes, barres, etc.)
+4. **Échelles** (`scale_*`) : Contrôle des axes et légendes
+5. **Étiquettes** (`labs`) : Titres, sous-titres, légendes
+6. **Thèmes** (`theme_*`) : Apparence générale du graphique
+
+### Thèmes ggplot2 : De la base à la personnalisation
+
+Les **thèmes** contrôlent l'apparence non-liée aux données de vos graphiques. ggplot2 offre plusieurs thèmes pré-formatés ainsi que des options de personnalisation complète.
+
+#### Thèmes pré-formatés utilisés dans ce tutoriel
+
+```{r}
+#| echo: false
+
+# Créer un graphique d'exemple pour démontrer les thèmes
+library(ggplot2)
+
+# Données d'exemple
+donnees_exemple <- data.frame(
+  x = 1:10,
+  y = rnorm(10, 5, 1),
+  groupe = rep(c("A", "B"), 5)
+)
+
+# Graphique de base
+graphique_base <- ggplot(donnees_exemple, aes(x = x, y = y, color = groupe)) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(
+    title = "Exemple de graphique pour démontrer les thèmes",
+    x = "Variable X",
+    y = "Variable Y"
+  )
+```
+
+#### Démonstration des différents thèmes
+
+```{r}
+#| echo: false
+print("1. Thème par défaut (theme_gray)")
+```
+
+```{r}
+graphique_base
+```
+
+```{r}
+#| echo: false
+print("2. theme_minimal() - Épuré et moderne")
+```
+
+```{r}
+graphique_base + theme_minimal()
+```
+
+```{r}
+#| echo: false
+print("3. theme_classic() - Style traditionnel")
+```
+
+```{r}
+graphique_base + theme_classic()
+```
+
+```{r}
+#| echo: false
+print("4. theme_bw() - Fond blanc avec bordures")
+```
+
+```{r}
+graphique_base + theme_bw()
+```
+
+```{r}
+#| echo: false
+print("5. theme_void() - Minimaliste absolu")
+```
+
+```{r}
+graphique_base + theme_void()
+```
+
+#### Thèmes recommandés pour la recherche scientifique
+
+**Pour les publications scientifiques :**
+- **`theme_classic()`** : Apparence traditionnelle, axes sans grille
+- **`theme_bw()`** : Fond blanc, grilles discrètes
+- **`theme_minimal()`** : Moderne et épuré (utilisé dans ce tutoriel)
+
+**Pour les présentations :**
+- **`theme_minimal()`** : Lisible et moderne
+- **`theme_void()`** : Pour les cartes et diagrammes simples
+
+#### Personnalisation avancée des thèmes
+
+Vous pouvez modifier n'importe quel élément d'un thème avec `theme()` :
+
+```{r}
+#| label: fig-theme-custom
+#| fig-cap: "Démonstration de personnalisation complète d'un thème ggplot2 avec contrôle des titres, axes, légendes et grilles."
+# Exemple de personnalisation complète
+graphique_personnalise <- graphique_base +
+  theme_minimal() +
+  theme(
+    # Titre principal
+    plot.title = element_text(
+      size = 16, 
+      face = "bold", 
+      hjust = 0.5,
+      color = "darkblue"
+    ),
+    # Axes
+    axis.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10),
+    axis.line = element_line(color = "black", size = 0.5),
+    # Légende
+    legend.position = "bottom",
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 10),
+    # Grilles
+    panel.grid.major = element_line(color = "gray90", size = 0.3),
+    panel.grid.minor = element_blank(),
+    # Fond
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+```
+
+```{r}
+#| echo: false
+print("Graphique avec thème personnalisé :")
+```
+
+```{r}
+graphique_personnalise
+```
+
+#### Créer et réutiliser ses propres thèmes
+
+```{r}
+#| label: fig-theme-entomo
+#| fig-cap: "Thème personnalisé pour l'entomologie avec esthétique optimisée pour les graphiques scientifiques de ce domaine."
+# Créer un thème personnalisé pour l'entomologie
+theme_entomo <- function() {
+  theme_minimal() +
+  theme(
+    # Titre centré et en gras
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5, color = "gray40"),
+    # Axes nets et lisibles
+    axis.title = element_text(size = 11, face = "bold"),
+    axis.text = element_text(size = 9),
+    # Légende en bas
+    legend.position = "bottom",
+    legend.key.size = unit(0.4, "cm"),
+    # Grilles discrètes
+    panel.grid.major = element_line(color = "gray90", size = 0.2),
+    panel.grid.minor = element_blank(),
+    # Marges optimisées
+    plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")
+  )
+}
+
+# Utiliser le thème personnalisé
+```
+
+```{r}
+#| echo: false
+print("Thème personnalisé pour l'entomologie :")
+```
+
+```{r}
+graphique_base + theme_entomo()
+```
+
+### Encouragement à l'expérimentation
+
+**💡 Conseil :** N'hésitez pas à **expérimenter** avec les thèmes tout au long de ce tutoriel !
+
+- **Remplacez `theme_minimal()`** par `theme_classic()` ou `theme_bw()`
+- **Modifiez les couleurs** avec `color = "votre_couleur"`
+- **Changez les tailles** avec `size = votre_taille`
+- **Déplacez les légendes** avec `legend.position = "right"/"left"/"top"/"bottom"`
+
+**Ressources pour aller plus loin :**
+- Documentation officielle : `?theme`
+- Galerie ggplot2 : https://r-graph-gallery.com/
+- Extension ggthemes : thèmes additionnels professionnels
+
+### Sauvegarde des graphiques avec ggsave()
+
+La fonction `ggsave()` est l'outil standard pour exporter vos graphiques dans différents formats.
+
+#### Syntaxe de base
+
+```{r}
+# Créer un graphique
+mon_graphique <- ggplot(donnees_exemple, aes(x = x, y = y)) +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Mon graphique à sauvegarder")
+
+# Sauvegarder le graphique
+ggsave(
+  filename = "mon_graphique.png",  # Nom du fichier
+  plot = mon_graphique,            # Objet graphique (optionnel si dernier plot)
+  width = 8,                       # Largeur en pouces
+  height = 6,                      # Hauteur en pouces
+  dpi = 300                        # Résolution (300 DPI pour publication)
+)
+
+```
+
+```{r}
+#| echo: false
+print("Graphique sauvegardé dans mon_graphique.png")
+```
+
+
+#### Formats de sortie supportés
+
+```{r}
+#| eval: false
+
+# PNG - Idéal pour le web et présentations
+ggsave("graphique.png", mon_graphique, width = 8, height = 6, dpi = 300)
+
+# PDF - Vectoriel, parfait pour les publications
+ggsave("graphique.pdf", mon_graphique, width = 8, height = 6)
+
+# SVG - Vectoriel, modifiable dans Illustrator
+ggsave("graphique.svg", mon_graphique, width = 8, height = 6)
+
+# TIFF - Format courant en recherche
+ggsave("graphique.tiff", mon_graphique, width = 8, height = 6, dpi = 300)
+
+# JPEG - Plus compressé que PNG
+ggsave("graphique.jpg", mon_graphique, width = 8, height = 6, dpi = 300, quality = 95)
+```
+
+#### Conseils pour la sauvegarde
+
+**Résolutions recommandées :**
+- **72-150 DPI** : Web, présentations PowerPoint
+- **300 DPI** : Publications scientifiques, rapports imprimés
+- **600 DPI** : Impression haute qualité
+
+**Formats recommandés selon l'usage :**
+- **PNG** : Graphiques avec transparence, usage général
+- **PDF** : Publications scientifiques (vectoriel, redimensionnable)
+- **SVG** : Retouches graphiques ultérieures
+- **TIFF** : Certaines revues scientifiques l'exigent
+
+**Dimensions typiques :**
+```r
+# Figure simple
+ggsave("figure.png", width = 6, height = 4, dpi = 300)
+
+# Figure large (deux colonnes)
+ggsave("figure_large.png", width = 10, height = 6, dpi = 300)
+
+# Figure carrée (pour certains graphiques)
+ggsave("figure_carree.png", width = 6, height = 6, dpi = 300)
+```
+
+#### Intégration avec les projets R
+
+```r
+# Avec le package here pour chemins relatifs
+library(here)
+
+# Sauvegarder dans le dossier graphiques du projet
+ggsave(
+  here("graphiques", "analyse_captures.png"),
+  plot = mon_graphique,
+  width = 8, height = 6, dpi = 300
+)
+```
+
+**Astuce :** Créez toujours vos graphiques avec des dimensions et résolutions adaptées à leur utilisation finale !
+
+# Analyse spatiale et exploration des données {#sec-spatial-analysis}
+
+## Chargement et préparation des données spatiales {#sec-spatial-data}
+
+::: {.callout-note}
+## Objectif de cette section
+Charger les données spatiales d'échantillonnage entomologique et les préparer pour l'analyse en uniformisant les systèmes de coordonnées.
+:::
+
+Nous commençons par charger nos données spatiales stockées au format GeoPackage (.gpkg), un format moderne et efficace pour les données géospatiales.
+
+### Chargement des fichiers spatiaux {#sec-load-spatial}
+
+```{r}
+#| label: load-spatial-data
+#| message: false
+#| warning: false
+
+# ========================================
+# CHARGEMENT DES DONNÉES SPATIALES
+# ========================================
+
+# Chargement des données spatiales depuis des fichiers GeoPackage
+# GeoPackage (.gpkg) est un format moderne qui remplace Shapefile
+# Il supporte plusieurs couches dans un seul fichier et préserve les métadonnées
+pieges <- st_read("pieges.gpkg")                  # Lecture des données de pièges (points)
+recoltes_actives <- st_read("recoltes_actives.gpkg")  # Lecture des données de récoltes actives (lignes/polygones)
+```
+
+### Transformation des systèmes de coordonnées {#sec-transform-crs}
+
+```{r}
+#| label: transform-coordinates
+
+# ========================================
+# TRANSFORMATION DU SYSTÈME DE COORDONNÉES
+# ========================================
+
+# Transformation vers le système de coordonnées WGS84 (EPSG:4326)
+# Cette étape est cruciale pour :
+# - Compatibilité avec les services de cartes web (OpenStreetMap, Google Maps)
+# - Uniformisation des systèmes de coordonnées entre couches
+# - Calculs de distances et surfaces précis à l'échelle globale
+pieges <- st_transform(pieges, crs = 4326)
+recoltes_actives <- st_transform(recoltes_actives, crs = 4326)
+
+# Vérification des systèmes de coordonnées après transformation
+cat("Système de coordonnées des pièges:", st_crs(pieges)$input, "\n")
+cat("Système de coordonnées des récoltes actives:", st_crs(recoltes_actives)$input, "\n")
+```
+
+::: {.callout-tip}
+## Fonctions clés utilisées
+
+- **`st_read()`** : Lit les fichiers de données spatiales (shapefile, gpkg, etc.)
+- **`st_transform()`** : Change le système de coordonnées des données spatiales
+- **`st_crs()`** : Affiche le système de référence de coordonnées
+
+## Pourquoi EPSG:4326 ?
+Le système WGS84 (EPSG:4326) utilise des coordonnées latitude/longitude et est compatible avec les services de cartes web comme OpenStreetMap. C'est essentiel pour superposer nos données avec des fonds de carte.
+:::
+
+
+## Étape 1: Exploration des données {#sec-data-exploration}
+
+::: {.callout-note}
+## Importance de l'exploration des données
+Avant toute analyse, il est crucial d'explorer la distribution de nos variables clés pour détecter des valeurs aberrantes et comprendre la structure des données.
+:::
+
+### Distribution de la couverture arborescente {#sec-tree-cover-distribution}
+
+```{r}
+#| label: fig-tree-cover-traps
+#| fig-cap: "Distribution de la couverture arborescente pour les sites de pièges. L'histogramme révèle une distribution bimodale suggérant deux types d'habitats distincts."
+
+# ========================================
+# EXPLORATION GRAPHIQUE DES DONNÉES
+# ========================================
+
+# Création d'un histogramme pour comprendre la distribution de la couverture arborescente
+# Cette étape est essentielle pour :
+# - Détecter des valeurs aberrantes ou incohérentes
+# - Comprendre la variabilité de l'environnement d'étude
+# - Planifier les analyses ultérieures (groupement, classification)
+pieges |>  # Utilisation du pipe pour un code lisible
+  ggplot(aes(x = couverture_arborescente)) +  # Mapping de la variable sur l'axe X
+  geom_histogram(
+    binwidth = 1,                    # Largeur des barres : 1% de couverture
+    fill = "steelblue3",            # Couleur de remplissage des barres
+    color = "white",                # Couleur des bordures
+    alpha = 0.7                     # Transparence pour un effet visuel agréable
+  ) +
+  labs(
+    y = "Fréquence",               # Étiquette de l'axe Y
+    x = "% Couverture arborescente", # Étiquette de l'axe X
+    title = "Distribution de la couverture arborescente",
+    subtitle = "Fréquence observée pour les sites de pièges",
+    caption = "Source: Données terrain - Analyse exploratoire"
+  ) +
+  theme_classic() +                # Thème propre pour publication
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    plot.subtitle = element_text(size = 10, color = "gray40")
+  )
+```
+
+::: {.callout-tip}
+## Interprétation de l'histogramme
+L'histogramme révèle une distribution bimodale de la couverture arborescente, suggérant naturellement deux types d'habitats distincts. Cette observation guidera notre stratégie de classification des sites.
+:::
+
+## Classification des sites par habitat {#sec-site-classification}
+
+::: {.callout-note}
+## Objectif de la classification
+Basé sur la distribution observée, nous créons deux groupes de sites selon leur couverture arborescente pour faciliter les analyses comparatives entre habitats.
+:::
+
+### Classification automatisée {#sec-automated-classification}
+
+Basé sur la distribution observée, nous créons deux groupes de sites selon leur couverture arborescente.
+
+```{r}
+#| label: tbl-habitat-classification
+#| tbl-cap: "Classification des sites selon l'habitat basée sur la couverture arborescente"
+
+# ========================================
+# CLASSIFICATION DES SITES SELON L'HABITAT
+# ========================================
+
+# Classification basée sur un seuil écologiquement pertinent (40% de couverture)
+# Cette classification permet de :
+# - Distinguer les habitats forestiers (>40%) des habitats ouverts (≤40%)
+# - Créer des groupes pour analyses comparatives
+# - Simplifier l'interprétation écologique des résultats
+pieges <- pieges |>
+  mutate(
+    site = ifelse(
+      couverture_arborescente > 40,  # Condition de test
+      1,                             # Valeur si condition vraie (habitat forestier)
+      2                              # Valeur si condition fausse (habitat ouvert)
+    ),
+    # Ajout d'une variable textuelle pour faciliter l'interprétation
+    type_habitat = case_when(
+      couverture_arborescente > 40 ~ "Forestier",
+      couverture_arborescente <= 40 ~ "Ouvert",
+      .default = "Non classé"  # Gestion des valeurs manquantes
+    )
+  )
+```
+
+### Vérification de la classification {#sec-classification-verification}
+
+```{r}
+#| label: verify-classification
+#| code-fold: true
+
+# Vérification de la classification
+verification_classification <- pieges |>
+  st_drop_geometry() |>  # Suppression de la géométrie pour affichage tabulaire
+  group_by(site, type_habitat) |>
+  summarise(
+    n_sites = n(),                                    # Nombre de sites par catégorie
+    couverture_min = min(couverture_arborescente),   # Couverture minimale
+    couverture_max = max(couverture_arborescente),   # Couverture maximale
+    couverture_moyenne = round(mean(couverture_arborescente), 1), # Couverture moyenne
+    .groups = "drop"
+  )
+
+```
+
+```{r}
+#| echo: false
+print("Résumé de la classification des habitats:")
+```
+
+```{r}
+#| echo: false
+verification_classification
+```
+
+Statistiques descriptives de la classification des habitats selon la couverture arborescente.
+
+::: {.callout-tip}
+## Logique de classification
+
+Le seuil de 40% de couverture arborescente divise naturellement nos sites en deux groupes écologiquement pertinents :
+
+- **Site 1 (Forestier)** : Zones avec >40% de couverture (habitats fermés)
+- **Site 2 (Ouvert)** : Zones avec ≤40% de couverture (habitats ouverts)
+
+Cette classification nous permettra de comparer les communautés d'insectes entre habitats contrastés.
+:::
+
+## Étape 2: Vérification de la classification
+
+Nous appliquons la même logique aux données de récoltes actives pour vérifier la cohérence de notre classification.
+
+```{r}
+#| label: fig-tree-cover-active
+#| fig-cap: "Distribution de la couverture arborescente pour les sites de récoltes actives. La distribution similaire à celle des pièges confirme la cohérence de notre échantillonnage."
+
+# Histogramme de la couverture arborescente pour les récoltes actives
+recoltes_actives |>
+  ggplot(aes(x = couverture_arborescente)) +
+  geom_histogram(binwidth = 1, fill = "coral3", color = "white", alpha = 0.7) +
+  labs(y = "Fréquence", 
+       x = "% Couverture arborescente",
+       title = "Distribution de la couverture arborescente (récoltes actives)",
+       subtitle = "Vérification de la cohérence avec les sites de pièges") +
+  theme_classic() +
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    plot.subtitle = element_text(size = 10, color = "gray40")
+  )
+```
+
+Ce second histogramme nous permet de vérifier que la distribution de la couverture arborescente est similaire entre les deux méthodes d'échantillonnage (pièges vs récoltes actives).
+
+```{r}
+# Application de la même classification de sites aux récoltes actives
+recoltes_actives <- recoltes_actives |>
+                      mutate(site = ifelse(couverture_arborescente > 40, 1, 2))
+```
+
+## Étape 3: Préparation de la cartographie
+
+Avant de créer nos cartes, nous devons calculer l'étendue spatiale de nos données pour déterminer la zone à afficher.
+
+```{r}
+# Calcul de l'étendue spatiale combinée des deux jeux de données
+bbox_combined <- st_bbox(c(st_geometry(pieges), st_geometry(recoltes_actives)))
+
+# Ajout d'un tampon à l'étendue spatiale (en degrés décimaux)
+buffer_deg <- 0.005  # Tampon plus petit pour une carte contextuelle plus focalisée
+
+# Création de l'étendue tampon
+bbox_buffered <- bbox_combined
+bbox_buffered["xmin"] <- bbox_combined["xmin"] - buffer_deg
+bbox_buffered["ymin"] <- bbox_combined["ymin"] - buffer_deg
+bbox_buffered["xmax"] <- bbox_combined["xmax"] + buffer_deg
+bbox_buffered["ymax"] <- bbox_combined["ymax"] + buffer_deg
+
+```
+
+```{r}
+#| echo: false
+print("Étendue originale:")
+print(bbox_combined)
+print("Étendue avec tampon:")
+print(bbox_buffered)
+```
+
+
+**Fonctions utilisées :**
+- `st_bbox()` : Calcule l'étendue spatiale (bounding box) des données
+- `st_geometry()` : Extrait uniquement la géométrie des objets spatiaux
+- `c()` : Combine plusieurs objets
+
+**Pourquoi un tampon (buffer) ?**
+Le tampon ajoute de l'espace autour de nos données pour :
+1. Éviter que les points touchent les bords de la carte
+2. Fournir du contexte spatial
+3. Améliorer l'esthétique de la carte
+
+**Note sur les unités :** 0.008 degrés décimaux ≈ 800 mètres à cette latitude.
+
+## Étape 4: Création de la carte principale
+
+Nous créons maintenant une carte détaillée montrant nos sites d'échantillonnage avec différents symboles et couleurs selon le type de piège et le site.
+
+Références utiles pour la personnalisation des graphiques:
+Formes de points: https://blog.albertkuo.me/post/point-shape-options-in-ggplot/ 
+Types de lignes: https://r-charts.com/base-r/line-types/ 
+Couleurs: https://www.nceas.ucsb.edu/sites/default/files/2020-04/colorPaletteCheatsheet.pdf 
+
+## Cartographie avancée avec ggplot2 et ggspatial
+
+La cartographie avec R permet de créer des cartes de qualité publication. Nous allons utiliser `ggplot2` combiné avec `ggspatial` pour ajouter des fonds de carte.
+
+```{r}
+#| label: fig-study-sites-map
+#| fig-cap: "Carte détaillée des sites d'échantillonnage entomologique avec fond cartographique OpenStreetMap. Les points représentent les pièges et les lignes les transects de récolte active, colorés selon le type d'habitat."
+
+# ========================================
+# CRÉATION D'UNE CARTE DÉTAILLÉE AVEC FOND CARTOGRAPHIQUE
+# ========================================
+
+# Création de la carte principale avec superposition de données vectorielles et raster
+# Cette approche permet de :
+# - Contextualiser géographiquement les données d'échantillonnage
+# - Visualiser les relations spatiales entre différents types de données
+# - Créer des cartes de qualité publication pour rapports scientifiques
+main_map <- ggplot() +
+  
+  # ========================================
+  # FOND DE CARTE (TUILES RASTER)
+  # ========================================
+  # Ajout des tuiles OpenStreetMap comme fond cartographique
+  # - type = "osm" : utilise OpenStreetMap (gratuit, détaillé)
+  # - zoom = 18 : niveau de détail élevé (1-19, plus élevé = plus détaillé)
+  annotation_map_tile(type = "osm", zoom = 18) +
+  
+  # ========================================
+  # COUCHES DE DONNÉES SPATIALES
+  # ========================================
+  
+  # Ajout des géométries linéaires (transects de récoltes actives)
+  # Ces lignes représentent les parcours d'échantillonnage actif
+  geom_sf(
+    data = recoltes_actives,        # Source des données
+    aes(
+      color = as.factor(site),      # Couleur selon le site (facteur pour couleurs discrètes)
+      linetype = type_recolte       # Type de ligne selon la méthode de récolte
+    ),
+    linewidth = 1.5,                # Épaisseur des lignes (visible sur le fond)
+    alpha = 0.7                     # Transparence pour éviter la surcharge visuelle
+  ) +
+  
+  # Ajout des géométries ponctuelles (emplacements des pièges)
+  # Ces points représentent les positions exactes des pièges passifs
+  geom_sf(
+    data = pieges,                  # Source des données
+    aes(
+      color = as.factor(site),      # Couleur selon le site (cohérence avec les lignes)
+      shape = type_de_piege         # Forme selon le type de piège
+    ),
+    size = 3,                       # Taille des points (lisibilité)
+    alpha = 0.8                     # Légère transparence pour l'esthétique
+  ) +
+  
+  # ========================================
+  # CONFIGURATION DES ÉCHELLES VISUELLES
+  # ========================================
+  
+  # Configuration des couleurs pour les sites
+  # Utilisation de couleurs contrastées et accessibles
+  scale_color_manual(
+    values = c("royalblue3", "mediumorchid3"),  # Couleurs distinctives
+    name = "Site",                               # Nom de la légende
+    labels = c("Site 1 (Forestier)", "Site 2 (Ouvert)")  # Étiquettes explicites
+  ) +
+  # Configuration des formes pour les types de pièges
+  scale_shape_manual(values = c(15, 18),
+                     labels = c("Bol Jaune", "Malaise"),
+                     name = "Type de piège") +
+  # Configuration des types de lignes pour les récoltes actives
+  scale_linetype_manual(values = c("dashed"),
+                        labels = c("Filet Fauchoir"),
+                        name = "Récoltes actives") +
+  labs(title = "Pièges et Récoltes Actives - Vue détaillée") +
+  theme(plot.title = element_text(hjust = 0.5, size = 14),
+        legend.position = "bottom",
+        legend.direction = "horizontal",
+        legend.key = element_blank())
+```
+
+**Fonctions cartographiques clés :**
+- `annotation_map_tile()` : Ajoute un fond de carte (ici OpenStreetMap)
+- `geom_sf()` : Affiche les données spatiales (points, lignes, polygones)
+- `scale_color_manual()` : Contrôle les couleurs utilisées
+- `scale_shape_manual()` : Contrôle les formes des points
+- `scale_linetype_manual()` : Contrôle les types de lignes
+
+**Paramètres de zoom :** Le zoom 18 fournit un niveau de détail élevé, idéal pour des études à l'échelle locale.
+
+## Étape 5: Création de la carte contextuelle
+
+Pour situer notre zone d'étude dans un contexte plus large, nous créons une carte d'ensemble (inset map).
+```{r}
+#| label: fig-combined-map
+#| fig-cap: "Carte combinée des sites d'échantillonnage entomologique avec vue détaillée et carte contextuelle. La carte principale montre les pièges et transects de récolte active avec fond OpenStreetMap, tandis que l'encart situe la zone d'étude dans la réserve naturelle du Mont-Bellevue."
+#| fig-width: 10
+#| fig-height: 8
+#| out-width: "100%"
+#| class-output: "large-figure"
+# Création de la carte contextuelle montrant la région de Sherbrooke
+# Création d'un polygone d'étendue plus large pour forcer une vue élargie
+larger_extent <- st_polygon(list(rbind(
+  c(bbox_buffered["xmin"], bbox_buffered["ymin"]),
+  c(bbox_buffered["xmax"], bbox_buffered["ymin"]),
+  c(bbox_buffered["xmax"], bbox_buffered["ymax"]),
+  c(bbox_buffered["xmin"], bbox_buffered["ymax"]),
+  c(bbox_buffered["xmin"], bbox_buffered["ymin"])
+))) |>
+  st_sfc(crs = 4326)
+
+# Création d'un polygone rectangulaire pour la zone d'étude
+study_area_rect <- st_polygon(list(rbind(
+  c(bbox_combined["xmin"], bbox_combined["ymin"]),
+  c(bbox_combined["xmax"], bbox_combined["ymin"]),
+  c(bbox_combined["xmax"], bbox_combined["ymax"]),
+  c(bbox_combined["xmin"], bbox_combined["ymax"]),
+  c(bbox_combined["xmin"], bbox_combined["ymin"])
+))) |>
+  st_sfc(crs = 4326)
+
+inset_map <- ggplot() +
+  # Ajout des tuiles de fond (zoom réduit pour petite zone)
+  annotation_map_tile(type = "osm", zoom = 18) +
+  # Ajout d'un polygone d'étendue invisible pour forcer des limites plus larges
+  geom_sf(data = larger_extent, fill = NA, color = NA) +
+  # Ajout du rectangle montrant l'étendue originale (zone d'étude) comme polygone sf
+  geom_sf(data = study_area_rect,
+          fill = "red", color = "darkred", alpha = 0.3, linewidth = 1) +
+  # Ajout de la flèche du nord
+  annotation_north_arrow(location = "tr", which_north = "true", 
+                         pad_x = unit(0.1, "in"), pad_y = unit(0.1, "in"),
+                         style = north_arrow_fancy_orienteering(),
+                         height = unit(0.3, "in"), width = unit(0.2, "in")) +
+  labs(title = "Réserve naturelle du Mont-Bellevue") +
+  theme(plot.title = element_text(hjust = 0.5, size = 8),
+        plot.background = element_rect(fill = "white", color = "black", linewidth = 1),
+        axis.text = element_text(size = 4),
+        plot.margin = margin(5, 5, 5, 5),
+        aspect.ratio = 0.5)  # Forcer un ratio d'aspect plus large
+
+# Combinaison des cartes en utilisant patchwork
+combined_map <- main_map + 
+  inset_element(inset_map, 
+                left = 0.01, bottom = 0.05, 
+                right = 0.99, top = 0.6)
+
+# Affichage de la carte combinée
+combined_map
+```
+
+Cette carte n'est pas parfaite pour une publication mais sera satisfaisante dans le cadre du rapport.
+
+::: {.callout-tip}
+## Comment fonctionne patchwork pour combiner les cartes
+
+Le package **patchwork** simplifie énormément la combinaison de graphiques ggplot2. Dans notre exemple :
+
+**Syntaxe de base :**
+- `main_map + inset_element(inset_map, ...)` combine les deux cartes
+- L'opérateur `+` de patchwork ajoute l'inset comme élément superposé
+
+**Paramètres de `inset_element()` :**
+- `left = 0.05` : Position du bord gauche de l'inset (5% de la largeur totale)
+- `bottom = 0.05` : Position du bord inférieur (5% de la hauteur totale)  
+- `right = 0.95` : Position du bord droit (95% de la largeur totale)
+- `top = 0.6` : Position du bord supérieur (60% de la hauteur totale)
+
+Ces coordonnées utilisent un système de **coordonnées normalisées** (0 à 1) où :
+- (0,0) = coin inférieur gauche de la carte principale
+- (1,1) = coin supérieur droit de la carte principale
+
+**Avantages de patchwork :**
+- Syntaxe intuitive et lisible
+- Contrôle précis du positionnement
+- Maintien de la qualité graphique
+- Compatible avec tous les thèmes ggplot2
+:::
+
+## Étape 6: Extraction des coordonnées des pièges malaise
+
+Nous allons extraire les coordonnées des pièges malaises des deux sites qui représentent approximativement les points centroides des sites.
+
+```{r}
+# Filtrage des pièges malaise
+malaise_traps <- pieges |>
+  filter(type_de_piege == "malaise")
+
+# Extraction des coordonnées
+malaise_coords <- malaise_traps |>
+  st_coordinates() |>
+  as_tibble() |>
+  rename(longitude = X, latitude = Y)
+
+# Combinaison avec les données originales (sans géométrie)
+malaise_with_coords <- malaise_traps |>
+  st_drop_geometry() |>
+  bind_cols(malaise_coords) |>
+  select(site, longitude, latitude)
+
+glimpse(malaise_with_coords)
+```
+
+**Fonctions utilisées :**
+- `filter()` : Sélectionne uniquement les lignes correspondant à un critère
+- `st_coordinates()` : Extrait les coordonnées X,Y des objets spatiaux
+- `as_tibble()` : Convertit en format tibble (data frame moderne)
+- `st_drop_geometry()` : Supprime la géométrie spatiale pour garder seulement les attributs
+- `bind_cols()` : Combine les colonnes de deux data frames
+- `rename()` : Renomme les colonnes pour plus de clarté
+
+**Pourquoi extraire les coordonnées ?**
+Les coordonnées seront utilisées pour récupérer les données météorologiques spécifiques à chaque site d'échantillonnage via l'API NASA POWER.
+
+# Analyse temporelle et données météorologiques {#sec-temporal-analysis}
+
+## Étape 7: Analyse temporelle des données d'échantillonnage
+
+L'analyse temporelle est cruciale pour comprendre les périodes d'activité des insectes et synchroniser nos données avec les conditions météorologiques. Nous utilisons la librairie `lubridate` qui simplifie grandement la manipulation des dates et heures en R.
+
+```{r}
+library(lubridate)  # Bibliothèque pour la manipulation de dates
+
+# Analyse temporelle des données de pièges
+pieges <- pieges |>
+  mutate(
+    # Analyse de date_pose (date de pose des pièges)
+    date_pose_parsed = ymd_hms(date_pose),
+    date_pose_date = date(date_pose_parsed),
+    date_pose_time = hms::as_hms(date_pose_parsed),
+    date_pose_year = year(date_pose_parsed),
+    date_pose_month = month(date_pose_parsed),
+    date_pose_day = day(date_pose_parsed),
+    date_pose_hour = hour(date_pose_parsed),
+    date_pose_minute = minute(date_pose_parsed),
+    
+    # Analyse de date_recolte (date de récolte)
+    date_recolte_parsed = ymd_hms(date_recolte),
+    date_recolte_date = date(date_recolte_parsed),
+    date_recolte_time = hms::as_hms(date_recolte_parsed),
+    date_recolte_year = year(date_recolte_parsed),
+    date_recolte_month = month(date_recolte_parsed),
+    date_recolte_day = day(date_recolte_parsed),
+    date_recolte_hour = hour(date_recolte_parsed),
+    date_recolte_minute = minute(date_recolte_parsed),
+    
+    # Analyse de date_retrait (date de retrait des pièges)
+    date_retrait_parsed = ymd_hms(date_retrait),
+    date_retrait_date = date(date_retrait_parsed),
+    date_retrait_time = hms::as_hms(date_retrait_parsed),
+    date_retrait_year = year(date_retrait_parsed),
+    date_retrait_month = month(date_retrait_parsed),
+    date_retrait_day = day(date_retrait_parsed),
+    date_retrait_hour = hour(date_retrait_parsed),
+    date_retrait_minute = minute(date_retrait_parsed)
+  )
+
+# Affichage du résumé des dates analysées
+pieges |>
+  st_drop_geometry() |>
+  select(contains("_parsed"), contains("_date"), contains("_time")) |>
+  glimpse()
+```
+
+**Fonctions temporelles clés :**
+- `ymd_hms()` : Parse une date au format Année-Mois-Jour Heure:Minute:Seconde
+- `date()` : Extrait seulement la partie date (sans l'heure)
+- `year()`, `month()`, `day()` : Extraient les composantes de date
+- `hour()`, `minute()` : Extraient les composantes d'heure
+- `hms::as_hms()` : Convertit en format heure:minute:seconde
+
+**Avantages de lubridate :**
+Cette librairie gère automatiquement les fuseaux horaires, les années bissextiles, et offre une syntaxe intuitive pour manipuler les dates.
+
+
+
+## Étape 8: Récupération des données météorologiques
+
+Les données météorologiques sont essentielles pour comprendre l'activité des insectes. Nous utilisons l'API NASA POWER qui fournit des données météorologiques de haute qualité, validées scientifiquement et disponibles gratuitement.
+
+# Données météorologiques
+## Site 1
+
+Pour chaque site, nous devons d'abord extraire les coordonnées précises, puis interroger l'API NASA POWER avec les bons paramètres.
+
+```{r}
+# Extraction de la latitude unique pour le site 1
+lat_1 <- pieges |>
+  filter(type_de_piege == "malaise") |>
+  filter(site == 1) |>
+  st_coordinates() |>
+  as_tibble() |>
+  pull(Y) |>
+  unique()
+
+# Extraction de la longitude unique pour le site 1  
+lon_1 <- pieges |>
+  filter(type_de_piege == "malaise") |>
+  filter(site == 1) |>
+  st_coordinates() |>
+  as_tibble() |>
+  pull(X) |>
+  unique()
+
+# Affichage des coordonnées extraites pour vérification
+```
+
+```{r}
+#| echo: false
+print(paste("Latitude (Y):", lat_1))
+print(paste("Longitude (X):", lon_1))
+```
+
+```{r}
+# Note: get_power() attend lonlat = c(longitude, latitude)
+meteo_site_1 <- get_power(community = "ag",
+                          temporal_api = "hourly",
+                          lonlat = c(lon_1, lat_1),  # longitude d'abord, puis latitude
+                          dates = c("2025-06-02", "2025-06-11"),
+                          pars = c("TS", "PRECTOTCORR"))
+
+glimpse(meteo_site_1)
+```
+
+**Paramètres de l'API NASA POWER :**
+- `community = "ag"` : Communauté agricole (optimisée pour applications terrestres)
+- `temporal_api = "hourly"` : Données horaires (plus de précision)
+- `lonlat = c(lon, lat)` : Coordonnées (attention à l'ordre : longitude PUIS latitude)
+- `dates = c("début", "fin")` : Période d'intérêt
+- `pars = c("TS", "PRECTOTCORR")` : Paramètres demandés (température et précipitations)
+
+**Variables météorologiques :**
+- `TS` : Température de l'air à 2 mètres (°C)
+- `PRECTOTCORR` : Précipitations totales corrigées (mm/heure)
+
+
+## Étape 9: Conversion des fuseaux horaires
+
+Les données NASA POWER sont fournies en temps universel coordonné (UTC). Pour notre étude au Québec, nous devons convertir vers l'heure locale (UTC-4 en été).
+
+```{r}
+# Conversion du temps UTC vers UTC-4 (heure avancée de l'Est)
+# D'abord, débogage des données originales
+```
+
+```{r}
+#| echo: false
+print("Structure des données originales:")
+print(str(meteo_site_1$DY))
+print(str(meteo_site_1$HR))
+print("Valeurs échantillons DY:")
+print(head(meteo_site_1$DY))
+print("Valeurs échantillons HR:")
+print(head(meteo_site_1$HR))
+```
+
+```{r}
+meteo_site_1 <- meteo_site_1 |>
+  mutate(
+    # Débogage: vérification de l'opération de collage
+    datetime_string = paste(DY, sprintf("%02d:00:00", HR)),
+    
+    # Utilisation des colonnes YEAR et MO réelles des données NASA POWER
+    datetime_utc = ISOdate(year = YEAR, 
+                          month = MO, 
+                          day = DY, 
+                          hour = HR, 
+                          min = 0, 
+                          sec = 0, 
+                          tz = "UTC"),
+    
+    # Conversion vers UTC-4 (heure avancée de l'Est) - soustraction de 4 heures en secondes
+    datetime_local = datetime_utc - (4 * 3600),
+    
+    # Extraction du jour et de l'heure locaux
+    DY_local = as.Date(datetime_local),
+    HR_local = as.numeric(format(datetime_local, "%H"))
+  )
+
+# Affichage des données converties
+print("Après conversion:")
+print("Échantillons datetime_string:")
+print(head(meteo_site_1$datetime_string))
+print("Échantillons datetime_utc:")
+print(head(meteo_site_1$datetime_utc))
+print("Échantillons datetime_local:")
+print(head(meteo_site_1$datetime_local))
+
+glimpse(meteo_site_1)
+```
+
+**Conversion de fuseau horaire :**
+- `ISOdate()` : Crée un objet date-heure en spécifiant le fuseau horaire
+- `4 * 3600` : 4 heures converties en secondes (3600 sec/heure)
+- `as.Date()` : Extrait seulement la date locale
+- `format(datetime, "%H")` : Extrait l'heure au format 24h
+
+**Pourquoi convertir les fuseaux horaires ?**
+La conversion permet d'aligner les données météorologiques avec les heures locales d'activité des insectes et de nos activités d'échantillonnage.
+
+## Étape 10: Préparation des données pour visualisation
+
+Nous simplifions et renommons les données météorologiques pour faciliter la création de graphiques.
+
+```{r}
+# Nettoyage et renommage des données météorologiques
+meteo_site_1 <- meteo_site_1 |>
+                 rename(temp = TS,              # Température
+                        precip = PRECTOTCORR) |> # Précipitations corrigées
+                 select(DY_local, HR_local, temp, precip)
+```
+
+**Simplification des données :**
+- `rename()` : Donne des noms plus courts et explicites aux variables
+- `select()` : Garde seulement les colonnes nécessaires pour la visualisation
+
+Cette étape améliore la lisibilité du code et réduit la taille des données en mémoire.
+
+
+## Étape 11: Visualisation des profils de température
+
+Les graphiques temporels nous permettent d'identifier les patterns de température pendant la période d'échantillonnage et de corréler l'activité des insectes avec les conditions météorologiques.
+
+```{r}
+#| label: fig-temperature-forest
+#| fig-cap: "Profil de température pour le Site 1 (habitat forestier) pendant la période d'échantillonnage. Les lignes verticales indiquent les dates de collecte entomologique."
+
+# Graphique de température pour le Site 1
+ggplot(meteo_site_1, aes(x = DY_local, y = temp)) +
+  # Lignes verticales pour marquer les dates importantes d'échantillonnage
+  geom_vline(xintercept = as.Date("2025-06-03"), linetype = "dashed", color = "black", linewidth = 1, alpha = 0.8) +
+  geom_vline(xintercept = as.Date("2025-06-06"), linetype = "dashed", color = "black", linewidth = 1, alpha = 0.8) +
+  geom_vline(xintercept = as.Date("2025-06-09"), linetype = "dashed", color = "black", linewidth = 1, alpha = 0.8) +
+  # Points de données de température
+  geom_point(color = "maroon3") +
+  # Multiples courbes de lissage avec différents niveaux de confiance
+  geom_smooth(se = TRUE, level = 0.1, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.2, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.3, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.4, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.5, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.6, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.7, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.8, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.9, alpha = 0.075, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.95, alpha = 0.05, linewidth = 2, color = "maroon3") +
+  # Annotations pour les dates d'activités d'échantillonnage
+  annotate("text", 
+            x = as.Date(c("2025-06-03", "2025-06-06", "2025-06-09")), 
+            y = c(3.5,5,3.5), 
+            label = c("pose des pièges", "changement de pièges & récoltes actives", "retrait des pièges"),
+            size = 5) +
+  labs(y = "Température (C)", x = NULL, title = "Profil de température lors de l'échantillonnage (Site 1)") +
+  theme(
+  axis.line = element_line(linewidth = 2, lineend = "round"),
+  panel.grid = element_blank(),
+  panel.background = element_blank(),
+  axis.ticks = element_blank(),
+  axis.text = element_text(size = 14, face = "bold"),
+  axis.title = element_text(size = 16, face = "bold"),
+  plot.title = element_text(size = 17, face = "bold"))
+
+```
+
+**Éléments de visualisation avancée :**
+- `geom_vline()` : Lignes verticales pour marquer les dates d'échantillonnage
+- `geom_smooth()` : Courbes de tendance avec intervalles de confiance multiples
+- `annotate()` : Annotations textuelles pour expliquer les dates importantes
+- `theme()` : Personnalisation complète de l'apparence du graphique
+
+**Courbes de lissage multiples :**
+L'utilisation de plusieurs niveaux de confiance (0.1 à 0.95) crée un effet visuel dégradé qui montre l'incertitude autour de la tendance générale.
+
+
+## Étape 12: Visualisation des profils de précipitations
+
+Les précipitations influencent fortement l'activité des insectes. Ce graphique nous permet d'identifier les périodes de pluie et leur impact potentiel sur nos captures.
+
+```{r}
+#| label: fig-precipitation-forest
+#| fig-cap: "Profil de précipitations pour le Site 1 (habitat forestier) pendant la période d'échantillonnage. Les bandes de confiance multiples illustrent l'incertitude des tendances temporelles."
+# Graphique de précipitations pour le Site 1
+ggplot(meteo_site_1, aes(x = DY_local, y = precip)) +
+  # Lignes verticales pour marquer les dates importantes d'échantillonnage
+  geom_vline(xintercept = as.Date("2025-06-03"), linetype = "dashed", color = "black", linewidth = 1, alpha = 0.8) +
+  geom_vline(xintercept = as.Date("2025-06-06"), linetype = "dashed", color = "black", linewidth = 1, alpha = 0.8) +
+  geom_vline(xintercept = as.Date("2025-06-09"), linetype = "dashed", color = "black", linewidth = 1, alpha = 0.8) +
+  # Points de données de précipitations
+  geom_point(color = "steelblue3") +
+  # Multiples courbes de lissage avec différents niveaux de confiance
+  geom_smooth(se = TRUE, level = 0.1, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.2, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.3, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.4, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.5, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.6, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.7, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.8, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.9, alpha = 0.075, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.95, alpha = 0.05, linewidth = 2, color = "steelblue3") +
+  # Annotations pour les dates d'activités d'échantillonnage
+  annotate("text", 
+            x = as.Date(c("2025-06-03", "2025-06-06", "2025-06-09")), 
+            y = c(25,20,25), 
+            label = c("pose des pièges", "changement de pièges & récoltes actives", "retrait des pièges"),
+            size = 5) +
+  labs(y = "Précipitation (mm)", x = NULL, title = "Profil de Précipitations lors de l'échantillonnage (Site 1)") +
+  theme(
+  axis.line = element_line(linewidth = 2, lineend = "round"),
+  panel.grid = element_blank(),
+  panel.background = element_blank(),
+  axis.ticks = element_blank(),
+  axis.text = element_text(size = 14, face = "bold"),
+  axis.title = element_text(size = 16, face = "bold"),
+  plot.title = element_text(size = 17, face = "bold"))
+```
+
+**Couleurs différentielles :**
+- Bleu (`steelblue3`) pour les précipitations (association intuitive avec l'eau)
+- Rouge (`maroon3`) pour la température (association avec la chaleur)
+
+Cette différenciation visuelle facilite l'interprétation rapide des graphiques.
+
+## Étape 13: Données météorologiques pour le Site 2
+
+Pour une analyse comparative complète, nous répétons le même processus pour le Site 2. Cette approche nous permettra de comparer les conditions météorologiques entre les deux habitats (forestier vs ouvert).
+
+## Site 2
+
+```{r}
+# Extraction de la latitude unique pour le site 2
+lat_2 <- pieges |>
+  filter(type_de_piege == "malaise") |>
+  filter(site == 2) |>
+  st_coordinates() |>
+  as_tibble() |>
+  pull(Y) |>
+  unique()
+
+# Extraction de la longitude unique pour le site 2  
+lon_2 <- pieges |>
+  filter(type_de_piege == "malaise") |>
+  filter(site == 2) |>
+  st_coordinates() |>
+  as_tibble() |>
+  pull(X) |>
+  unique()
+
+# Affichage des coordonnées extraites pour vérification
+print(paste("Latitude (Y):", lat_2))
+print(paste("Longitude (X):", lon_2))
+
+# Note: get_power() attend lonlat = c(longitude, latitude)
+meteo_site_2 <- get_power(community = "ag",
+                          temporal_api = "hourly",
+                          lonlat = c(lon_2, lat_2),  # longitude d'abord, puis latitude
+                          dates = c("2025-06-02", "2025-06-11"),
+                          pars = c("TS", "PRECTOTCORR"))
+
+glimpse(meteo_site_2)
+```
+
+**Importance de la réplication :**
+En analysant les deux sites avec la même méthodologie, nous pouvons :
+1. Comparer les microclimats entre habitats
+2. Identifier les différences météorologiques qui pourraient expliquer les variations dans les communautés d'insectes
+3. Valider la cohérence de nos méthodes d'analyse
+
+
+## Étape 14: Traitement des données météorologiques du Site 2
+
+Nous appliquons la même séquence de conversion de fuseau horaire et de nettoyage des données pour assurer la cohérence entre les sites.
+
+```{r}
+# Conversion du temps UTC vers UTC-4 pour le Site 2
+# Débogage des données originales
+print("Structure des données originales:")
+print(str(meteo_site_2$DY))
+print(str(meteo_site_2$HR))
+print("Valeurs échantillons DY:")
+print(head(meteo_site_2$DY))
+print("Valeurs échantillons HR:")
+print(head(meteo_site_2$HR))
+
+meteo_site_2 <- meteo_site_2 |>
+  mutate(
+    # Débogage: vérification de l'opération de collage
+    datetime_string = paste(DY, sprintf("%02d:00:00", HR)),
+    
+    # Utilisation des colonnes YEAR et MO réelles des données NASA POWER
+    datetime_utc = ISOdate(year = YEAR, 
+                          month = MO, 
+                          day = DY, 
+                          hour = HR, 
+                          min = 0, 
+                          sec = 0, 
+                          tz = "UTC"),
+    
+    # Conversion vers UTC-4 (heure avancée de l'Est) - soustraction de 4 heures en secondes
+    datetime_local = datetime_utc - (4 * 3600),
+    
+    # Extraction du jour et de l'heure locaux
+    DY_local = as.Date(datetime_local),
+    HR_local = as.numeric(format(datetime_local, "%H"))
+  )
+
+# Affichage des données converties
+print("Après conversion:")
+print("Échantillons datetime_string:")
+print(head(meteo_site_2$datetime_string))
+print("Échantillons datetime_utc:")
+print(head(meteo_site_2$datetime_utc))
+print("Échantillons datetime_local:")
+print(head(meteo_site_2$datetime_local))
+
+glimpse(meteo_site_2)
+```
+
+**Standardisation des procédures :**
+En utilisant exactement la même séquence de code pour les deux sites, nous évitons les erreurs de traitement et garantissons que toute différence observée reflète de vraies différences environnementales, non des artéfacts de traitement des données.
+
+## Étape 15: Préparation finale des données du Site 2
+
+```{r}
+# Nettoyage et renommage des données météorologiques du Site 2
+meteo_site_2 <- meteo_site_2 |>
+                 rename(temp = TS,              # Température
+                        precip = PRECTOTCORR) |> # Précipitations corrigées
+                 select(DY_local, HR_local, temp, precip)
+```
+
+Cette étape finalise la préparation de nos données pour les visualisations comparatives entre les deux sites.
+
+
+## Étape 16: Visualisations comparatives pour le Site 2
+
+Les graphiques du Site 2 nous permettront de comparer les profils météorologiques entre l'habitat forestier (Site 1) et l'habitat ouvert (Site 2).
+
+```{r}
+#| label: fig-temperature-open
+#| fig-cap: "Profil de température pour le Site 2 (habitat ouvert) pendant la période d'échantillonnage. Comparaison avec le Site 1 pour analyser les différences d'habitat."
+# Graphique de température pour le Site 2
+ggplot(meteo_site_2, aes(x = DY_local, y = temp)) +
+  # Lignes verticales pour marquer les dates importantes d'échantillonnage
+  geom_vline(xintercept = as.Date("2025-06-03"), linetype = "dashed", color = "black", linewidth = 1, alpha = 0.8) +
+  geom_vline(xintercept = as.Date("2025-06-06"), linetype = "dashed", color = "black", linewidth = 1, alpha = 0.8) +
+  geom_vline(xintercept = as.Date("2025-06-09"), linetype = "dashed", color = "black", linewidth = 1, alpha = 0.8) +
+  # Points de données de température
+  geom_point(color = "maroon3") +
+  # Multiples courbes de lissage avec différents niveaux de confiance
+  geom_smooth(se = TRUE, level = 0.1, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.2, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.3, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.4, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.5, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.6, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.7, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.8, alpha = 0.1, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.9, alpha = 0.075, color = "maroon3") +
+  geom_smooth(se = TRUE, level = 0.95, alpha = 0.05, linewidth = 2, color = "maroon3") +
+  # Annotations pour les dates d'activités d'échantillonnage
+  annotate("text", 
+            x = as.Date(c("2025-06-03", "2025-06-06", "2025-06-09")), 
+            y = c(3.5,5,3.5), 
+            label = c("pose des pièges", "changement de pièges & récoltes actives", "retrait des pièges"),
+            size = 5) +
+  labs(y = "Température (C)", x = NULL, title = "Profil de température lors de l'échantillonnage (Site 2)") +
+  theme(
+  axis.line = element_line(linewidth = 2, lineend = "round"),
+  panel.grid = element_blank(),
+  panel.background = element_blank(),
+  axis.ticks = element_blank(),
+  axis.text = element_text(size = 14, face = "bold"),
+  axis.title = element_text(size = 16, face = "bold"),
+  plot.title = element_text(size = 17, face = "bold"))
+
+```
+
+Nasapower modélise les variables météorologiques sur une grille avec cases de 50 x 50 km donc il se peut que les mesures soient identiques entre les sites.
+
+
+## Étape 17: Analyse finale des précipitations du Site 2
+
+```{r}
+#| label: fig-precipitation-open
+#| fig-cap: "Profil de précipitations pour le Site 2 (habitat ouvert) pendant la période d'échantillonnage. Les bandes de confiance multiples illustrent l'incertitude des tendances temporelles."
+# Graphique de précipitations pour le Site 2
+ggplot(meteo_site_2, aes(x = DY_local, y = precip)) +
+  # Lignes verticales pour marquer les dates importantes d'échantillonnage
+  geom_vline(xintercept = as.Date("2025-06-03"), linetype = "dashed", color = "black", linewidth = 1, alpha = 0.8) +
+  geom_vline(xintercept = as.Date("2025-06-06"), linetype = "dashed", color = "black", linewidth = 1, alpha = 0.8) +
+  geom_vline(xintercept = as.Date("2025-06-09"), linetype = "dashed", color = "black", linewidth = 1, alpha = 0.8) +
+  # Points de données de précipitations
+  geom_point(color = "steelblue3") +
+  # Multiples courbes de lissage avec différents niveaux de confiance
+  geom_smooth(se = TRUE, level = 0.1, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.2, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.3, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.4, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.5, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.6, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.7, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.8, alpha = 0.1, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.9, alpha = 0.075, color = "steelblue3") +
+  geom_smooth(se = TRUE, level = 0.95, alpha = 0.05, linewidth = 2, color = "steelblue3") +
+  # Annotations pour les dates d'activités d'échantillonnage
+  annotate("text", 
+            x = as.Date(c("2025-06-03", "2025-06-06", "2025-06-09")), 
+            y = c(25,20,25), 
+            label = c("pose des pièges", "changement de pièges & récoltes actives", "retrait des pièges"),
+            size = 5) +
+  labs(y = "Précipitation (mm)", x = NULL, title = "Profil de Précipitations lors de l'échantillonnage (Site 2)") +
+  theme(
+  axis.line = element_line(linewidth = 2, lineend = "round"),
+  panel.grid = element_blank(),
+  panel.background = element_blank(),
+  axis.ticks = element_blank(),
+  axis.text = element_text(size = 14, face = "bold"),
+  axis.title = element_text(size = 16, face = "bold"),
+  plot.title = element_text(size = 17, face = "bold"))
+```
+
+# Intégration et traitement des données biologiques {#sec-data-integration}
+
+## Étape 18: Intégration des données d'identification d'insectes
+
+Maintenant que nous avons analysé les conditions spatiales et météorologiques, nous devons intégrer les données d'identification des insectes capturés. Cette étape nécessite d'harmoniser les identifiants d'échantillons et d'extraire les coordonnées géographiques pour chaque échantillon.
+
+```{r}
+data_insectes <- read_excel("echantillons_campus_2025_exemple.xlsx")
+
+glimpse(data_insectes)
+glimpse(pieges)
+glimpse(recoltes_actives)
+```
+
+Nous voulons joindre l'identifiant du site des données de pièges et récoltes actives à la base de données d'insectes.
+
+La colonne identifiant les échantillons dans data_insectes s'appelle echantillon_ID tandis que dans la base de données des pièges, elle s'appelle piege_ID et ID_echantillon dans la base de données des récoltes actives. Nous allons homogénéiser les noms de colonnes pour pouvoir joindre les données ensemble. Nous allons aussi joindre les données de latitude et longitude des données géoréférencées.
+
+## Étape 19: Extraction des coordonnées géographiques
+
+Pour chaque échantillon, nous devons extraire les coordonnées géographiques. Pour les pièges (points), nous extrayons directement les coordonnées. Pour les récoltes actives (lignes), nous calculons le centroïde de chaque transect.
+
+```{r}
+pieges <- pieges |>
+            mutate(echantillon_ID = piege_ID)
+
+recoltes_actives <- recoltes_actives |>
+            mutate(echantillon_ID = ID_echantillon)
+
+# Extraction des coordonnées X & Y pour les pièges (points)
+pieges_coords <- pieges |>
+  st_coordinates() |>
+  as_tibble() |>
+  rename(longitude = X, latitude = Y)
+
+# Ajout des coordonnées aux données de pièges
+pieges <- pieges |>
+  bind_cols(pieges_coords)
+
+# Extraction des coordonnées X & Y pour les récoltes actives (centroïdes des lignes)
+recoltes_coords <- recoltes_actives |>
+  st_centroid() |>  # Calcul du centroïde de chaque ligne
+  st_coordinates() |>
+  as_tibble() |>
+  rename(longitude = X, latitude = Y)
+
+# Ajout des coordonnées aux données de récoltes actives
+recoltes_actives <- recoltes_actives |>
+  bind_cols(recoltes_coords)
+
+# Vérification des coordonnées extraites
+glimpse(pieges |> st_drop_geometry() |> select(echantillon_ID, longitude, latitude))
+
+glimpse(recoltes_actives |> st_drop_geometry() |> select(echantillon_ID, longitude, latitude))
+```
+
+**Fonctions utilisées pour l'extraction de coordonnées :**
+- `st_coordinates()` : Extrait les coordonnées X,Y des objets spatiaux
+- `st_centroid()` : Calcule le centroïde (point central) d'une géométrie
+- `bind_cols()` : Ajoute les colonnes de coordonnées aux données originales
+
+**Pourquoi utiliser les centroïdes pour les lignes ?**
+Les récoltes actives sont des transects linéaires. Le centroïde nous donne un point représentatif de la position centrale de chaque transect, ce qui permet d'assigner une coordonnée unique à chaque échantillon de récolte active.
+
+## Étape 20: Jointure des données spatiales avec les données d'insectes
+
+Maintenant nous devons joindre les informations de localisation (latitude, longitude, site) des pièges et récoltes actives avec les données d'identification d'insectes.
+
+```{r}
+# Préparation des données spatiales pour la jointure
+# Sélection des colonnes pertinentes des pièges
+pieges_spatial <- pieges |>
+  st_drop_geometry() |>
+  select(echantillon_ID, longitude, latitude, site)
+
+# Sélection des colonnes pertinentes des récoltes actives
+recoltes_spatial <- recoltes_actives |>
+  st_drop_geometry() |>
+  select(echantillon_ID, longitude, latitude, site)
+
+# Combinaison des données spatiales des deux méthodes d'échantillonnage
+spatial_data <- bind_rows(pieges_spatial, recoltes_spatial)
+
+# Jointure avec les données d'insectes
+data_insectes_complete <- data_insectes |>
+  left_join(spatial_data, by = "echantillon_ID")
+
+# Vérification du résultat
+glimpse(data_insectes_complete)
+
+# Affichage des premières lignes pour vérifier la jointure
+head(data_insectes_complete)
+```
+
+**Fonctions utilisées pour la jointure :**
+- `bind_rows()` : Combine verticalement les données de pièges et récoltes actives
+- `left_join()` : Joint les données en gardant tous les échantillons d'insectes
+- `by = "echantillon_ID"` : Spécifie la colonne commune pour la jointure
+
+**Résultat de la jointure :**
+Chaque insecte identifié est maintenant associé à :
+- Sa latitude et longitude précises
+- Son site d'appartenance (1 = forestier, 2 = ouvert)
+- Toutes les informations taxonomiques originales
+
+## Étape 21: Nettoyage des noms de colonnes
+
+Les noms de colonnes dans les données d'insectes contiennent souvent des caractères problématiques (espaces, accents, caractères spéciaux) qui compliquent la programmation en R. Nous allons utiliser la fonction `clean_names()` du package `janitor` pour standardiser ces noms.
+
+```{r}
+# Examen des noms de colonnes problématiques
+print("Noms de colonnes avant nettoyage:")
+print(names(data_insectes_complete))
+
+# Nettoyage des noms de colonnes avec janitor
+data_insectes_clean <- data_insectes_complete |>
+  clean_names()
+
+# Vérification des noms de colonnes après nettoyage
+print("Noms de colonnes après nettoyage:")
+print(names(data_insectes_clean))
+
+# Comparaison côte à côte pour voir les changements
+comparison <- data.frame(
+  avant = names(data_insectes_complete),
+  apres = names(data_insectes_clean)
+)
+print("Comparaison des noms de colonnes:")
+print(comparison)
+
+# Vérification de la structure finale
+glimpse(data_insectes_clean)
+```
+
+**Avantages de `clean_names()` :**
+- Supprime les espaces et les remplace par des underscores (_)
+- Supprime ou remplace les caractères spéciaux (parenthèses, crochets, etc.)
+- Normalise les accents (é devient e, à devient a, etc.)
+- Convertit tout en minuscules pour la cohérence
+- Assure que les noms sont valides pour R (pas de mots-clés réservés)
+
+**Pourquoi nettoyer les noms de colonnes ?**
+Des noms de colonnes propres facilitent :
+- L'écriture de code (pas besoin de guillemets ou backticks)
+- L'auto-complétion dans RStudio
+- La lisibilité et la maintenance du code
+- L'évitement d'erreurs de syntaxe
+
+```{r}
+# Inspection de quelques colonnes suspectes
+# Vérifions si certaines colonnes sont vides ou remplies de NAs
+data_insectes_clean |>
+  select(x30, x31, x32, x33, x34) |>
+  summary()
+```
+
+Cette inspection nous révèle que les colonnes `x30`, `x31`, `x32`, `x33`, et `x34` ne contiennent que des valeurs manquantes (NAs). Ces colonnes sont probablement des artefacts de l'importation des données Excel.
+
+### Suppression des colonnes inutiles
+
+Il est important de supprimer les colonnes qui n'apportent aucune information pour :
+- **Réduire la taille des données** : moins de mémoire utilisée
+- **Améliorer la lisibilité** : se concentrer sur les données utiles
+- **Éviter la confusion** : éliminer les colonnes parasites
+- **Optimiser les performances** : calculs plus rapides
+
+```{r}
+# Suppression des colonnes remplies de NAs
+data_insectes_final <- data_insectes_clean |>
+  select(-c(x30, x31, x32, x33, x34))
+
+# Vérification de la structure finale
+glimpse(data_insectes_final)
+```
+
+**Méthode alternative pour identifier automatiquement les colonnes vides :**
+
+```{r}
+# Identifier les colonnes avec plus de 90% de NAs
+colonnes_vides <- data_insectes_clean |>
+  summarise_all(~sum(is.na(.)) / length(.) * 100) |>
+  gather(colonne, pourcentage_na) |>
+  filter(pourcentage_na > 90)
+
+print(colonnes_vides)
+```
+
+Cette approche permet d'identifier automatiquement les colonnes problématiques dans de gros jeux de données.
+
+## Étape 22: Création d'une variable de type de récolte
+
+Avant de transformer nos données en format long, nous devons créer une variable qui identifie le type de méthode de récolte utilisée pour chaque échantillon. Cette information est encodée dans l'identifiant de l'échantillon (`echantillon_id`).
+
+### Schéma de codage des méthodes de récolte
+
+Les différentes méthodes d'échantillonnage sont identifiées par des codes dans les identifiants d'échantillons :
+
+```{r}
+# Définition du schéma de codage
+codes_recolte <- c("FF", "DB", "FO", "BBlanc", "BJaune", "M")
+types_recolte <- c("filet_fauchoir", "drap_battage", "fosse", "bol_blanc", "bol_jaune", "malaise")
+
+# Affichage du schéma de correspondance
+correspondance <- data.frame(
+  Code = codes_recolte,
+  Type_de_recolte = types_recolte,
+  Description = c(
+    "Filet fauchoir - Capture d'insectes volants dans la végétation",
+    "Drap de battage - Secouage de branches sur un drap",
+    "Piège fosse - Capture d'insectes rampants",
+    "Bol blanc - Piège coloré attractif",
+    "Bol jaune - Piège coloré attractif",
+    "Piège Malaise - Capture d'insectes volants"
+  )
+)
+
+print(correspondance)
+```
+
+### Création de la variable type_de_recolte
+
+Nous utilisons la fonction `case_when()` pour attribuer le type de récolte basé sur le contenu de l'identifiant d'échantillon. Cette fonction évalue plusieurs conditions de manière séquentielle.
+
+```{r}
+# Création de la variable type_de_recolte
+data_insectes_final <- data_insectes_final |>
+  mutate(
+    type_de_recolte = case_when(
+      str_detect(echantillon_id, "FF") ~ "filet_fauchoir",
+      str_detect(echantillon_id, "DB") ~ "drap_battage", 
+      str_detect(echantillon_id, "FO") ~ "fosse",
+      str_detect(echantillon_id, "BBlanc") ~ "bol_blanc",
+      str_detect(echantillon_id, "BJaune") ~ "bol_jaune",
+      str_detect(echantillon_id, "M") ~ "malaise",
+      TRUE ~ "non_identifie"  # Valeur par défaut si aucun pattern ne correspond
+    )
+  )
+
+# Vérification de la création de la variable
+table(data_insectes_final$type_de_recolte, useNA = "ifany")
+```
+
+**Fonctions utilisées :**
+- `case_when()` : Évalue plusieurs conditions et assigne des valeurs correspondantes
+- `str_detect()` : Détecte la présence d'un pattern dans une chaîne de caractères
+- `TRUE ~ "non_identifie"` : Condition par défaut (catch-all) pour les cas non couverts
+
+### Vérification de la classification
+
+Il est important de vérifier que notre classification a fonctionné correctement en examinant quelques exemples.
+
+```{r}
+# Échantillonnage de quelques cas pour vérification
+# Utiliser slice_sample avec un maximum sécurisé
+verification <- data_insectes_final |>
+  select(echantillon_id, type_de_recolte) |>
+  slice_sample(n = min(20, nrow(data_insectes_final))) |>  # Prendre max 20 ou toutes les lignes si < 20
+  arrange(type_de_recolte)
+
+print("Échantillons de vérification:")
+print(verification)
+
+# Résumé par type de récolte
+resume_types <- data_insectes_final |>
+  group_by(type_de_recolte) |>
+  summarise(
+    nombre_echantillons = n(),
+    .groups = "drop"
+  ) |>
+  arrange(desc(nombre_echantillons))
+
+print("Résumé par type de récolte:")
+print(resume_types)
+```
+
+**Avantages de cette approche :**
+- **Automatisation** : Plus besoin de classifier manuellement chaque échantillon
+- **Reproductibilité** : La même règle s'applique de manière cohérente
+- **Traçabilité** : La logique de classification est explicite dans le code
+- **Flexibilité** : Facile de modifier les règles si nécessaire
+
+Cette variable `type_de_recolte` nous permettra d'analyser l'efficacité relative des différentes méthodes d'échantillonnage et de comprendre quels types d'insectes sont mieux capturés par chaque méthode.
+
+## Étape 23: Transformation des données de format large vers format long
+
+### Problème avec les données en format large (wide format)
+
+Les données d'insectes sont actuellement en **format large** : chaque groupe taxonomique (plecoptera, diptera, etc.) occupe une colonne séparée avec l'abondance comme valeur. Ce format pose plusieurs problèmes pour l'analyse et la visualisation :
+
+**Difficultés du format large :**
+- **Graphiques complexes** : Difficile de créer des graphiques comparant les abondances entre groupes
+- **Analyses statistiques** : La plupart des tests statistiques requirent des données en format long
+- **Filtrage compliqué** : Impossible de filtrer facilement par groupe taxonomique
+- **Agrégations difficiles** : Calculs de totaux et moyennes par groupe compliqués
+
+**Avantages du format long :**
+- **Visualisation facile** : Parfait pour ggplot2 (une variable = un axe)
+- **Analyses groupées** : Facilite les analyses par groupe taxonomique
+- **Flexibilité** : Permet filtrage, agrégation et transformation par groupe
+- **Tidyverse-friendly** : Compatible avec la philosophie des données bien organisées
+
+```{r}
+# Vérification de la structure actuelle (format large)
+glimpse(data_insectes_final)
+
+# Affichage des colonnes taxonomiques pour identifier la plage
+names(data_insectes_final)[grep("plecoptera|myriapodes", names(data_insectes_final))]
+```
+
+### Transformation avec pivot_longer()
+
+Nous allons transformer les données du format large vers le format long en utilisant `pivot_longer()`. Cette fonction prend plusieurs colonnes et les "pivote" en deux nouvelles colonnes : une pour les noms (taxon) et une pour les valeurs (abondance).
+
+```{r}
+# Transformation du format large vers format long
+data_insectes_long <- data_insectes_final |>
+  pivot_longer(
+    cols = plecoptera:myriapodes,    # Colonnes à transformer (de plecoptera à myriapodes)
+    names_to = "taxon",              # Nom de la nouvelle colonne pour les noms de colonnes
+    values_to = "abondance"          # Nom de la nouvelle colonne pour les valeurs
+  )
+
+# Vérification de la transformation
+glimpse(data_insectes_long)
+
+# Affichage des premiers échantillons pour voir la transformation
+head(data_insectes_long, 20)
+```
+
+**Explication de la transformation :**
+- `cols = plecoptera:myriapodes` : Sélectionne toutes les colonnes de plecoptera à myriapodes
+- `names_to = "taxon"` : Crée une nouvelle colonne "taxon" contenant les noms des anciennes colonnes
+- `values_to = "abondance"` : Crée une nouvelle colonne "abondance" contenant les valeurs
+
+**Résultat :** Chaque ligne représente maintenant un échantillon × taxon, avec l'abondance correspondante.
+
+```{r}
+# Vérification des groupes taxonomiques uniques
+unique(data_insectes_long$taxon)
+
+# Résumé des abondances par taxon
+data_insectes_long |>
+  group_by(taxon) |>
+  summarise(
+    nombre_observations = n(),
+    abondance_totale = sum(abondance, na.rm = TRUE),
+    abondance_moyenne = mean(abondance, na.rm = TRUE),
+    abondance_max = max(abondance, na.rm = TRUE)
+  ) |>
+  arrange(desc(abondance_totale))
+```
+
+Nous pouvons maintenant passer à la partie excitante de l'analyse: la représentation graphique des données de captures.
+
+# Visualisation avancée et bonnes pratiques {#sec-advanced-viz}
+
+## Étape 24: Bonnes pratiques de visualisation - Éviter les graphiques en secteurs
+
+Avant de créer nos visualisations, il est important de discuter des bonnes pratiques en matière de graphiques. Un des graphiques les plus problématiques, mais malheureusement très populaire, est le **graphique en secteurs (pie chart)**.
+
+### Problèmes des graphiques en secteurs
+
+Les graphiques en secteurs posent plusieurs problèmes majeurs qui nuisent à la compréhension des données :
+
+#### 1. Difficulté de comparaison des angles
+```{r}
+#| label: fig-pie-chart-bad
+#| fig-cap: "Exemple de graphique en secteurs problématique - difficile de comparer les proportions avec précision."
+# Exemple problématique avec un graphique en secteurs
+# (Code commenté pour montrer ce qu'il NE faut PAS faire)
+
+# Données d'exemple pour la démonstration
+exemple_donnees <- data.frame(
+  taxon = c("Diptera", "Coleoptera", "Hymenoptera", "Lepidoptera", "Hemiptera"),
+  abondance = c(145, 89, 123, 67, 98)
+)
+
+# MAUVAISE pratique - Graphique en secteurs (ne pas utiliser!)
+ggplot(exemple_donnees, aes(x = "", y = abondance, fill = taxon)) +
+   geom_bar(stat = "identity", width = 1) +
+   coord_polar("y", start = 0) +
+   labs(title = "MAUVAIS: Difficile de comparer les proportions") +
+   theme_void()
+
+```
+
+#### 2. Limitations cognitives
+- **Perception des angles** : L'œil humain est mauvais pour comparer des angles
+- **Comparaisons multiples** : Impossible de comparer plus de 2-3 segments facilement
+- **Valeurs exactes** : Difficile d'estimer les pourcentages précis
+- **Ordre** : Pas d'ordre logique évident pour les segments
+
+### Alternative 1: Graphiques en barres empilées
+
+Les graphiques en barres empilées permettent de mieux comparer les proportions tout en montrant la contribution de chaque groupe.
+
+```{r}
+#| label: fig-stacked-bar-good
+#| fig-cap: "Graphique en barres empilées - amélioration par rapport aux secteurs pour comparer les proportions taxonomiques."
+# BONNE pratique - Graphique en barres empilées
+stacked_bar <- exemple_donnees |>
+  mutate(
+    pourcentage = abondance / sum(abondance) * 100,
+    taxon = reorder(taxon, abondance)  # Ordonner par abondance
+  ) |>
+  ggplot(aes(x = "Échantillon", y = pourcentage, fill = taxon)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  geom_text(aes(label = paste0(round(pourcentage, 1), "%")), 
+            position = position_stack(vjust = 0.5),
+            color = "white", fontface = "bold", size = 3.5) +
+  labs(
+    title = "MIEUX: Graphique en barres empilées",
+    subtitle = "Proportions plus faciles à comparer",
+    y = "Pourcentage (%)",
+    x = NULL,
+    fill = "Groupe taxonomique"
+  ) +
+  scale_fill_viridis_d(option = "plasma") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.position = "right"
+  )
+
+print(stacked_bar)
+```
+
+**Avantages des barres empilées :**
+- **Longueurs comparables** : Plus facile de comparer les longueurs que les angles
+- **Valeurs précises** : Possibilité d'ajouter les pourcentages exacts
+- **Ordre logique** : Peut être ordonné par importance
+- **Échelle commune** : Tous les segments partagent la même échelle
+
+### Alternative 2: Graphiques en sucettes (Lollipop plots)
+
+Les graphiques en sucettes sont excellents pour montrer des proportions ou des valeurs absolues de manière claire et attrayante.
+
+```{r}
+#| label: fig-lollipop-best
+#| fig-cap: "Graphique en sucettes - solution optimale pour comparer les proportions avec précision et esthétique moderne."
+# EXCELLENTE pratique - Graphique en sucettes
+lollipop_plot <- exemple_donnees |>
+  mutate(
+    pourcentage = abondance / sum(abondance) * 100,
+    taxon = reorder(taxon, pourcentage)  # Ordonner par pourcentage
+  ) |>
+  ggplot(aes(x = taxon, y = pourcentage)) +
+  geom_segment(aes(xend = taxon, yend = 0), 
+               color = "steelblue3", linewidth = 1.2) +
+  geom_point(color = "steelblue3", size = 4) +
+  geom_text(aes(label = paste0(round(pourcentage, 1), "%")), 
+            vjust = -1, fontface = "bold", size = 3.5) +
+  labs(
+    title = "OPTIMAL: Graphique en sucettes",
+    subtitle = "Comparaisons précises et esthétique moderne",
+    y = "Pourcentage (%)",
+    x = "Groupe taxonomique"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 12, color = "gray50")
+  ) +
+  coord_flip()  # Rotation pour meilleure lisibilité
+
+print(lollipop_plot)
+```
+
+**Avantages des graphiques en sucettes :**
+- **Comparaisons précises** : Position sur l'axe facilement comparable
+- **Esthétique moderne** : Apparence propre et professionnelle
+- **Espace optimisé** : Moins d'encombrement visuel
+- **Valeurs exactes** : Lecture précise des valeurs
+- **Extensibilité** : Fonctionne bien avec de nombreuses catégories
+
+### Recommandations générales
+
+**Quand utiliser chaque type :**
+
+1. **Barres empilées** : 
+   - Quand vous voulez montrer les parties d'un tout
+   - Pour comparer des compositions entre groupes
+   - Maximum 5-7 catégories pour la lisibilité
+
+2. **Graphiques en sucettes** :
+   - Pour comparer des valeurs individuelles
+   - Quand l'ordre/ranking est important
+   - Excellent pour de nombreuses catégories
+
+3. **JAMAIS de graphiques en secteurs** :
+   - Sauf si vous avez exactement 2 catégories
+   - Et que la différence est très marquée (ex: 80% vs 20%)
+
+**Règle d'or :** Si vous pouvez remplacer un graphique en secteurs par un graphique en barres, faites-le toujours !
+
+## Étape 25: Application pratique - Visualisation des captures par site et type de piège
+
+Maintenant, appliquons ces bonnes pratiques de visualisation à nos données entomologiques réelles. Nous allons comparer l'abondance des groupes taxonomiques par site et type de méthode de récolte.
+
+### Préparation des données pour la visualisation
+
+Avant de créer nos graphiques, nous devons préparer et nettoyer les données en éliminant les taxons avec une abondance nulle et en calculant les proportions.
+
+```{r}
+# Préparation des données : suppression des taxons avec abondance nulle et calcul des proportions
+donnees_viz <- data_insectes_long |>
+  filter(abondance > 0) |>  # Éliminer les taxons sans captures
+  group_by(site, type_de_recolte, taxon) |>
+  summarise(abondance_totale = sum(abondance, na.rm = TRUE), .groups = "drop") |>
+  group_by(site, type_de_recolte) |>
+  mutate(
+    pourcentage = abondance_totale / sum(abondance_totale) * 100,
+    total_site_methode = sum(abondance_totale)
+  ) |>
+  ungroup() |>
+  filter(total_site_methode >= 5) |>  # Garder seulement les combinaisons avec ≥5 individus
+  arrange(site, type_de_recolte, desc(abondance_totale))
+
+# Affichage d'un aperçu des données préparées
+glimpse(donnees_viz)
+print("Aperçu des données pour visualisation:")
+head(donnees_viz, 10)
+```
+
+### Choix de la méthode de visualisation appropriée
+
+Avant de créer nos visualisations, il est important de choisir la méthode la plus appropriée en fonction du nombre de catégories (taxa) à représenter.
+
+```{r}
+# Vérifier le nombre de taxons uniques dans nos données
+nombre_taxons <- donnees_viz |> 
+  distinct(taxon) |> 
+  nrow()
+
+print(paste("Nombre total de taxons à visualiser:", nombre_taxons))
+
+# Vérifier la distribution des taxons par site
+distribution_taxons <- donnees_viz |>
+  group_by(site) |>
+  summarise(
+    nombre_taxons = n_distinct(taxon),
+    .groups = "drop"
+  )
+
+print("Distribution des taxons par site:")
+print(distribution_taxons)
+```
+
+**Problème avec les graphiques en barres empilées pour de nombreux taxons :**
+
+Quand le nombre de catégories dépasse 8-10 éléments, les graphiques en barres empilées deviennent :
+- **Difficiles à lire** : Trop de couleurs différentes
+- **Peu informatifs** : Les petites catégories sont invisibles
+- **Problématiques pour l'accessibilité** : Difficile de distinguer les couleurs similaires
+- **Surchargés** : La légende devient encombrante
+
+**Solution recommandée :** Utiliser des graphiques en sucettes (lollipop plots) qui :
+- **Permettent de comparer facilement** les valeurs individuelles
+- **Fonctionnent bien** avec de nombreuses catégories
+- **Sont plus lisibles** même avec beaucoup de données
+- **Peuvent être facettés** par méthode de récolte
+
+### Graphiques en sucettes par site et méthode
+
+Les graphiques en sucettes offrent une vision plus claire des abondances relatives et facilitent les comparaisons entre taxons, même avec de nombreux taxons.
+
+```{r}
+#| label: fig-taxonomic-composition
+#| fig-cap: "Composition taxonomique par site et méthode de récolte. Les graphiques en sucettes permettent de comparer facilement les abondances relatives des groupes taxonomiques dominants."
+# Fonction pour créer un graphique en sucettes pour une combinaison spécifique
+create_lollipop_specific <- function(data, site_num, type_recolte, n_taxons = 8) {
+  # Nettoyer le nom du type de récolte pour l'affichage
+  type_clean <- str_replace_all(type_recolte, "_", " ") |> str_to_title()
+  
+  data |>
+    filter(site == site_num, type_de_recolte == type_recolte) |>
+    # Garder les n taxons les plus abondants
+    slice_max(order_by = pourcentage, n = n_taxons) |>
+    mutate(taxon = reorder(taxon, pourcentage)) |>
+    ggplot(aes(x = taxon, y = pourcentage)) +
+    geom_segment(aes(xend = taxon, yend = 0), 
+                 color = "steelblue3", linewidth = 1.2) +
+    geom_point(color = "steelblue3", size = 3.5) +
+    geom_text(aes(label = paste0(round(pourcentage, 1), "%")), 
+              hjust = -0.2, fontface = "bold", size = 3) +
+    labs(
+      title = paste("Site", site_num, "-", type_clean),
+      y = "Pourcentage (%)",
+      x = NULL
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(size = 8),
+      axis.text.y = element_text(size = 8),
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor = element_blank(),
+      plot.title = element_text(size = 10, face = "bold", hjust = 0.5),
+      axis.title.x = element_text(size = 9)
+    ) +
+    coord_flip() +
+    scale_y_continuous(expand = expansion(mult = c(0.02, 0.15)))
+}
+
+# Obtenir toutes les combinaisons site x type_de_recolte
+combinaisons <- donnees_viz |>
+  distinct(site, type_de_recolte) |>
+  arrange(type_de_recolte, site)
+
+print("Combinaisons site x type de récolte disponibles:")
+print(combinaisons)
+
+# Créer tous les graphiques individuels
+plots_list <- list()
+for(i in 1:nrow(combinaisons)) {
+  site_i <- combinaisons$site[i]
+  type_i <- combinaisons$type_de_recolte[i]
+  plot_name <- paste0("plot_s", site_i, "_", type_i)
+  
+  plots_list[[plot_name]] <- create_lollipop_specific(donnees_viz, site_i, type_i)
+}
+
+# Organiser les graphiques par type de récolte (rows) et site (columns)
+types_recolte <- unique(combinaisons$type_de_recolte)
+sites <- unique(combinaisons$site)
+
+print(paste("Types de récolte:", paste(types_recolte, collapse = ", ")))
+print(paste("Sites:", paste(sites, collapse = ", ")))
+
+# Créer la matrice de graphiques avec patchwork
+lollipop_combined <- wrap_plots(plots_list, ncol = length(sites), byrow = TRUE) +
+  plot_annotation(
+    title = "Composition taxonomique par site et méthode de récolte",
+    subtitle = "Pourcentages des groupes taxonomiques dominants (top 8 par combinaison)",
+    caption = "Colonnes = Sites | Lignes = Méthodes de récolte"
+  )
+
+print(lollipop_combined)
+```
+
+### Analyse des résultats des graphiques en sucettes
+
+Les graphiques en sucettes nous permettent d'identifier clairement les taxons les plus abondants par site et méthode de récolte.
+
+```{r}
+#| label: tbl-capture-summary
+#| tbl-cap: "Résumé des captures entomologiques par site et méthode de récolte, montrant la diversité taxonomique et les groupes dominants."
+# Charger tinytable pour créer des tableaux de qualité professionnelle
+library(tinytable)
+
+# Tableau résumé pour accompagner les visualisations
+resume_captures <- donnees_viz |>
+  group_by(site, type_de_recolte) |>
+  summarise(
+    nb_taxons = n(),
+    abondance_totale = sum(abondance_totale),
+    taxon_dominant = taxon[which.max(abondance_totale)],
+    pourcentage_dominant = max(pourcentage),
+    .groups = "drop"
+  ) |>
+  arrange(site, desc(abondance_totale)) |>
+  # Améliorer les noms de colonnes pour l'affichage
+  mutate(
+    type_de_recolte = str_replace_all(type_de_recolte, "_", " ") |> str_to_title(),
+    pourcentage_dominant = round(pourcentage_dominant, 1)
+  ) |>
+  rename(
+    Site = site,
+    `Méthode de récolte` = type_de_recolte,
+    `Nombre de taxons` = nb_taxons,
+    `Abondance totale` = abondance_totale,
+    `Taxon dominant` = taxon_dominant,
+    `Pourcentage dominant (%)` = pourcentage_dominant
+  )
+
+# Créer le tableau avec tinytable
+tableau_resume <- resume_captures |>
+  tt() |>
+  style_tt(
+    bootstrap_class = "table table-striped table-hover",
+    align = "llcccr"
+  ) |>
+  format_tt(
+    j = 4, # "Abondance totale" (index utilisé car le nom contient des espaces)
+    fn = function(x) format(x, big.mark = " ", scientific = FALSE)
+  ) |>
+  format_tt(
+    j = 6, # "Pourcentage dominant (%)" (index utilisé car le nom contient des parenthèses)
+    fn = function(x) paste0(x, "%")
+  ) |>
+  style_tt(
+    i = 0,  # En-têtes
+    bold = TRUE,
+    background = "lightgray",
+    align = "c"
+  )
+
+# Afficher le tableau avec une note explicative
+tableau_resume
+
+cat("Note: Tableau résumé des captures entomologiques par site et méthode de récolte.")
+cat("\nLe taxon dominant correspond au groupe le plus abondant pour chaque combinaison.")
+```
+
+### Exportation du tableau pour Word
+
+Tinytable offre plusieurs options pour exporter les tableaux dans des formats compatibles avec Microsoft Word.
+
+```{r}
+#| eval: false
+# Option 1: Sauvegarder en format Word (.docx)
+# Le tableau sera intégré dans un document Word
+save_tt(tableau_resume, 
+        output = "tableau_resume_captures.docx",
+        overwrite = TRUE)
+
+# Option 2: Sauvegarder en HTML (peut être copié-collé dans Word)
+save_tt(tableau_resume, 
+        output = "tableau_resume_captures.html",
+        overwrite = TRUE)
+
+print("Tableaux sauvegardés dans les formats suivants:")
+print("- tableau_resume_captures.docx (Word)")
+print("- tableau_resume_captures.html (HTML)")
+```
+
+**Avantages de tinytable pour les publications scientifiques :**
+
+1. **Formatage professionnel** : Tableaux avec bordures, alignement et styles
+2. **Compatibilité** : Export direct vers Word, HTML, LaTeX, PDF
+3. **Personnalisation** : Contrôle total sur l'apparence et le formatage
+4. **Notes et légendes** : Ajout facile de notes explicatives
+5. **Formatage conditionnel** : Mise en forme basée sur les valeurs
+
+**Workflow recommandé pour Word :**
+1. Créer le tableau avec tinytable dans R/Quarto
+2. Exporter en format .docx
+3. Ouvrir dans Word pour intégration finale
+4. Ajuster la mise en page si nécessaire
+
+**Insights tirés de ces visualisations :**
+
+1. **Efficacité des méthodes** : Les graphiques permettent de comparer l'efficacité relative de chaque méthode de capture
+2. **Spécificité des habitats** : Différences de composition entre sites forestiers et ouverts
+3. **Sélectivité des pièges** : Certains taxons sont mieux capturés par certaines méthodes
+4. **Diversité comparative** : Comparaison du nombre de taxons capturés par méthode
+
+Ces visualisations démontrent la supériorité des graphiques en barres et en sucettes par rapport aux graphiques en secteurs pour analyser des données écologiques complexes.
+
+
+### Interprétation des résultats
+
+**Points clés à retenir :**
+
+1. **Efficacité des méthodes** : Les graphiques permettent de comparer l'efficacité relative des différents types de pièges
+2. **Spécificité des sites** : Chaque site peut avoir des profils taxonomiques différents
+3. **Dominance taxonomique** : Identification des taxons les plus abondants par site et méthode
+4. **Diversité** : Évaluation de la richesse taxonomique par méthode de collecte
+
+**Applications pratiques :**
+- Optimisation des protocoles d'échantillonnage
+- Planification des campagnes de terrain
+- Études de biodiversité comparative
+- Monitoring environnemental
+
+# Conclusion et perspectives {#sec-conclusion}
+
+## Conclusion
+
+Ce tutoriel vous a guidé à travers une analyse complète de données entomologiques spatio-temporelles en R, couvrant l'ensemble du workflow depuis l'organisation des projets jusqu'à la publication des résultats. Vous avez acquis des compétences essentielles dans :
+
+### Compétences techniques acquises
+
+#### 1. **Organisation et reproductibilité des projets**
+- **Gestion des projets R** pour une recherche reproductible
+- **Évitement des pièges** comme `setwd()` qui brisent la reproductibilité
+- **Utilisation du package `here`** pour des chemins relatifs portables
+- **Structure organisée des dossiers** pour faciliter la collaboration
+
+#### 2. **Maîtrise de l'écosystème tidyverse**
+- **Philosophie des données bien organisées** (tidy data)
+- **Utilisation experte de l'opérateur pipe** (`|>`) pour un code lisible
+- **Manipulation avancée avec dplyr** (filter, select, mutate, summarise)
+- **Restructuration des données** avec tidyr (pivot_longer, pivot_wider)
+
+#### 3. **Visualisation professionnelle avec ggplot2**
+- **Grammaire des graphiques** pour construire des visualisations par couches
+- **Maîtrise des thèmes** pré-formatés et personnalisés
+- **Création de graphiques publication-ready** avec annotations détaillées
+- **Sauvegarde optimisée** avec `ggsave()` selon les standards de publication
+
+#### 4. **Analyses spatiales et cartographiques**
+- **Manipulation de données spatiales** avec le package `sf`
+- **Création de cartes contextuelles** avec `ggplot2` et `ggspatial`
+- **Extraction et transformation de coordonnées** pour différents types de géométries
+- **Jointures spatiales** entre jeux de données géographiques
+
+#### 5. **Intégration de données climatiques**
+- **Accès aux données NASA POWER** via l'API automatisée
+- **Gestion des fuseaux horaires** et conversions temporelles
+- **Analyse de séries temporelles** météorologiques
+- **Visualisation annotée** des conditions climatiques
+
+#### 6. **Manipulation avancée des données**
+- **Nettoyage automatisé** des noms de colonnes avec `janitor`
+- **Détection et suppression** des colonnes inutiles
+- **Création de variables dérivées** avec `case_when()` et `str_detect()`
+- **Transformation des formats** de données pour l'analyse
+
+#### 7. **Bonnes pratiques de visualisation**
+- **Évitement des mauvaises pratiques** (graphiques en secteurs)
+- **Choix approprié du type de graphique** selon le nombre de catégories
+- **Création de visualisations comparatives** avec `patchwork`
+- **Utilisation des couleurs et légendes** pour une communication claire
+
+#### 8. **Documentation et publication**
+- **Création de tableaux professionnels** avec `tinytable`
+- **Export vers formats compatibles Word** pour collaboration
+- **Documentation reproductible** avec Quarto/R Markdown
+- **Workflow complet** de l'analyse à la publication
+
+### Bonnes pratiques méthodologiques retenues
+
+#### Reproductibilité et collaboration
+- **Projets R organisés** : Structure claire et chemins relatifs
+- **Code documenté** : Commentaires détaillés pour la compréhension
+- **Contrôle de version** : Prêt pour l'intégration Git/GitHub
+- **Partage facilité** : Projets portables entre collaborateurs
+
+#### Qualité des données et analyses
+- **Exploration systématique** : Visualisation avant analyse statistique
+- **Validation continue** : Vérification des données à chaque étape
+- **Nettoyage méthodique** : Standardisation et optimisation
+- **Traçabilité complète** : Chaque transformation documentée
+
+#### Communication scientifique
+- **Visualisations professionnelles** : Standards de publication respectés
+- **Légendes informatives** : Context et métadonnées incluses
+- **Formats adaptés** : Selon le public et le medium de diffusion
+- **Accessibility** : Choix de couleurs et polices appropriés
+
+### Applications dans la recherche entomologique
+
+Les compétences développées dans ce tutoriel s'appliquent directement à :
+
+#### Écologie et biodiversité
+- **Monitoring des populations** d'insectes dans le temps et l'espace
+- **Analyses de diversité** taxonomique et fonctionnelle
+- **Études de distribution** et modélisation de niche écologique
+- **Évaluation de l'impact** des changements environnementaux
+
+#### Recherche appliquée
+- **Gestion des ravageurs** agricoles et forestiers
+- **Conservation des espèces** menacées ou bénéfiques
+- **Surveillance entomologique** pour la santé publique
+- **Études d'efficacité** des méthodes de contrôle
+
+#### Recherche fondamentale
+- **Écologie des communautés** et réseaux trophiques
+- **Biogéographie** et phylogéographie
+- **Écologie comportementale** et sélection d'habitat
+- **Réponses aux stress** climatiques et anthropiques
+
+### Workflow reproductible recommandé
+
+Pour vos futurs projets, suivez cette séquence éprouvée :
+
+1. **Initialisation** : Créer un projet R avec structure organisée
+2. **Importation** : Charger les données avec chemins relatifs
+3. **Exploration** : Visualiser et comprendre les données brutes
+4. **Nettoyage** : Standardiser et valider les données
+5. **Transformation** : Créer les variables d'analyse nécessaires
+6. **Analyse** : Conduire les analyses statistiques et spatiales
+7. **Visualisation** : Créer les graphiques de communication
+8. **Documentation** : Rédiger le rapport avec Quarto
+9. **Validation** : Tester la reproductibilité sur un autre système
+10. **Partage** : Publier le code et les données selon les standards ouverts
+
+### Ressources pour approfondir vos compétences
+
+#### Documentation officielle et guides
+- **R for Data Science** : https://r4ds.hadley.nz/ (bible du tidyverse)
+- **Spatial Data Science** : https://r-spatial.org/ (analyses spatiales en R)
+- **ggplot2 Book** : https://ggplot2-book.org/ (maîtrise complète de ggplot2)
+- **Quarto Documentation** : https://quarto.org/ (publication scientifique)
+
+#### Packages et outils spécialisés
+- **Package `sf`** : https://r-spatial.github.io/sf/ (données spatiales)
+- **NASA POWER** : https://power.larc.nasa.gov/ (données climatiques)
+- **Package `janitor`** : https://sfirke.github.io/janitor/ (nettoyage de données)
+- **Package `patchwork`** : https://patchwork.data-imaginist.com/ (composition de graphiques)
+- **Package `tinytable`** : https://vincentarelbundock.github.io/tinytable/ (tableaux professionnels)
+
+#### Visualisation et design
+- **R Graph Gallery** : https://r-graph-gallery.com/ (inspiration et code)
+- **Data Visualization Handbook** : https://datavizproject.com/ (choix du bon graphique)
+- **ColorBrewer** : https://colorbrewer2.org/ (palettes de couleurs scientifiques)
+- **Fundamentals of Data Visualization** : https://clauswilke.com/dataviz/ (théorie)
+
+#### Reproductibilité et bonnes pratiques
+- **renv Package** : https://rstudio.github.io/renv/ (gestion des dépendances)
+- **here Package** : https://here.r-lib.org/ (chemins relatifs)
+- **Happy Git with R** : https://happygitwithr.com/ (contrôle de version)
+- **Reproducible Research with R** : https://www.crcpress.com/reproducible-research-with-r-and-r-studio/
+
+#### Communautés et support
+- **RStudio Community** : https://community.rstudio.com/ (forum d'entraide)
+- **Stack Overflow** : https://stackoverflow.com/questions/tagged/r (questions techniques)
+- **R-bloggers** : https://www.r-bloggers.com/ (actualités et tutoriels)
+- **#RStats Twitter** : Communauté active sur les réseaux sociaux
+
+#### Formation continue
+- **Posit Academy** : https://academy.posit.co/ (cours officiels RStudio)
+- **DataCamp** : https://www.datacamp.com/courses/r (cours interactifs)
+- **Coursera R Specialization** : https://www.coursera.org/specializations/r (université Johns Hopkins)
+- **edX MITx** : https://www.edx.org/ (cours universitaires en ligne)
+
+### Perspectives d'avancement
+
+#### Compétences à développer ensuite
+- **Analyses statistiques avancées** : modèles mixtes, GLM, machine learning
+- **Analyses phylogénétiques** : packages `ape`, `phytools`, `ggtree`
+- **Modélisation spatiale** : krigeage, modèles de distribution d'espèces
+- **Applications Shiny** : interfaces interactives pour vos analyses
+- **Packages R personnalisés** : développement d'outils spécialisés
+
+#### Intégration avec d'autres outils
+- **QGIS** : SIG complémentaire pour analyses spatiales complexes
+- **MaxEnt/ENMeval** : modélisation de niche écologique
+- **GBIF** : accès aux données de biodiversité mondiales
+- **iNaturalist** : science participative et validation taxonomique
+- **Docker/Singularity** : conteneurisation pour reproductibilité maximale
+
+### Message final
+
+La maîtrise de R et de ses écosystèmes représente un investissement majeur pour votre carrière scientifique. Les compétences acquises dans ce tutoriel constituent une base solide pour :
+
+- **Conduire des recherches reproductibles** de haute qualité
+- **Collaborer efficacement** avec la communauté scientifique internationale
+- **Publier dans les meilleures revues** avec des analyses robustes
+- **Contribuer à la science ouverte** et aux bonnes pratiques de recherche
+
+Continuez à pratiquer, expérimenter et partager vos découvertes. La communauté R est accueillante et toujours prête à aider les nouveaux utilisateurs à progresser.
+
+**Bonne continuation dans vos analyses entomologiques !** 🐛📊🌍
+
+------------------------------------------------------------------------
+
+## Gabarit de rapport étudiant
+
+Un [gabarit Quarto de rapport de laboratoire](template_rapport_etudiant.qmd) est fourni pour vous aider à structurer votre propre analyse spatio-temporelle de données entomologiques.
