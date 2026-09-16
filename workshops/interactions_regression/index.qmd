@@ -3,6 +3,7 @@ title: "Understanding Interactions in Regression Models"
 subtitle: "Categorical × numerical and numerical × numerical interactions, marginal vs. conditional effects, and common pitfalls in ecological data"
 author: "Allen Bush-Beaupré"
 date: 10-05-2026
+image: workshop_5oct_2026_announcement.png
 categories: [tutorial, interactions, marginaleffects, glmm, statistics, R, workshop]
 format:
   revealjs:
