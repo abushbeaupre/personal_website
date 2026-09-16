@@ -16,6 +16,7 @@ format:
     out-width: "90%"
     footer: "Interactions in Regression Models"
     css: interactions_regression.css
+    scrollable: true
 execute:
   echo: true
   warning: false
@@ -39,10 +40,13 @@ By the end of this workshop you should be able to:
 1.  Explain what an interaction term means for a categorical × numerical model and for a numerical × numerical model
 2.  Distinguish **conditional** effects from **marginal** effects, and choose the right one for a research question
 3.  Recognize Simpson's Paradox and sampling bias as threats to naive interpretation
+
+## Learning objectives (continued)
+
 4.  Use `marginaleffects` (`predictions()`, `slopes()`, `avg_predictions()`, `avg_slopes()`, `hypotheses()`) to extract and test the quantities you actually care about
 5.  Visualize interaction effects (slope-by-moderator plots, five-number-summary predictions, response surfaces) and know their trade-offs
 
-## Setup
+## Setup {.smaller}
 
 ```{r}
 #| output: false
@@ -98,7 +102,7 @@ For a categorical $X_2$ (e.g., sex) and continuous $X_1$ (e.g., snow depth): the
 
 Both are legitimate; they answer different questions. Interactions are exactly where the distinction starts to matter.
 
-## Case study: Bighorn sheep
+## Case study: Bighorn sheep {.smaller}
 
 Ram Mountain, Alberta. Question: how does winter snow depth relate to spring mass in Bighorn sheep, and does it differ by sex? Males and females segregate in winter — females use lower, less snowy habitat.
 
@@ -164,7 +168,7 @@ Using `bighorn_population`:
 
 *(\~5 minutes — discuss with a neighbor)*
 
-## Sampling from the population
+## Sampling from the population {.smaller}
 
 In practice we can't measure everyone. Two sampling scenarios:
 

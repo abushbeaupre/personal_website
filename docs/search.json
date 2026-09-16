@@ -886,7 +886,7 @@
     "href": "workshops/interactions_regression/index.html#learning-objectives",
     "title": "Understanding Interactions in Regression Models",
     "section": "Learning objectives",
-    "text": "Learning objectives\nBy the end of this workshop you should be able to:\n\nExplain what an interaction term means for a categorical × numerical model and for a numerical × numerical model\nDistinguish conditional effects from marginal effects, and choose the right one for a research question\nRecognize Simpson’s Paradox and sampling bias as threats to naive interpretation\nUse marginaleffects (predictions(), slopes(), avg_predictions(), avg_slopes(), hypotheses()) to extract and test the quantities you actually care about\nVisualize interaction effects (slope-by-moderator plots, five-number-summary predictions, response surfaces) and know their trade-offs"
+    "text": "Learning objectives\nBy the end of this workshop you should be able to:\n\nExplain what an interaction term means for a categorical × numerical model and for a numerical × numerical model\nDistinguish conditional effects from marginal effects, and choose the right one for a research question\nRecognize Simpson’s Paradox and sampling bias as threats to naive interpretation"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#setup",
@@ -1146,5 +1146,12 @@
     "title": "Understanding Interactions in Regression Models",
     "section": "Simulating heteroscedastic data",
     "text": "Simulating heteroscedastic data\n\nlog_sd_intercept &lt;- log(sd_petal_length)\nlog_sd_temp_slope &lt;- 0.03\n\nflower_measurements_2 &lt;- tibble(\n  temp_centered = temperature - mean(temperature),\n  rain_centered = rain - mean(rain),\n  petal_length = rnorm(n_flowers,\n    mean = avg_petal_length + temperature_effect * temp_centered,\n    sd = exp(log_sd_intercept + log_sd_temp_slope * temp_centered))\n)\n\nmod_flower_2 &lt;- glmmTMB(petal_length ~ temp_centered,\n                         dispformula = ~ temp_centered,\n                         data = flower_measurements_2)"
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#learning-objectives-continued",
+    "href": "workshops/interactions_regression/index.html#learning-objectives-continued",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Learning objectives (continued)",
+    "text": "Learning objectives (continued)\n\nUse marginaleffects (predictions(), slopes(), avg_predictions(), avg_slopes(), hypotheses()) to extract and test the quantities you actually care about\nVisualize interaction effects (slope-by-moderator plots, five-number-summary predictions, response surfaces) and know their trade-offs"
   }
 ]

@@ -121,6 +121,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -233,18 +234,23 @@ Allen Bush-Beaupré
 <p><strong>Audience</strong>: graduate students and researchers in ecology who fit GL(M)Ms and want to interpret interaction terms correctly.</p>
 <p><strong>Format</strong>: short lecture blocks, live-coded examples, and practice exercises (look for the 🧪 slides).</p>
 </section>
-<section id="learning-objectives" class="slide level2">
+<section id="learning-objectives" class="slide level2 scrollable">
 <h2>Learning objectives</h2>
 <p>By the end of this workshop you should be able to:</p>
 <ol type="1">
 <li>Explain what an interaction term means for a categorical × numerical model and for a numerical × numerical model</li>
 <li>Distinguish <strong>conditional</strong> effects from <strong>marginal</strong> effects, and choose the right one for a research question</li>
 <li>Recognize Simpson’s Paradox and sampling bias as threats to naive interpretation</li>
+</ol>
+</section>
+<section id="learning-objectives-continued" class="slide level2 scrollable">
+<h2>Learning objectives (continued)</h2>
+<ol start="4" type="1">
 <li>Use <code>marginaleffects</code> (<code>predictions()</code>, <code>slopes()</code>, <code>avg_predictions()</code>, <code>avg_slopes()</code>, <code>hypotheses()</code>) to extract and test the quantities you actually care about</li>
 <li>Visualize interaction effects (slope-by-moderator plots, five-number-summary predictions, response surfaces) and know their trade-offs</li>
 </ol>
 </section>
-<section id="setup" class="slide level2">
+<section id="setup" class="slide level2 smaller">
 <h2>Setup</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a aria-label="1"></a><span class="fu">library</span>(tidyverse)       <span class="co"># Data manipulation and plotting</span></span>
@@ -300,7 +306,7 @@ Allen Bush-Beaupré
 </ul>
 <p>Both are legitimate; they answer different questions. Interactions are exactly where the distinction starts to matter.</p>
 </section>
-<section id="case-study-bighorn-sheep" class="slide level2">
+<section id="case-study-bighorn-sheep" class="slide level2 smaller">
 <h2>Case study: Bighorn sheep</h2>
 <p>Ram Mountain, Alberta. Question: how does winter snow depth relate to spring mass in Bighorn sheep, and does it differ by sex? Males and females segregate in winter — females use lower, less snowy habitat.</p>
 <div class="cell">
@@ -359,7 +365,7 @@ Allen Bush-Beaupré
 
 </div>
 <img data-src="index_files/figure-revealjs/unnamed-chunk-4-1.png" width="864" class="r-stretch quarto-figure-center"><p class="caption">Within-sex trends are negative, as expected.</p></section>
-<section id="exercise-1" class="slide level2">
+<section id="exercise-1" class="slide level2 scrollable">
 <h2>🧪 Exercise 1</h2>
 <p>Using <code>bighorn_population</code>:</p>
 <ol type="1">
@@ -369,7 +375,7 @@ Allen Bush-Beaupré
 </ol>
 <p><em>(~5 minutes — discuss with a neighbor)</em></p>
 </section>
-<section id="sampling-from-the-population" class="slide level2">
+<section id="sampling-from-the-population" class="slide level2 smaller">
 <h2>Sampling from the population</h2>
 <p>In practice we can’t measure everyone. Two sampling scenarios:</p>
 <ul>
@@ -558,7 +564,7 @@ Comparison: dY/dX</code></pre>
 </div>
 </div>
 </section>
-<section id="exercise-2" class="slide level2">
+<section id="exercise-2" class="slide level2 scrollable">
 <h2>🧪 Exercise 2</h2>
 <p>Using <code>mod_mass_2</code> (the biased sample model):</p>
 <ol type="1">
@@ -568,7 +574,7 @@ Comparison: dY/dX</code></pre>
 </ol>
 <p><em>(~7 minutes — try it in your own script, then we’ll compare answers)</em></p>
 </section>
-<section id="part-1-takeaways" class="slide level2">
+<section id="part-1-takeaways" class="slide level2 scrollable">
 <h2>Part 1 takeaways</h2>
 <ol type="1">
 <li>Interactions → conditional effects that depend on other variables</li>
@@ -729,7 +735,7 @@ Comparison: dY/dX</code></pre>
 </div>
 <img data-src="index_files/figure-revealjs/unnamed-chunk-21-1.png" width="864" class="r-stretch"><p>Contour bins are arbitrary and hide uncertainty — good for exploration, risky for publication-quality inference. Prefer line-and-ribbon plots when you can.</p>
 </section>
-<section id="exercise-3" class="slide level2">
+<section id="exercise-3" class="slide level2 scrollable">
 <h2>🧪 Exercise 3</h2>
 <p>Using <code>mod_flower_1</code>:</p>
 <ol type="1">
@@ -790,7 +796,7 @@ Comparison: dY/dX</code></pre>
 </div>
 <img data-src="index_files/figure-revealjs/unnamed-chunk-23-1.png" width="864" class="r-stretch quarto-figure-center"><p class="caption">Recovered vs.&nbsp;simulated standard deviation of petal length.</p><p><code>type = "disp"</code> retrieves predictions/slopes for the dispersion sub-model, exactly as <code>type = "conditional"</code> does for the mean.</p>
 </section>
-<section id="exercise-4-challenge" class="slide level2">
+<section id="exercise-4-challenge" class="slide level2 scrollable">
 <h2>🧪 Exercise 4 (challenge)</h2>
 <p>Extend <code>mod_flower_2</code> by adding <code>rain_centered</code> and a <code>temp_centered * rain_centered</code> interaction to <strong>both</strong> the conditional formula and the <code>dispformula</code>.</p>
 <ol type="1">
@@ -800,7 +806,7 @@ Comparison: dY/dX</code></pre>
 </ol>
 <p><em>(~10 minutes — this is open-ended; there’s no single correct answer)</em></p>
 </section>
-<section id="part-2-takeaways" class="slide level2">
+<section id="part-2-takeaways" class="slide level2 scrollable">
 <h2>Part 2 takeaways</h2>
 <ol type="1">
 <li>With two numerical predictors, the interaction coefficient is the <em>rate of change of one slope per unit of the other</em> — not a separate slope for each group</li>
