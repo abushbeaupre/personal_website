@@ -45,20 +45,26 @@
   overflow-y: auto;
 }
 
-.reveal .slide.fig-slide .cell-output-display {
+.reveal .slide.fig-slide .cell {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
-.reveal .slide.fig-slide .cell-output-display img {
-  /* Fixed height (not max-height) so every plot is scaled to the same visual
-     size regardless of its native pixel dimensions (which vary slightly by
-     chunk depending on legend size, facets, etc.). width: auto preserves
-     each image's own aspect ratio; !important overrides the HTML width=
-     attribute pandoc writes on each <img> from fig-width/fig-height. */
+/* Quarto/pandoc emits figures as plain <img class="r-stretch"> with no
+   .cell-output-display wrapper (that class only appears around printed
+   text/table output, not images) - so the image itself is the selector
+   target. reveal.js's r-stretch plugin also sets inline width/height via
+   JS at runtime based on available space, which is why figures were
+   ending up at different visual sizes depending on how much vertical
+   room the code block above them left. Force every figure to the same
+   fixed height regardless of that JS, using !important to win over the
+   inline style. */
+.reveal .slide.fig-slide img.r-stretch {
   height: 80vh !important;
   width: auto !important;
   max-width: 100% !important;
+  max-height: none !important;
 }
 
 /* Dedicated slides for a single printed table (predictions()/slopes()/
