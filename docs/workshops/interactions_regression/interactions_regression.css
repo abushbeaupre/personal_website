@@ -51,7 +51,31 @@
 }
 
 .reveal .slide.fig-slide .cell-output-display img {
-  max-height: 70vh;
+  max-height: 85vh;
   width: auto;
   max-width: 100%;
+}
+
+/* Dedicated slides for a single printed table (predictions()/slopes()/
+   summary() output, no accompanying figure). Mirrors .fig-slide: collapse
+   and shrink the code, then enlarge the printed output beyond the shared
+   28px default since there's no plot competing for space. Add class
+   "table-slide" to the slide heading for any slide whose code chunk's
+   only output is a printed table. */
+.reveal .slide.table-slide div.sourceCode pre,
+.reveal .slide.table-slide div.sourceCode pre code {
+  font-size: 16px;
+  line-height: 1.15;
+}
+
+.reveal .slide.table-slide details[class="code-fold"] {
+  max-height: 30vh;
+  overflow-y: auto;
+}
+
+.reveal .slide.table-slide .cell-output pre,
+.reveal .slide.table-slide .cell-output-stdout pre,
+.reveal .slide.table-slide .cell-output pre code {
+  font-size: 34px;
+  line-height: 1.4;
 }

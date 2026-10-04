@@ -486,8 +486,8 @@
     "objectID": "workshops/interactions_regression/index.html#welcome",
     "href": "workshops/interactions_regression/index.html#welcome",
     "title": "Understanding Interactions in Regression Models",
-    "section": "Welcome",
-    "text": "Welcome\nThis workshop is adapted from a two-part tutorial series on interactions in regression models:\n\nPart 1: Categorical × numerical interactions\nPart 2: Numerical × numerical interactions\nPart 3: Generalized linear models and link functions\n\nAudience: graduate students and researchers in ecology who fit GL(M)Ms and want to interpret interaction terms correctly.\nFormat: short lecture blocks, live-coded examples, and practice exercises (look for the 🧪 slides)."
+    "section": "",
+    "text": "This workshop is adapted from a two-part tutorial series on interactions in regression models:\n\nPart 1: Categorical × numerical interactions\nPart 2: Numerical × numerical interactions\nPart 3: Generalized linear models and link functions\n\nAudience: graduate students and researchers in ecology who fit GL(M)Ms and want to interpret interaction terms correctly.\nFormat: short lecture blocks, live-coded examples, and practice exercises (look for the 🧪 slides)."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#learning-objectives",
@@ -508,7 +508,7 @@
     "href": "workshops/interactions_regression/index.html#setup",
     "title": "Understanding Interactions in Regression Models",
     "section": "Setup",
-    "text": "Setup\n\nlibrary(tidyverse)       # Data manipulation and plotting\nlibrary(glmmTMB)         # Generalized linear (mixed) models\nlibrary(marginaleffects) # Compute marginal/conditional effects\nlibrary(patchwork)       # Combine multiple plots\nlibrary(GGally)          # Pairwise plots\nlibrary(distributional)  # Simulate mixture/gamma/normal distributions (Part 3)\n\n# Set ggplot2 theme\nblack_theme &lt;- theme(\n  axis.line = element_line(linewidth = 2, lineend = \"round\", color = \"white\"),\n  panel.grid = element_blank(),\n  panel.background = element_rect(fill = \"black\", color = NA),\n  axis.ticks = element_blank(),\n  axis.text = element_text(size = 21, face = \"bold\", color = \"white\"),\n  axis.title = element_text(size = 21, face = \"bold\", color = \"white\"),\n  plot.title = element_text(size = 25, face = \"bold\", color = \"white\"),\n  plot.background = element_rect(fill = \"black\", color = NA),\n  legend.background = element_rect(fill = \"black\", color = NA),\n  legend.text = element_text(size = 21, color = \"white\"),\n  legend.title = element_text(size = 21, face = \"bold\", color = \"white\"),\n  legend.position = \"bottom\"\n)\n\ntheme_set(black_theme)\n\n# Set global default for geom_point shape\nupdate_geom_defaults(\"point\", list(shape = 1, size = 3, alpha = 0.8))\n\n# silence marginaleffects warnings about glmmTMB\noptions(marginaleffects_safe = FALSE)\n\nset.seed(4127)"
+    "text": "Setup\n\nlibrary(tidyverse)       # Data manipulation and plotting\nlibrary(glmmTMB)         # Generalized linear (mixed) models\nlibrary(marginaleffects) # Compute marginal/conditional effects\nlibrary(patchwork)       # Combine multiple plots\nlibrary(GGally)          # Pairwise plots\nlibrary(distributional)  # Simulate mixture/gamma/normal distributions (Part 3)\n\n# Set ggplot2 theme\nblack_theme &lt;- theme(\n  axis.line = element_line(linewidth = 2, lineend = \"round\", color = \"white\"),\n  panel.grid = element_blank(),\n  panel.background = element_rect(fill = \"black\", color = NA),\n  axis.ticks = element_blank(),\n  axis.text = element_text(size = 21, face = \"bold\", color = \"white\"),\n  axis.title = element_text(size = 21, face = \"bold\", color = \"white\"),\n  plot.title = element_text(size = 25, face = \"bold\", color = \"white\"),\n  plot.background = element_rect(fill = \"black\", color = NA),\n  legend.background = element_rect(fill = \"black\", color = NA),\n  legend.text = element_text(size = 21, color = \"white\"),\n  legend.title = element_text(size = 21, face = \"bold\", color = \"white\"),\n  legend.position = \"bottom\"\n)\n\ntheme_set(black_theme)\n\n# Set global default for geom_point shape\nupdate_geom_defaults(\"point\", list(shape = 1, size = 3, alpha = 0.8))\n\n# silence marginaleffects warnings about glmmTMB\noptions(marginaleffects_safe = FALSE)\n\nset.seed(333)"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#coding-style-functions-used-throughout",
@@ -522,7 +522,7 @@
     "href": "workshops/interactions_regression/index.html#what-is-an-interaction",
     "title": "Understanding Interactions in Regression Models",
     "section": "What is an interaction?",
-    "text": "What is an interaction?\nFor predictors \\(X_1\\) and \\(X_2\\):\n\\[Y = \\beta_0 + \\beta_1 X_1 + \\beta_2 X_2 + \\beta_3 (X_1 \\times X_2) + \\epsilon\\]\n\\(\\beta_3\\) is the interaction coefficient. When \\(\\beta_3 \\neq 0\\), the effect of \\(X_1\\) on \\(Y\\) depends on the value of \\(X_2\\).\nFor a categorical \\(X_2\\) (e.g., sex) and continuous \\(X_1\\) (e.g., snow depth): the interaction means the slope of the continuous predictor differs between categories."
+    "text": "What is an interaction?\nAn interaction means the effect of one predictor depends on the value of another.\n\nNo interaction: snow depth affects weight the same way for every sheep\nInteraction: the effect of snow depth on weight differs by sex\n\nFor a categorical moderator (e.g., sex) and a continuous predictor (e.g., snow depth): the interaction means the slope differs between categories.\nOur focus today isn’t the algebra — it’s using marginaleffects to find, test, and plot “it depends.”"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#conditional-vs.-marginal-effects",
@@ -543,7 +543,7 @@
     "href": "workshops/interactions_regression/index.html#simpsons-paradox",
     "title": "Understanding Interactions in Regression Models",
     "section": "Simpson’s Paradox",
-    "text": "Simpson’s Paradox\n\n\nCode\nggplot(bighorn_population, aes(x = snow_depth, y = weight)) +\n  geom_point(aes(color = sex)) +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"red\", linewidth = 2)\n\n\n\nIgnoring sex hides the true within-sex trends.Pooled: snow depth looks positively associated with weight — even though both sexes lose weight with more snow."
+    "text": "Simpson’s Paradox\nPooling males and females together and fitting a single trend line can hide — or even reverse — the true relationship."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#why-sex-is-a-confounder",
@@ -557,7 +557,7 @@
     "href": "workshops/interactions_regression/index.html#within-sex-trends",
     "title": "Understanding Interactions in Regression Models",
     "section": "Within-sex trends",
-    "text": "Within-sex trends\n\n\nCode\nggplot(bighorn_population, aes(x = snow_depth, y = weight, color = sex)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = FALSE)\n\n\n\nWithin-sex trends are negative, as expected."
+    "text": "Within-sex trends\n\n\nCode\nggplot(bighorn_population, aes(x = snow_depth, y = weight, color = sex)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = FALSE)\n\n\n\n\n\nWithin-sex trends are negative, as expected."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#exercise-1",
@@ -585,35 +585,35 @@
     "href": "workshops/interactions_regression/index.html#model-coefficients",
     "title": "Understanding Interactions in Regression Models",
     "section": "Model coefficients",
-    "text": "Model coefficients\n\nsummary(mod_mass_1)$coefficients$cond\n\n                     Estimate Std. Error    z value     Pr(&gt;|z|)\n(Intercept)        180.252394  4.5758581  39.392042 0.000000e+00\nsexmale             49.686455 11.6121023   4.278851 1.878606e-05\nsnow_depth          -2.485942  0.2124809 -11.699604 1.280491e-31\nsexmale:snow_depth   1.534424  0.2937494   5.223580 1.754970e-07\nattr(,\"ddf\")\n[1] \"asymptotic\""
+    "text": "Model coefficients\n\nsummary(mod_mass_1)$coefficients$cond\n\n                     Estimate Std. Error    z value     Pr(&gt;|z|)\n(Intercept)        179.711531  3.4913367  51.473560 0.000000e+00\nsexmale             39.011436 11.0092824   3.543504 3.948474e-04\nsnow_depth          -2.495525  0.1717861 -14.526933 8.180169e-48\nsexmale:snow_depth   1.686797  0.2685643   6.280794 3.368472e-10\nattr(,\"ddf\")\n[1] \"asymptotic\""
   },
   {
     "objectID": "workshops/interactions_regression/index.html#q1-do-sexes-differ-in-spring-mass",
     "href": "workshops/interactions_regression/index.html#q1-do-sexes-differ-in-spring-mass",
     "title": "Understanding Interactions in Regression Models",
     "section": "Q1: Do sexes differ in spring mass?",
-    "text": "Q1: Do sexes differ in spring mass?\n\npredictions(mod_mass_1, by = \"sex\")\n\n\n    sex Estimate Std. Error    z Pr(&gt;|z|)   S 2.5 % 97.5 %\n female      132       2.06 64.2   &lt;0.001 Inf   128    137\n male        181       2.06 87.6   &lt;0.001 Inf   177    185\n\nType: response\n\n\nThis is a marginal prediction: the model-implied mean for each sex, averaged over the observed snow-depth distribution in the sample.\n\npredictions(mod_mass_1, by = \"sex\") |&gt;\n  hypotheses(hypothesis = \"b1 - b2 = 0\")\n\n\n Hypothesis Estimate Std. Error     z Pr(&gt;|z|)     S 2.5 % 97.5 %\n    b1-b2=0    -48.3       2.92 -16.6   &lt;0.001 202.2 -54.1  -42.6"
+    "text": "Q1: Do sexes differ in spring mass?\n\npredictions(mod_mass_1, by = \"sex\")\n\n\n    sex Estimate Std. Error    z Pr(&gt;|z|)   S 2.5 % 97.5 %\n female      137       1.88 73.0   &lt;0.001 Inf   133    141\n male        178       1.88 95.1   &lt;0.001 Inf   175    182\n\nType: response\n\n\nThis is a marginal prediction: the model-implied mean for each sex, averaged over the observed snow-depth distribution in the sample."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#q2-does-snow-depth-affect-mass-equally-by-sex",
     "href": "workshops/interactions_regression/index.html#q2-does-snow-depth-affect-mass-equally-by-sex",
     "title": "Understanding Interactions in Regression Models",
     "section": "Q2: Does snow depth affect mass equally by sex?",
-    "text": "Q2: Does snow depth affect mass equally by sex?\n\n\nCode\nslopes(mod_mass_1, variables = \"snow_depth\", by = \"sex\", vcov = TRUE) |&gt;\n  ggplot(aes(x = estimate, xmax = conf.high, xmin = conf.low, y = sex, color = sex)) +\n  geom_pointrange(size = 1.5, lineend = \"round\", linewidth = 2, pch = 21, stroke = 4) +\n  geom_vline(xintercept = female_loss, color = \"red\") +\n  geom_vline(xintercept = male_loss, color = \"blue\") +\n  theme(legend.position = \"none\")\n\n\n\nSlopes of snow depth by sex, with true simulated values as vertical lines."
+    "text": "Q2: Does snow depth affect mass equally by sex?\n\n\nCode\nslopes(mod_mass_1, variables = \"snow_depth\", by = \"sex\", vcov = TRUE) |&gt;\n  ggplot(aes(x = estimate, xmax = conf.high, xmin = conf.low, y = sex, color = sex)) +\n  geom_pointrange(size = 1.5, lineend = \"round\", linewidth = 2, pch = 21, stroke = 4) +\n  geom_vline(xintercept = female_loss, color = \"red\") +\n  geom_vline(xintercept = male_loss, color = \"blue\") +\n  theme(legend.position = \"none\")\n\n\n\n\n\nSlopes of snow depth by sex, with true simulated values as vertical lines."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#testing-the-slope-difference",
     "href": "workshops/interactions_regression/index.html#testing-the-slope-difference",
     "title": "Understanding Interactions in Regression Models",
     "section": "Testing the slope difference",
-    "text": "Testing the slope difference\n\nslopes(mod_mass_1, variables = \"snow_depth\", by = \"sex\", vcov = TRUE) |&gt;\n  hypotheses(hypothesis = \"b1 - b2 = 0\")\n\n\n Hypothesis Estimate Std. Error     z Pr(&gt;|z|)    S 2.5 % 97.5 %\n    b1-b2=0    -1.53      0.294 -5.22   &lt;0.001 22.4 -2.11 -0.959"
+    "text": "Testing the slope difference\n\nslopes(mod_mass_1, variables = \"snow_depth\", by = \"sex\", vcov = TRUE) |&gt;\n  hypotheses(hypothesis = \"b1 - b2 = 0\")\n\n\n Hypothesis Estimate Std. Error     z Pr(&gt;|z|)    S 2.5 % 97.5 %\n    b1-b2=0    -1.69      0.269 -6.28   &lt;0.001 31.5 -2.21  -1.16"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#q3-whats-the-population-average-slope",
     "href": "workshops/interactions_regression/index.html#q3-whats-the-population-average-slope",
     "title": "Understanding Interactions in Regression Models",
     "section": "Q3: What’s the population-average slope?",
-    "text": "Q3: What’s the population-average slope?\navg_slopes() computes the slope for every observation, then averages:\n\navg_slopes(mod_mass_1, variables = \"snow_depth\", vcov = TRUE)\n\n\n Estimate Std. Error     z Pr(&gt;|z|)     S 2.5 % 97.5 %\n    -1.72      0.147 -11.7   &lt;0.001 102.7 -2.01  -1.43\n\nTerm: snow_depth\nType: response\nComparison: dY/dX\n\n\n\nmean(c(male_loss, female_loss))  # true simulated average\n\n[1] -1.65"
+    "text": "Q3: What’s the population-average slope?\navg_slopes() computes the slope for every observation, then averages:\n\navg_slopes(mod_mass_1, variables = \"snow_depth\", vcov = TRUE)\n\n\n Estimate Std. Error     z Pr(&gt;|z|)     S 2.5 % 97.5 %\n    -1.65      0.134 -12.3   &lt;0.001 113.1 -1.92  -1.39\n\nTerm: snow_depth\nType: response\nComparison: dY/dX\n\n\n\nmean(c(male_loss, female_loss))  # true simulated average\n\n[1] -1.65"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#marginal-vs-conditional-visualized",
@@ -627,7 +627,7 @@
     "href": "workshops/interactions_regression/index.html#scenario-2-biased-sampling-80-male",
     "title": "Understanding Interactions in Regression Models",
     "section": "Scenario 2: biased sampling (80% male)",
-    "text": "Scenario 2: biased sampling (80% male)\n\nbighorn_mass_2 &lt;- bind_rows(\n  bighorn_population |&gt; filter(sex == \"male\") |&gt; slice_sample(n = 80),\n  bighorn_population |&gt; filter(sex == \"female\") |&gt; slice_sample(n = 20)\n)\nmod_mass_2 &lt;- glmmTMB(weight ~ sex * snow_depth, data = bighorn_mass_2, family = gaussian())\navg_slopes(mod_mass_2, variables = \"snow_depth\", vcov = TRUE)\n\n\n Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %\n    -1.27      0.161 -7.9   &lt;0.001 48.3 -1.58 -0.954\n\nTerm: snow_depth\nType: response\nComparison: dY/dX\n\n\nConditional (by-sex) slopes stay close to truth. But the marginal slope is biased toward the overrepresented, weaker-effect sex (males)."
+    "text": "Scenario 2: biased sampling (80% male)\n\nbighorn_mass_2 &lt;- bind_rows(\n  bighorn_population |&gt; filter(sex == \"male\") |&gt; slice_sample(n = 80),\n  bighorn_population |&gt; filter(sex == \"female\") |&gt; slice_sample(n = 20)\n)\nmod_mass_2 &lt;- glmmTMB(weight ~ sex * snow_depth, data = bighorn_mass_2, family = gaussian())\navg_slopes(mod_mass_2, variables = \"snow_depth\", vcov = TRUE)\n\n\n Estimate Std. Error     z Pr(&gt;|z|)    S 2.5 % 97.5 %\n    -1.12       0.17 -6.62   &lt;0.001 34.7 -1.46 -0.792\n\nTerm: snow_depth\nType: response\nComparison: dY/dX"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#correcting-for-known-sampling-bias",
@@ -641,7 +641,7 @@
     "href": "workshops/interactions_regression/index.html#balanced-newdata-correction",
     "title": "Understanding Interactions in Regression Models",
     "section": "Balanced-newdata correction",
-    "text": "Balanced-newdata correction\n\nnewdata_balanced &lt;- bighorn_mass_2 |&gt;\n  group_by(sex) |&gt;\n  reframe(snow_depth = seq(min(snow_depth), max(snow_depth), length.out = 50)) |&gt;\n  ungroup()\n\navg_predictions(mod_mass_2, variables = \"snow_depth\", newdata = newdata_balanced) |&gt;\n  as_tibble() |&gt; select(estimate, conf.low, conf.high) |&gt; head(3)\n\n# A tibble: 3 × 3\n  estimate conf.low conf.high\n     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;\n1     201.     190.      212.\n2     140.     132.      149.\n3     124.     113.      134."
+    "text": "Balanced-newdata correction\n\nnewdata_balanced &lt;- bighorn_mass_2 |&gt;\n  group_by(sex) |&gt;\n  reframe(snow_depth = seq(min(snow_depth), max(snow_depth), length.out = 50)) |&gt;\n  ungroup()\n\navg_predictions(mod_mass_2, variables = \"snow_depth\", newdata = newdata_balanced) |&gt;\n  as_tibble() |&gt; select(estimate, conf.low, conf.high) |&gt; head(3)\n\n# A tibble: 3 × 3\n  estimate conf.low conf.high\n     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;\n1     197.     185.      209.\n2     138.     130.      146.\n3     120.     109.      131."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#exercise-2",
@@ -683,21 +683,21 @@
     "href": "workshops/interactions_regression/index.html#fit-the-model",
     "title": "Understanding Interactions in Regression Models",
     "section": "Fit the model",
-    "text": "Fit the model\n\nmod_flower_1 &lt;- glmmTMB(petal_length ~ temp_centered * rain_centered,\n                         data = flower_measurements_1)\nsummary(mod_flower_1)$coefficients$cond\n\n                              Estimate Std. Error  z value      Pr(&gt;|z|)\n(Intercept)                 25.6288031 0.28512980 89.88469  0.000000e+00\ntemp_centered                0.3978619 0.01753886 22.68460 6.358816e-114\nrain_centered                0.8783765 0.20525261  4.27949  1.873219e-05\ntemp_centered:rain_centered  0.2104061 0.01379506 15.25228  1.589951e-52\nattr(,\"ddf\")\n[1] \"asymptotic\"\n\n\nEvery term has a small p-value — but what do these numbers mean for our research question? Time to unpack them."
+    "text": "Fit the model\n\nmod_flower_1 &lt;- glmmTMB(petal_length ~ temp_centered * rain_centered,\n                         data = flower_measurements_1)\nsummary(mod_flower_1)$coefficients$cond\n\n                              Estimate Std. Error   z value     Pr(&gt;|z|)\n(Intercept)                 24.7315526 0.34191019 72.333477 0.000000e+00\ntemp_centered                0.4441477 0.02209133 20.105064 6.663435e-90\nrain_centered                1.0517379 0.26351075  3.991253 6.572525e-05\ntemp_centered:rain_centered  0.2181736 0.01616323 13.498145 1.603630e-41\nattr(,\"ddf\")\n[1] \"asymptotic\"\n\n\nEvery term has a small p-value — but what do these numbers mean for our research question? Time to unpack them."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#slope-of-one-predictor-at-a-single-value-of-the-other",
     "href": "workshops/interactions_regression/index.html#slope-of-one-predictor-at-a-single-value-of-the-other",
     "title": "Understanding Interactions in Regression Models",
     "section": "Slope of one predictor at a single value of the other",
-    "text": "Slope of one predictor at a single value of the other\n\n# Effect of temperature when rain_centered = 0 (i.e., average rain)\nslopes(mod_flower_1, newdata = datagrid(rain_centered = 0),\n       variables = \"temp_centered\")\n\n\n rain_centered Estimate Std. Error    z Pr(&gt;|z|)     S 2.5 % 97.5 %\n             0    0.398     0.0175 22.7   &lt;0.001 376.0 0.363  0.432\n\nTerm: temp_centered\nType: response\nComparison: dY/dX\n\n\nThis matches the temp_centered coefficient directly — because rain is centered, “at rain = 0” means “at average rain.”"
+    "text": "Slope of one predictor at a single value of the other\n\n# Effect of temperature when rain_centered = 0 (i.e., average rain)\nslopes(mod_flower_1, newdata = datagrid(rain_centered = 0),\n       variables = \"temp_centered\")\n\n\n rain_centered Estimate Std. Error    z Pr(&gt;|z|)     S 2.5 % 97.5 %\n             0    0.444     0.0221 20.1   &lt;0.001 296.2 0.401  0.487\n\nTerm: temp_centered\nType: response\nComparison: dY/dX\n\n\nThis matches the temp_centered coefficient directly — because rain is centered, “at rain = 0” means “at average rain.”"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#slope-across-the-range-of-the-moderator",
     "href": "workshops/interactions_regression/index.html#slope-across-the-range-of-the-moderator",
     "title": "Understanding Interactions in Regression Models",
     "section": "Slope across the range of the moderator",
-    "text": "Slope across the range of the moderator\n\n\nCode\nslopes_by_temp &lt;- slopes(mod_flower_1,\n  newdata = datagrid(temp_centered = seq(min(flower_measurements_1$temp_centered),\n                                          max(flower_measurements_1$temp_centered), length.out = 30)),\n  variables = \"rain_centered\", by = \"temp_centered\")\n\ntrend_slope_temp &lt;- coef(lm(estimate ~ temp_centered, data = slopes_by_temp))[[\"temp_centered\"]]\n\nslopes_by_temp |&gt;\n  ggplot() +\n  geom_hline(yintercept = 0, color = \"blue\", linewidth = 1.5, linetype = 2) +\n  geom_ribbon(aes(x = temp_centered + mean(temperature), ymin = conf.low, ymax = conf.high),\n    alpha = 0.4, fill = \"lightgrey\") +\n  geom_line(aes(x = temp_centered + mean(temperature), y = estimate),\n    lineend = \"round\", linewidth = 2, color = \"white\") +\n  annotate(\"text\", x = -Inf, y = Inf, hjust = -0.2, vjust = 1.5,\n    label = paste0(\"slope = \", round(trend_slope_temp, 3)),\n    color = \"white\", size = 6, fontface = \"bold\") +\n  scale_x_continuous(breaks = seq(-25, 50, by = 5)) +\n  labs(y = \"Effect of rain on petal length\", x = \"Temperature values\")\n\n\n\nEffect of rain on petal length, across observed temperatures.The interaction coefficient is exactly the slope of this line — how much the effect of rain changes per unit of temperature."
+    "text": "Slope across the range of the moderator\n\n\nCode\nslopes_by_temp &lt;- slopes(mod_flower_1,\n  newdata = datagrid(temp_centered = seq(min(flower_measurements_1$temp_centered),\n                                          max(flower_measurements_1$temp_centered), length.out = 30)),\n  variables = \"rain_centered\", by = \"temp_centered\")\n\ntrend_slope_temp &lt;- coef(lm(estimate ~ temp_centered, data = slopes_by_temp))[[\"temp_centered\"]]\n\nslopes_by_temp |&gt;\n  ggplot() +\n  geom_hline(yintercept = 0, color = \"blue\", linewidth = 1.5, linetype = 2) +\n  geom_ribbon(aes(x = temp_centered + mean(temperature), ymin = conf.low, ymax = conf.high),\n    alpha = 0.4, fill = \"lightgrey\") +\n  geom_line(aes(x = temp_centered + mean(temperature), y = estimate),\n    lineend = \"round\", linewidth = 2, color = \"white\") +\n  annotate(\"text\", x = -Inf, y = Inf, hjust = -0.2, vjust = 1.5,\n    label = paste0(\"slope = \", round(trend_slope_temp, 3)),\n    color = \"white\", size = 6, fontface = \"bold\") +\n  scale_x_continuous(breaks = seq(-25, 50, by = 5)) +\n  labs(y = \"Effect of rain on petal length\", x = \"Temperature values\")\n\n\n\n\n\nEffect of rain on petal length, across observed temperatures."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#visualizing-predictions-at-chosen-moderator-values",
@@ -711,7 +711,7 @@
     "href": "workshops/interactions_regression/index.html#response-surfaces-use-with-caution",
     "title": "Understanding Interactions in Regression Models",
     "section": "Response surfaces — use with caution",
-    "text": "Response surfaces — use with caution\n\n\nCode\npredictions(mod_flower_1,\n  newdata = datagrid(\n    temp_centered = seq(min(flower_measurements_1$temp_centered),\n                         max(flower_measurements_1$temp_centered), length.out = 30),\n    rain_centered = seq(min(flower_measurements_1$rain_centered),\n                         max(flower_measurements_1$rain_centered), length.out = 30)\n  )) |&gt;\n  as_tibble() |&gt;\n  mutate(rain = rain_centered + mean(rain), temp = temp_centered + mean(temperature)) |&gt;\n  ggplot(aes(x = rain, y = temp, z = estimate)) +\n  stat_contour_filled() +\n  labs(x = \"Rain\", y = \"Temperature\", fill = \"Predicted petal length\")\n\n\n\nContour bins are arbitrary and hide uncertainty — good for exploration, risky for publication-quality inference. Prefer line-and-ribbon plots when you can."
+    "text": "Response surfaces — use with caution\n\n\nCode\npredictions(mod_flower_1,\n  newdata = datagrid(\n    temp_centered = seq(min(flower_measurements_1$temp_centered),\n                         max(flower_measurements_1$temp_centered), length.out = 30),\n    rain_centered = seq(min(flower_measurements_1$rain_centered),\n                         max(flower_measurements_1$rain_centered), length.out = 30)\n  )) |&gt;\n  as_tibble() |&gt;\n  mutate(rain = rain_centered + mean(rain), temp = temp_centered + mean(temperature)) |&gt;\n  ggplot(aes(x = rain, y = temp, z = estimate)) +\n  stat_contour_filled() +\n  labs(x = \"Rain\", y = \"Temperature\", fill = \"Predicted petal length\")"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#exercise-3",
@@ -739,7 +739,7 @@
     "href": "workshops/interactions_regression/index.html#checking-the-dispersion-model",
     "title": "Understanding Interactions in Regression Models",
     "section": "Checking the dispersion model",
-    "text": "Checking the dispersion model\n\n\nCode\npredictions(mod_flower_2, newdata = flower_measurements_2, type = \"disp\") |&gt;\n  as_tibble() -&gt; pred_sd_temp\n\ntrue_sd_temp &lt;- flower_measurements_2 |&gt;\n  mutate(true_sd = exp(log_sd_intercept + log_sd_temp_slope * temp_centered))\n\nggplot() +\n  geom_line(data = true_sd_temp,\n            aes(x = temp_centered + mean(temperature), y = true_sd, color = \"Simulated\"),\n            linewidth = 2, linetype = \"dashed\") +\n  geom_ribbon(data = pred_sd_temp,\n              aes(ymin = conf.low, ymax = conf.high, x = temp_centered + mean(temperature)),\n              fill = \"red\", alpha = 0.6) +\n  geom_line(data = pred_sd_temp,\n            aes(x = temp_centered + mean(temperature), y = estimate, color = \"Estimated\"),\n            linewidth = 2, lineend = \"round\") +\n  scale_color_manual(values = c(\"Simulated\" = \"green\", \"Estimated\" = \"red\"), name = \"Standard deviation\") +\n  labs(x = \"Temperature\", y = \"Standard deviation\")\n\n\n\nRecovered vs. simulated standard deviation of petal length.type = \"disp\" retrieves predictions/slopes for the dispersion sub-model, exactly as type = \"conditional\" does for the mean."
+    "text": "Checking the dispersion model\n\n\nCode\npredictions(mod_flower_2, newdata = flower_measurements_2, type = \"disp\") |&gt;\n  as_tibble() -&gt; pred_sd_temp\n\ntrue_sd_temp &lt;- flower_measurements_2 |&gt;\n  mutate(true_sd = exp(log_sd_intercept + log_sd_temp_slope * temp_centered))\n\nggplot() +\n  geom_line(data = true_sd_temp,\n            aes(x = temp_centered + mean(temperature), y = true_sd, color = \"Simulated\"),\n            linewidth = 2, linetype = \"dashed\") +\n  geom_ribbon(data = pred_sd_temp,\n              aes(ymin = conf.low, ymax = conf.high, x = temp_centered + mean(temperature)),\n              fill = \"red\", alpha = 0.6) +\n  geom_line(data = pred_sd_temp,\n            aes(x = temp_centered + mean(temperature), y = estimate, color = \"Estimated\"),\n            linewidth = 2, lineend = \"round\") +\n  scale_color_manual(values = c(\"Simulated\" = \"green\", \"Estimated\" = \"red\"), name = \"Standard deviation\") +\n  labs(x = \"Temperature\", y = \"Standard deviation\")\n\n\n\n\n\nRecovered vs. simulated standard deviation of petal length."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#exercise-4-challenge",
@@ -774,14 +774,14 @@
     "href": "workshops/interactions_regression/index.html#fit-the-model-1",
     "title": "Understanding Interactions in Regression Models",
     "section": "Fit the model",
-    "text": "Fit the model\n\nmod_1 &lt;- glmmTMB(occurence ~ tree_cov + rain + temp, family = binomial(link = \"logit\"), data = occ_data)\nsummary(mod_1)$coefficients$cond\n\n               Estimate Std. Error   z value     Pr(&gt;|z|)\n(Intercept) -1.57990035 0.49404071 -3.197915 1.384249e-03\ntree_cov     1.89295895 0.43249936  4.376790 1.204398e-05\nrain         0.06558535 0.05850909  1.120943 2.623121e-01\ntemp         0.02060719 0.01559519  1.321381 1.863742e-01\nattr(,\"ddf\")\n[1] \"asymptotic\"\n\n\nWe simulated the effect of tree cover to be 0.45 on the probability scale, but the model reports ~1.87. Did the model get it wrong?"
+    "text": "Fit the model\n\nmod_1 &lt;- glmmTMB(occurence ~ tree_cov + rain + temp, family = binomial(link = \"logit\"), data = occ_data)\nsummary(mod_1)$coefficients$cond\n\n               Estimate Std. Error    z value     Pr(&gt;|z|)\n(Intercept) -2.91472721 0.60152587 -4.8455558 1.262577e-06\ntree_cov     2.64365984 0.48511414  5.4495625 5.049387e-08\nrain         0.01929265 0.06480240  0.2977151 7.659206e-01\ntemp         0.06736255 0.01797552  3.7474602 1.786342e-04\nattr(,\"ddf\")\n[1] \"asymptotic\"\n\n\nWe simulated the effect of tree cover to be 0.45 on the probability scale, but the model reports ~1.87. Did the model get it wrong?"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#no-its-reporting-a-different-scale",
     "href": "workshops/interactions_regression/index.html#no-its-reporting-a-different-scale",
     "title": "Understanding Interactions in Regression Models",
     "section": "No — it’s reporting a different scale",
-    "text": "No — it’s reporting a different scale\nThe logit-link GLM draws a straight line through the log-odds of occurrence, then bends that line into an S-shape to get back to a probability.\n\n\nCode\ntibble(log_odds = seq(-6, 6, length.out = 400)) |&gt;\n  mutate(probability = plogis(log_odds)) |&gt;\n  ggplot(aes(x = log_odds, y = probability)) +\n  geom_line(linewidth = 2) +\n  labs(x = \"log-odds scale (what the coefficient describes)\",\n       y = \"probability scale (what we care about)\")\n\n\n\nThe logit link bends a straight line into an S-shape.Near the middle (p ≈ 0.5) the curve is steep: a small log-odds push moves probability a lot. Near the ends (p ≈ 0 or 1) the curve flattens: the same push barely moves probability."
+    "text": "No — it’s reporting a different scale\nThe logit-link GLM draws a straight line through the log-odds of occurrence, then bends that line into an S-shape to get back to a probability."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#from-log-odds-to-probability-by-hand",
@@ -795,14 +795,14 @@
     "href": "workshops/interactions_regression/index.html#marginaleffects-does-this-for-us",
     "title": "Understanding Interactions in Regression Models",
     "section": "marginaleffects does this for us",
-    "text": "marginaleffects does this for us\n\nslopes(mod_1, variables = \"tree_cov\",\n       newdata = datagrid(temp = mean(occ_data$temp), rain = mean(occ_data$rain)))\n\n\n temp rain Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %\n 19.7 4.24    0.473      0.108 4.38   &lt;0.001 16.3 0.261  0.684\n\nTerm: tree_cov\nType: response\nComparison: dY/dX\n\n\nslopes() asks: “at these covariate values, how much does predicted probability change for a small increase in tree cover?” — a probability-scale answer, directly comparable to how we simulated the data."
+    "text": "marginaleffects does this for us\n\nslopes(mod_1, variables = \"tree_cov\",\n       newdata = datagrid(temp = mean(occ_data$temp), rain = mean(occ_data$rain)))\n\n\n temp rain Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %\n 20.7 4.29     0.66      0.121 5.45   &lt;0.001 24.3 0.423  0.897\n\nTerm: tree_cov\nType: response\nComparison: dY/dX\n\n\nslopes() asks: “at these covariate values, how much does predicted probability change for a small increase in tree cover?” — a probability-scale answer, directly comparable to how we simulated the data."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#the-implicit-interaction-visualized",
     "href": "workshops/interactions_regression/index.html#the-implicit-interaction-visualized",
     "title": "Understanding Interactions in Regression Models",
     "section": "The implicit interaction, visualized",
-    "text": "The implicit interaction, visualized\n\n\nCode\nslopes(mod_1, variables = \"tree_cov\", newdata = datagrid(temp = fivenum, rain = fivenum)) |&gt;\n  ggplot() +\n  geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1)) +\n  geom_vline(xintercept = occurence_tree_effect, alpha = .8) +\n  facet_grid(rain ~ temp) +\n  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.line.y = element_blank())\n\n\n\nThe tree-cover slope on the probability scale changes across rain × temp, though no interaction term exists in the model.Because the amount of “bending” depends on where you are on the S-curve, tree cover’s probability-scale effect depends on rain and temp too — even though we never told the model to include that interaction."
+    "text": "The implicit interaction, visualized\n\n\nCode\nslopes(mod_1, variables = \"tree_cov\", newdata = datagrid(temp = fivenum, rain = fivenum)) |&gt;\n  ggplot() +\n  geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1)) +\n  geom_vline(xintercept = occurence_tree_effect, alpha = .8) +\n  facet_grid(rain ~ temp) +\n  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.line.y = element_blank())\n\n\n\n\n\nThe tree-cover slope on the probability scale changes across rain × temp, though no interaction term exists in the model."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#a-note-on-measurement-scale-spake-et-al.-2023",
@@ -837,7 +837,7 @@
     "href": "workshops/interactions_regression/index.html#two-ways-to-report-a-log-link-coefficient",
     "title": "Understanding Interactions in Regression Models",
     "section": "Two ways to report a log-link coefficient",
-    "text": "Two ways to report a log-link coefficient\n\nRate ratio (\\[e^\\beta\\]): a constant multiplicative effect, valid everywhere — “each unit increase in tree cover multiplies expected abundance by this factor, regardless of rain or temp”\nLocal slope (\\[\\lambda \\cdot \\beta\\]): an additive, count-scale effect (“this many more individuals”), but only valid near the specific covariate values used\n\n\nexp(fixef(mod_2)$cond[\"tree_cov\"])  # rate ratio: ~2.08, i.e. a ~108% increase per unit tree cover\n\ntree_cov \n2.038641 \n\n\nBoth describe the same underlying model — pick the one that matches your audience (percent change vs. a concrete headcount)."
+    "text": "Two ways to report a log-link coefficient\n\nRate ratio: a constant multiplicative effect, valid everywhere — “each unit increase in tree cover multiplies expected abundance by this factor, regardless of rain or temp”\nLocal slope: an additive, count-scale effect (“this many more individuals”), but only valid near the specific covariate values used"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#exercise-6",
@@ -865,21 +865,21 @@
     "href": "workshops/interactions_regression/index.html#fitting-the-hurdle-model",
     "title": "Understanding Interactions in Regression Models",
     "section": "Fitting the hurdle model",
-    "text": "Fitting the hurdle model\n\nmod_hu &lt;- glmmTMB(\n  abundance_pop ~ scl_prey * scl_competitors,\n  zi = ~ scl_tree_cov,\n  family = truncated_poisson,\n  data = pop_data\n)\nsummary(mod_hu)$coefficients$cond\n\n                            Estimate Std. Error     z value     Pr(&gt;|z|)\n(Intercept)               0.40278350 0.05457497   7.3803710 1.578491e-13\nscl_prey                 -0.04294752 0.05018470  -0.8557891 3.921144e-01\nscl_competitors          -0.76680976 0.05182842 -14.7951598 1.574100e-49\nscl_prey:scl_competitors -0.21247950 0.05087391  -4.1765911 2.959102e-05\nattr(,\"ddf\")\n[1] \"asymptotic\"\n\n\nzi = ~ scl_tree_cov: the zero-inflation (occurrence) part. The conditional formula’s scl_prey * scl_competitors is an explicit interaction, layered on top of the log link’s implicit one."
+    "text": "Fitting the hurdle model\n\nmod_hu &lt;- glmmTMB(\n  abundance_pop ~ scl_prey * scl_competitors,\n  zi = ~ scl_tree_cov,\n  family = truncated_poisson,\n  data = pop_data\n)\nsummary(mod_hu)$coefficients$cond\n\n                            Estimate Std. Error    z value     Pr(&gt;|z|)\n(Intercept)               0.51213906 0.05130134   9.982957 1.809903e-23\nscl_prey                 -0.07302407 0.04865830  -1.500753 1.334196e-01\nscl_competitors          -0.65964489 0.04755800 -13.870324 9.584320e-44\nscl_prey:scl_competitors -0.15951817 0.04726146  -3.375227 7.375475e-04\nattr(,\"ddf\")\n[1] \"asymptotic\"\n\n\nzi = ~ scl_tree_cov: the zero-inflation (occurrence) part. The conditional formula’s scl_prey * scl_competitors is an explicit interaction, layered on top of the log link’s implicit one."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#the-interaction-on-the-count-scale",
     "href": "workshops/interactions_regression/index.html#the-interaction-on-the-count-scale",
     "title": "Understanding Interactions in Regression Models",
     "section": "The interaction on the count scale",
-    "text": "The interaction on the count scale\n\n\nCode\nslopes(mod_hu, variables = \"scl_prey\",\n       newdata = datagrid(scl_competitors = seq(min(pop_data$scl_competitors),\n                                                 max(pop_data$scl_competitors), length.out = 30)),\n       type = \"response\") |&gt;\n  ggplot(aes(x = scl_competitors, y = estimate)) +\n  geom_hline(yintercept = 0, color = \"blue\", linetype = 2) +\n  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.4, fill = \"lightgrey\") +\n  geom_line(linewidth = 1.5, lineend = \"round\", color = \"white\") +\n  labs(y = \"Slope of scl_prey (count scale)\", x = \"Competitors (scaled)\")\n\n\n\nCount-scale effect of prey weakens (and reverses) as competitors increase."
+    "text": "The interaction on the count scale\n\n\nCode\nslopes(mod_hu, variables = \"scl_prey\",\n       newdata = datagrid(scl_competitors = seq(min(pop_data$scl_competitors),\n                                                 max(pop_data$scl_competitors), length.out = 30)),\n       type = \"response\") |&gt;\n  ggplot(aes(x = scl_competitors, y = estimate)) +\n  geom_hline(yintercept = 0, color = \"blue\", linetype = 2) +\n  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.4, fill = \"lightgrey\") +\n  geom_line(linewidth = 1.5, lineend = \"round\", color = \"white\") +\n  labs(y = \"Slope of scl_prey (count scale)\", x = \"Competitors (scaled)\")\n\n\n\n\n\nCount-scale effect of prey weakens (and reverses) as competitors increase."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#isolating-the-interaction-rate-ratios",
     "href": "workshops/interactions_regression/index.html#isolating-the-interaction-rate-ratios",
     "title": "Understanding Interactions in Regression Models",
     "section": "Isolating the interaction: rate ratios",
-    "text": "Isolating the interaction: rate ratios\nA rate ratio (\\[e^\\beta\\]) stays constant regardless of where the moderator is evaluated — the cleanest way to report “the interaction itself”:\n\navg_slopes(mod_hu, variables = \"scl_prey\", by = \"scl_competitors\",\n           newdata = datagrid(scl_competitors = c(-1, 0, 1)), type = \"link\") |&gt;\n  mutate(rate_ratio = exp(estimate)) |&gt;\n  select(scl_competitors, rate_ratio, p.value)\n\n\n Pr(&gt;|z|)\n   &lt;0.001\n   0.3921\n   0.0065\n\n\nPrey’s rate ratio drops from &gt;1 (helps abundance) at low competitor density to &lt;1 (hurts abundance) at high competitor density."
+    "text": "Isolating the interaction: rate ratios\nA rate ratio stays constant regardless of where the moderator is evaluated — the cleanest way to report “the interaction itself”:\n\navg_slopes(mod_hu, variables = \"scl_prey\", by = \"scl_competitors\",\n           newdata = datagrid(scl_competitors = c(-1, 0, 1)), type = \"link\") |&gt;\n  mutate(rate_ratio = exp(estimate)) |&gt;\n  select(scl_competitors, rate_ratio, p.value)\n\n\n Pr(&gt;|z|)\n  0.01960\n  0.13341\n  0.00859\n\n\nPrey’s rate ratio drops from &gt;1 (helps abundance) at low competitor density to &lt;1 (hurts abundance) at high competitor density."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#interactions-are-symmetric",
@@ -893,7 +893,7 @@
     "href": "workshops/interactions_regression/index.html#population-scale-predictions",
     "title": "Understanding Interactions in Regression Models",
     "section": "Population-scale predictions",
-    "text": "Population-scale predictions\nCombine both model parts (type = \"response\") to get expected abundance across all plots, accounting for occurrence probability:\n\n\nCode\npredictions(mod_hu,\n  newdata = datagrid(\n    scl_prey = seq(min(pop_data$scl_prey), max(pop_data$scl_prey), length.out = 30),\n    scl_competitors = fivenum\n  ),\n  type = \"response\"\n) |&gt;\n  ggplot(aes(x = scl_prey, y = estimate, color = as.factor(scl_competitors), fill = as.factor(scl_competitors))) +\n  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.2) +\n  geom_line(linewidth = 1.5, lineend = \"round\") +\n  labs(y = \"Predicted population abundance\", x = \"Prey (scaled)\", color = \"Competitors\", fill = \"Competitors\")\n\n\n\nPopulation-scale abundance: same prey x competitors shape, shifted by occupancy."
+    "text": "Population-scale predictions\nCombine both model parts (type = \"response\") to get expected abundance across all plots, accounting for occurrence probability:\n\n\nCode\npredictions(mod_hu,\n  newdata = datagrid(\n    scl_prey = seq(min(pop_data$scl_prey), max(pop_data$scl_prey), length.out = 30),\n    scl_competitors = fivenum\n  ),\n  type = \"response\"\n) |&gt;\n  ggplot(aes(x = scl_prey, y = estimate, color = as.factor(scl_competitors), fill = as.factor(scl_competitors))) +\n  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.2) +\n  geom_line(linewidth = 1.5, lineend = \"round\") +\n  labs(y = \"Predicted population abundance\", x = \"Prey (scaled)\", color = \"Competitors\", fill = \"Competitors\")\n\n\n\n\n\nPopulation-scale abundance: same prey x competitors shape, shifted by occupancy."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#exercise-7",
@@ -921,7 +921,7 @@
     "href": "workshops/interactions_regression/index.html#exercise-solutions-instructor-notes",
     "title": "Understanding Interactions in Regression Models",
     "section": "Exercise solutions (instructor notes)",
-    "text": "Exercise solutions (instructor notes)\n\n\n\n\n\n\nExercise 1\n\n\n\nmod_mass_true &lt;- glmmTMB(weight ~ sex * snow_depth, data = bighorn_population, family = gaussian())\nMale slope = snow_depth coefficient + sexmale:snow_depth coefficient\nA naive pooled model would show a positive (or attenuated) relationship due to Simpson’s Paradox: sex confounds both snow exposure and baseline weight, so ignoring it would lead a manager to underestimate (or misjudge the direction of) the harm of a harsh winter.\n\n\n\n\n\n\n\n\n\n\nExercise 2\n\n\n\nUncorrected avg_slopes() on the biased sample is pulled toward the male slope (weaker effect) because males are overrepresented\nCorrected version (using newdata_balanced) should land closer to mean(c(male_loss, female_loss))\nWithout a known true ratio, you would need an independent, unbiased estimate of population sex ratio (e.g., aerial survey, camera trap monitoring not subject to the same capture bias) to justify reweighting\n\n\n\n\n\n\n\n\n\n\nExercise 3\n\n\n\nMirror the code from the “slope across the range of the moderator” slide, swapping the roles of temp_centered and rain_centered\nAnswer depends on the random seed / simulated draw — have students report their own CI crossing point\nExample framing: “Does the effect of temperature (exposure) on petal length depend on rainfall (moderator)?”\n\n\n\n\n\n\n\n\n\n\nExercise 5\n\n\n\nslopes(mod_1, variables = \"tree_cov\", newdata = datagrid(temp = c(min(occ_data$temp), max(occ_data$temp)), rain = c(min(occ_data$rain), max(occ_data$rain))))\nThe smallest slope occurs at whichever combination pushes predicted probability closest to 0 or 1 (flat ends of the S-curve); the largest occurs near predicted probability ≈ 0.5 (steepest part of the curve)\nReporting only the raw coefficient (~1.87) would mislead a reader into thinking tree cover has one fixed effect on occurrence probability, when in fact that effect shrinks or grows depending on rain and temperature — exactly the implicit interaction discussed above\n\n\n\n\n\n\n\n\n\n\nExercise 6\n\n\n\nRate ratio: exp(fixef(mod_2)$cond[\"temp\"]) — identical regardless of rain or tree_cov, since \\[e^\\beta\\] does not depend on other covariate values\nLocal slope: lambda * beta_temp where lambda &lt;- exp(predict(mod_2, newdata = datagrid(model = mod_2, rain = min(abund_data$rain), tree_cov = mean(abund_data$tree_cov)), type = \"link\")) — this does change with tree_cov (and rain), because it’s rescaled by the expected count \\[\\lambda\\] at each point\nThe rate ratio is constant because exponentiating a fixed additive (log-scale) effect always yields the same multiplicative factor; the local slope is not constant because it also depends on the curve’s local steepness, i.e., on \\[\\lambda\\] itself\n\n\n\n\n\n\n\n\n\n\nExercise 7\n\n\n\navg_slopes(mod_hu, variables = \"scl_tree_cov\", type = \"response\") — scl_tree_cov only enters the zi = formula, but type = \"response\" still lets you ask how it affects population-scale abundance by way of occupancy\ntype = \"conditional\" gives abundance given the plot is occupied (ignores occurrence entirely); type = \"response\" multiplies that by the predicted probability of occurrence, giving abundance across all plots\nThe mirror plot (competitors on the x-axis, one line per prey level) makes it easier to see that abundance converges to roughly the same low floor once competitors are abundant, regardless of prey — a pattern that’s harder to spot when prey is on the x-axis"
+    "text": "Exercise solutions (instructor notes)\n\n\n\n\n\n\nNoteExercise 1\n\n\n\n\n\n\nmod_mass_true &lt;- glmmTMB(weight ~ sex * snow_depth, data = bighorn_population, family = gaussian())\nMale slope = snow_depth coefficient + sexmale:snow_depth coefficient\nA naive pooled model would show a positive (or attenuated) relationship due to Simpson’s Paradox: sex confounds both snow exposure and baseline weight, so ignoring it would lead a manager to underestimate (or misjudge the direction of) the harm of a harsh winter.\n\n\n\n\n\n\n\n\n\n\nNoteExercise 2\n\n\n\n\n\n\nUncorrected avg_slopes() on the biased sample is pulled toward the male slope (weaker effect) because males are overrepresented\nCorrected version (using newdata_balanced) should land closer to mean(c(male_loss, female_loss))\nWithout a known true ratio, you would need an independent, unbiased estimate of population sex ratio (e.g., aerial survey, camera trap monitoring not subject to the same capture bias) to justify reweighting\n\n\n\n\n\n\n\n\n\n\nNoteExercise 3\n\n\n\n\n\n\nMirror the code from the “slope across the range of the moderator” slide, swapping the roles of temp_centered and rain_centered\nAnswer depends on the random seed / simulated draw — have students report their own CI crossing point\nExample framing: “Does the effect of temperature (exposure) on petal length depend on rainfall (moderator)?”\n\n\n\n\n\n\n\n\n\n\nNoteExercise 5\n\n\n\n\n\n\nslopes(mod_1, variables = \"tree_cov\", newdata = datagrid(temp = c(min(occ_data$temp), max(occ_data$temp)), rain = c(min(occ_data$rain), max(occ_data$rain))))\nThe smallest slope occurs at whichever combination pushes predicted probability closest to 0 or 1 (flat ends of the S-curve); the largest occurs near predicted probability ≈ 0.5 (steepest part of the curve)\nReporting only the raw coefficient (~1.87) would mislead a reader into thinking tree cover has one fixed effect on occurrence probability, when in fact that effect shrinks or grows depending on rain and temperature — exactly the implicit interaction discussed above\n\n\n\n\n\n\n\n\n\n\nNoteExercise 6\n\n\n\n\n\n\nRate ratio: exp(fixef(mod_2)$cond[\"temp\"]) — identical regardless of rain or tree_cov, since \\[e^\\beta\\] does not depend on other covariate values\nLocal slope: lambda * beta_temp where lambda &lt;- exp(predict(mod_2, newdata = datagrid(model = mod_2, rain = min(abund_data$rain), tree_cov = mean(abund_data$tree_cov)), type = \"link\")) — this does change with tree_cov (and rain), because it’s rescaled by the expected count \\[\\lambda\\] at each point\nThe rate ratio is constant because exponentiating a fixed additive (log-scale) effect always yields the same multiplicative factor; the local slope is not constant because it also depends on the curve’s local steepness, i.e., on \\[\\lambda\\] itself\n\n\n\n\n\n\n\n\n\n\nNoteExercise 7\n\n\n\n\n\n\navg_slopes(mod_hu, variables = \"scl_tree_cov\", type = \"response\") — scl_tree_cov only enters the zi = formula, but type = \"response\" still lets you ask how it affects population-scale abundance by way of occupancy\ntype = \"conditional\" gives abundance given the plot is occupied (ignores occurrence entirely); type = \"response\" multiplies that by the predicted probability of occurrence, giving abundance across all plots\nThe mirror plot (competitors on the x-axis, one line per prey level) makes it easier to see that abundance converges to roughly the same low floor once competitors are abundant, regardless of prey — a pattern that’s harder to spot when prey is on the x-axis"
   },
   {
     "objectID": "workshops/interactions_regression/pre_workshop_handout.html",
@@ -1727,5 +1727,110 @@
     "title": "ENT101: Échantillonnage du campus UdS",
     "section": "9.2 Gabarit de rapport étudiant",
     "text": "9.2 Gabarit de rapport étudiant\nUn gabarit Quarto de rapport de laboratoire est fourni pour vous aider à structurer votre propre analyse spatio-temporelle de données entomologiques."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#simpsons-paradox-1",
+    "href": "workshops/interactions_regression/index.html#simpsons-paradox-1",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Simpson’s Paradox",
+    "text": "Simpson’s Paradox\n\n\nCode\nggplot(bighorn_population, aes(x = snow_depth, y = weight)) +\n  geom_point(aes(color = sex)) +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"red\", linewidth = 2)\n\n\n\n\n\nIgnoring sex hides the true within-sex trends."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#pooled-vs.-within-sex",
+    "href": "workshops/interactions_regression/index.html#pooled-vs.-within-sex",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Pooled vs. within-sex",
+    "text": "Pooled vs. within-sex\nPooled: snow depth looks positively associated with weight — even though both sexes lose weight with more snow."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#testing-the-sex-difference",
+    "href": "workshops/interactions_regression/index.html#testing-the-sex-difference",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Testing the sex difference",
+    "text": "Testing the sex difference\n\npredictions(mod_mass_1, by = \"sex\") |&gt;\n  hypotheses(hypothesis = \"b1 - b2 = 0\")\n\n\n Hypothesis Estimate Std. Error     z Pr(&gt;|z|)     S 2.5 % 97.5 %\n    b1-b2=0    -41.5       2.65 -15.7   &lt;0.001 181.2 -46.7  -36.3"
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#reading-the-biased-sample-result",
+    "href": "workshops/interactions_regression/index.html#reading-the-biased-sample-result",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Reading the biased-sample result",
+    "text": "Reading the biased-sample result\nConditional (by-sex) slopes stay close to truth. But the marginal slope is biased toward the overrepresented, weaker-effect sex (males)."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#two-numerical-predictors",
+    "href": "workshops/interactions_regression/index.html#two-numerical-predictors",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Two numerical predictors",
+    "text": "Two numerical predictors\nWith two continuous predictors, an interaction means: the slope of one predictor changes as the other predictor changes — not a separate slope per group, but a sliding one.\nA raw coefficient is only “the slope when the other predictor equals zero” — meaningful only if zero is a meaningful value. This motivates centering predictors on their mean, so the intercept and main-effect coefficients describe average conditions."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#reading-the-slope-by-moderator-plot",
+    "href": "workshops/interactions_regression/index.html#reading-the-slope-by-moderator-plot",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Reading the slope-by-moderator plot",
+    "text": "Reading the slope-by-moderator plot\nThe interaction coefficient is exactly the slope of this line — how much the effect of rain changes per unit of temperature."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#response-surfaces-a-caution",
+    "href": "workshops/interactions_regression/index.html#response-surfaces-a-caution",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Response surfaces: a caution",
+    "text": "Response surfaces: a caution\nContour bins are arbitrary and hide uncertainty — good for exploration, risky for publication-quality inference. Prefer line-and-ribbon plots when you can."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#reading-the-dispersion-model-plot",
+    "href": "workshops/interactions_regression/index.html#reading-the-dispersion-model-plot",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Reading the dispersion-model plot",
+    "text": "Reading the dispersion-model plot\ntype = \"disp\" retrieves predictions/slopes for the dispersion sub-model, exactly as type = \"conditional\" does for the mean."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#the-logit-link-visualized",
+    "href": "workshops/interactions_regression/index.html#the-logit-link-visualized",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "The logit link, visualized",
+    "text": "The logit link, visualized\n\n\nCode\ntibble(log_odds = seq(-6, 6, length.out = 400)) |&gt;\n  mutate(probability = plogis(log_odds)) |&gt;\n  ggplot(aes(x = log_odds, y = probability)) +\n  geom_line(linewidth = 2) +\n  labs(x = \"log-odds scale (what the coefficient describes)\",\n       y = \"probability scale (what we care about)\")\n\n\n\n\n\nThe logit link bends a straight line into an S-shape."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#reading-the-s-curve",
+    "href": "workshops/interactions_regression/index.html#reading-the-s-curve",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Reading the S-curve",
+    "text": "Reading the S-curve\nNear the middle (p ≈ 0.5) the curve is steep: a small log-odds push moves probability a lot. Near the ends (p ≈ 0 or 1) the curve flattens: the same push barely moves probability.\nNo manual derivative needed — marginaleffects converts automatically to the scale we actually care about."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#why-the-slope-moves-around",
+    "href": "workshops/interactions_regression/index.html#why-the-slope-moves-around",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Why the slope moves around",
+    "text": "Why the slope moves around\nBecause the amount of “bending” depends on where you are on the S-curve, tree cover’s probability-scale effect depends on rain and temp too — even though we never told the model to include that interaction."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#the-log-link-bends-a-line-into-a-curve",
+    "href": "workshops/interactions_regression/index.html#the-log-link-bends-a-line-into-a-curve",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "The log link bends a line into a curve",
+    "text": "The log link bends a line into a curve\n\n\nCode\ntibble(log_count = seq(-2, 6, length.out = 400)) |&gt;\n  mutate(count = exp(log_count)) |&gt;\n  ggplot(aes(x = log_count, y = count)) +\n  geom_line(linewidth = 2) +\n  labs(x = \"log scale (what the coefficient describes)\", y = \"count scale (what we care about)\")"
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#from-log-scale-to-counts",
+    "href": "workshops/interactions_regression/index.html#from-log-scale-to-counts",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "From log scale to counts",
+    "text": "From log scale to counts\nThe log-scale tree_cov coefficient is ~0.73, not 4.5 — the same phenomenon as the logit link, just a different curve."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#computing-the-rate-ratio",
+    "href": "workshops/interactions_regression/index.html#computing-the-rate-ratio",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Computing the rate ratio",
+    "text": "Computing the rate ratio\n\nexp(fixef(mod_2)$cond[\"tree_cov\"])  # rate ratio: ~2.08, i.e. a ~108% increase per unit tree cover\n\ntree_cov \n1.658646 \n\n\nBoth describe the same underlying model — pick the one that matches your audience (percent change vs. a concrete headcount)."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html",
+    "href": "workshops/interactions_regression/index.html",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "",
+    "text": "This workshop is adapted from a two-part tutorial series on interactions in regression models:\n\nPart 1: Categorical × numerical interactions\nPart 2: Numerical × numerical interactions\nPart 3: Generalized linear models and link functions\n\nAudience: graduate students and researchers in ecology who fit GL(M)Ms and want to interpret interaction terms correctly.\nFormat: short lecture blocks, live-coded examples, and practice exercises (look for the 🧪 slides)."
   }
 ]

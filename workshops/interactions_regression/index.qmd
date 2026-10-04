@@ -1,6 +1,6 @@
 ---
 title: "Understanding Interactions in Regression Models"
-subtitle: "Categorical × numerical and numerical × numerical interactions, marginal vs. conditional effects, and common pitfalls in ecological data"
+subtitle: "Categorical × numerical and numerical × numerical interactions, marginal vs. conditional effects, and common pitfalls in ecological data analysis"
 author: "Allen Bush-Beaupré"
 date: 10-05-2026
 image: workshop_5oct_2026_announcement.png
@@ -11,9 +11,9 @@ format:
     slide-number: true
     chalkboard: true
     code-line-numbers: true
-    fig-width: 9
-    fig-height: 6
-    out-width: "90%"
+    fig-width: 11
+    fig-height: 7.5
+    out-width: "95%"
     footer: "Interactions in Regression Models"
     css: interactions_regression.css
     scrollable: true
@@ -84,7 +84,7 @@ update_geom_defaults("point", list(shape = 1, size = 3, alpha = 0.8))
 # silence marginaleffects warnings about glmmTMB
 options(marginaleffects_safe = FALSE)
 
-set.seed(4127)
+set.seed(333)
 ```
 
 ## Coding style & functions used throughout {.smaller}
@@ -106,13 +106,14 @@ A few conventions and workhorse functions you'll see on repeat:
 
 ## What is an interaction?
 
-For predictors $X_1$ and $X_2$:
+An interaction means **the effect of one predictor depends on the value of another**.
 
-$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 (X_1 \times X_2) + \epsilon$$
+- No interaction: snow depth affects weight the same way for every sheep
+- Interaction: the effect of snow depth on weight *differs by sex*
 
-$\beta_3$ is the interaction coefficient. When $\beta_3 \neq 0$, the effect of $X_1$ on $Y$ **depends on the value of** $X_2$.
+For a categorical moderator (e.g., sex) and a continuous predictor (e.g., snow depth): the interaction means the **slope** differs between categories.
 
-For a categorical $X_2$ (e.g., sex) and continuous $X_1$ (e.g., snow depth): the interaction means the **slope** of the continuous predictor differs between categories.
+Our focus today isn't the algebra — it's using `marginaleffects` to find, test, and plot "it depends."
 
 ## Conditional vs. marginal effects
 
@@ -149,7 +150,11 @@ bighorn_population <- tibble(
 
 Built-in features: different intercepts, different slopes, **and** different snow-depth distributions by sex.
 
-## Simpson's Paradox {.smaller .fig-slide}
+## Simpson's Paradox
+
+Pooling males and females together and fitting a single trend line can hide — or even reverse — the true relationship.
+
+## Simpson's Paradox {.fig-slide}
 
 ```{r}
 #| code-fold: true
@@ -158,6 +163,8 @@ ggplot(bighorn_population, aes(x = snow_depth, y = weight)) +
   geom_point(aes(color = sex)) +
   geom_smooth(method = "lm", se = FALSE, color = "red", linewidth = 2)
 ```
+
+## Pooled vs. within-sex
 
 Pooled: snow depth looks **positively** associated with weight — even though both sexes lose weight with more snow.
 
@@ -214,13 +221,13 @@ mod_mass_1 <- glmmTMB(weight ~ sex * snow_depth,
 
 Useful for hypothesis tests, not directly interpretable for "what's the effect for males?" — that's what `marginaleffects` is for.
 
-## Model coefficients {.smaller}
+## Model coefficients {.table-slide}
 
 ```{r}
 summary(mod_mass_1)$coefficients$cond
 ```
 
-## Q1: Do sexes differ in spring mass?
+## Q1: Do sexes differ in spring mass? {.table-slide}
 
 ```{r}
 predictions(mod_mass_1, by = "sex")
@@ -228,12 +235,14 @@ predictions(mod_mass_1, by = "sex")
 
 This is a **marginal prediction**: the model-implied mean for each sex, averaged over the observed snow-depth distribution in the sample.
 
+## Testing the sex difference {.table-slide}
+
 ```{r}
 predictions(mod_mass_1, by = "sex") |>
   hypotheses(hypothesis = "b1 - b2 = 0")
 ```
 
-## Q2: Does snow depth affect mass equally by sex? {.smaller .fig-slide}
+## Q2: Does snow depth affect mass equally by sex? {.fig-slide}
 
 ```{r}
 #| code-fold: true
@@ -246,14 +255,14 @@ slopes(mod_mass_1, variables = "snow_depth", by = "sex", vcov = TRUE) |>
   theme(legend.position = "none")
 ```
 
-## Testing the slope difference
+## Testing the slope difference {.table-slide}
 
 ```{r}
 slopes(mod_mass_1, variables = "snow_depth", by = "sex", vcov = TRUE) |>
   hypotheses(hypothesis = "b1 - b2 = 0")
 ```
 
-## Q3: What's the population-average slope?
+## Q3: What's the population-average slope? {.table-slide}
 
 `avg_slopes()` computes the slope for every observation, then averages:
 
@@ -265,7 +274,7 @@ avg_slopes(mod_mass_1, variables = "snow_depth", vcov = TRUE)
 mean(c(male_loss, female_loss))  # true simulated average
 ```
 
-## Marginal vs conditional, visualized {.smaller .fig-slide}
+## Marginal vs conditional, visualized {.fig-slide}
 
 ```{r}
 #| code-fold: true
@@ -289,7 +298,7 @@ ggplot() +
   coord_cartesian(ylim = c(50, 220))
 ```
 
-## Scenario 2: biased sampling (80% male)
+## Scenario 2: biased sampling (80% male) {.table-slide}
 
 ```{r}
 bighorn_mass_2 <- bind_rows(
@@ -299,6 +308,8 @@ bighorn_mass_2 <- bind_rows(
 mod_mass_2 <- glmmTMB(weight ~ sex * snow_depth, data = bighorn_mass_2, family = gaussian())
 avg_slopes(mod_mass_2, variables = "snow_depth", vcov = TRUE)
 ```
+
+## Reading the biased-sample result
 
 Conditional (by-sex) slopes stay close to truth. But the **marginal** slope is biased toward the overrepresented, weaker-effect sex (males).
 
@@ -340,17 +351,11 @@ Using `mod_mass_2` (the biased sample model):
 
 # Part 2 — Numerical × Numerical Interactions
 
-## The math, revisited
+## Two numerical predictors
 
-$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 (X_1 \times X_2) + \epsilon$$
+With two continuous predictors, an interaction means: **the slope of one predictor changes as the other predictor changes** — not a separate slope per group, but a sliding one.
 
-Regrouping terms in $X_1$:
-
-$$Y = \beta_0 + (\beta_1 + \beta_3 X_2)\, X_1 + \beta_2 X_2 + \epsilon$$
-
-The slope of $X_1$ is now **itself a linear function of** $X_2$: it equals $\beta_1 + \beta_3 X_2$. Symmetrically, the slope of $X_2$ is $\beta_2 + \beta_3 X_1$.
-
-$\beta_1$ alone is only the slope of $X_1$ when $X_2 = 0$ — meaningful only if zero is a meaningful value of $X_2$. This motivates **centering**.
+A raw coefficient is only "the slope when the other predictor equals zero" — meaningful only if zero is a meaningful value. This motivates **centering** predictors on their mean, so the intercept and main-effect coefficients describe *average* conditions.
 
 ## Case study: petal length
 
@@ -379,7 +384,7 @@ flower_measurements_1 <- tibble(
 )
 ```
 
-## Fit the model
+## Fit the model {.table-slide}
 
 ```{r}
 mod_flower_1 <- glmmTMB(petal_length ~ temp_centered * rain_centered,
@@ -389,7 +394,7 @@ summary(mod_flower_1)$coefficients$cond
 
 Every term has a small p-value — but what do these numbers *mean* for our research question? Time to unpack them.
 
-## Slope of one predictor at a single value of the other
+## Slope of one predictor at a single value of the other {.table-slide}
 
 ```{r}
 # Effect of temperature when rain_centered = 0 (i.e., average rain)
@@ -399,7 +404,7 @@ slopes(mod_flower_1, newdata = datagrid(rain_centered = 0),
 
 This matches the `temp_centered` coefficient directly — because rain is centered, "at rain = 0" means "at average rain."
 
-## Slope across the *range* of the moderator {.smaller .fig-slide}
+## Slope across the *range* of the moderator {.fig-slide}
 
 ```{r}
 #| code-fold: true
@@ -425,9 +430,11 @@ slopes_by_temp |>
   labs(y = "Effect of rain on petal length", x = "Temperature values")
 ```
 
+## Reading the slope-by-moderator plot
+
 The interaction coefficient is exactly the slope of this line — how much the effect of rain *changes* per unit of temperature.
 
-## Visualizing predictions at chosen moderator values {.smaller .fig-slide}
+## Visualizing predictions at chosen moderator values {.fig-slide}
 
 Common choice: the [five-number summary](https://en.wikipedia.org/wiki/Five-number_summary) of the moderator.
 
@@ -450,7 +457,7 @@ predictions(mod_flower_1,
   coord_cartesian(ylim = c(0, 50))
 ```
 
-## Response surfaces — use with caution {.smaller .fig-slide}
+## Response surfaces — use with caution {.fig-slide}
 
 ```{r}
 #| code-fold: true
@@ -467,6 +474,8 @@ predictions(mod_flower_1,
   stat_contour_filled() +
   labs(x = "Rain", y = "Temperature", fill = "Predicted petal length")
 ```
+
+## Response surfaces: a caution
 
 Contour bins are arbitrary and hide uncertainty — good for exploration, risky for publication-quality inference. Prefer line-and-ribbon plots when you can.
 
@@ -503,7 +512,7 @@ mod_flower_2 <- glmmTMB(petal_length ~ temp_centered,
                          data = flower_measurements_2)
 ```
 
-## Checking the dispersion model {.smaller .fig-slide}
+## Checking the dispersion model {.fig-slide}
 
 ```{r}
 #| code-fold: true
@@ -527,6 +536,8 @@ ggplot() +
   scale_color_manual(values = c("Simulated" = "green", "Estimated" = "red"), name = "Standard deviation") +
   labs(x = "Temperature", y = "Standard deviation")
 ```
+
+## Reading the dispersion-model plot
 
 `type = "disp"` retrieves predictions/slopes for the dispersion sub-model, exactly as `type = "conditional"` does for the mean.
 
@@ -586,18 +597,20 @@ occ_data <- tibble(
       occurence_temp_effect * temp))
 ```
 
-## Fit the model {.smaller}
+## Fit the model {.table-slide}
 
 ```{r}
 mod_1 <- glmmTMB(occurence ~ tree_cov + rain + temp, family = binomial(link = "logit"), data = occ_data)
 summary(mod_1)$coefficients$cond
 ```
 
-We simulated the effect of tree cover to be **0.45** on the probability scale, but the model reports **~1.87**. Did the model get it wrong?
+We simulated the effect of tree cover to be **0.45** on the probability scale, but the model reports **\~1.87**. Did the model get it wrong?
 
 ## No — it's reporting a different scale
 
 The logit-link GLM draws a straight line through the **log-odds** of occurrence, then bends that line into an S-shape to get back to a probability.
+
+## The logit link, visualized {.fig-slide}
 
 ```{r}
 #| code-fold: true
@@ -610,23 +623,13 @@ tibble(log_odds = seq(-6, 6, length.out = 400)) |>
        y = "probability scale (what we care about)")
 ```
 
+## Reading the S-curve
+
 Near the middle (p ≈ 0.5) the curve is steep: a small log-odds push moves probability a lot. Near the ends (p ≈ 0 or 1) the curve flattens: the same push barely moves probability.
 
-## From log-odds to probability, by hand
+No manual derivative needed — `marginaleffects` converts automatically to the scale we actually care about.
 
-The derivative of the inverse-logit gives the conversion: if $\eta$ is the log-odds and $p = \text{logit}^{-1}(\eta)$,
-
-$$\frac{dp}{dX} = p(1-p) \times \beta$$
-
-```{r}
-beta_tree <- fixef(mod_1)$cond["tree_cov"]
-eta <- predict(mod_1, newdata = datagrid(model = mod_1, temp = mean(occ_data$temp),
-                                          rain = mean(occ_data$rain)), type = "link")
-p <- plogis(eta)
-p * (1 - p) * beta_tree  # matches slopes() below, and is close to our simulated 0.45
-```
-
-## `marginaleffects` does this for us
+## `marginaleffects` does this for us {.table-slide}
 
 ```{r}
 slopes(mod_1, variables = "tree_cov",
@@ -635,7 +638,7 @@ slopes(mod_1, variables = "tree_cov",
 
 `slopes()` asks: "at these covariate values, how much does *predicted probability* change for a small increase in tree cover?" — a probability-scale answer, directly comparable to how we simulated the data.
 
-## The implicit interaction, visualized {.smaller .fig-slide}
+## The implicit interaction, visualized {.fig-slide}
 
 ```{r}
 #| code-fold: true
@@ -647,6 +650,8 @@ slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = 
   facet_grid(rain ~ temp) +
   theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.line.y = element_blank())
 ```
+
+## Why the slope moves around
 
 Because the amount of "bending" depends on where you are on the S-curve, tree cover's probability-scale effect depends on rain and temp too — even though we never told the model to include that interaction.
 
@@ -696,7 +701,7 @@ abund_data <- tibble(
 mod_2 <- glmmTMB(abundance ~ tree_cov + rain + temp, family = poisson(link = "log"), data = abund_data)
 ```
 
-## The log link bends a line into an exponential curve
+## The log link bends a line into a curve {.fig-slide}
 
 ```{r}
 #| code-fold: true
@@ -707,12 +712,16 @@ tibble(log_count = seq(-2, 6, length.out = 400)) |>
   labs(x = "log scale (what the coefficient describes)", y = "count scale (what we care about)")
 ```
 
-The log-scale `tree_cov` coefficient is **~0.73**, not 4.5. The local rate of change on the count scale is $$\lambda \cdot \beta$$ (the expected count itself, times the log-scale coefficient) — the count-scale analogue of $$p(1-p)\cdot\beta$$.
+## From log scale to counts
+
+The log-scale `tree_cov` coefficient is **\~0.73**, not 4.5 — the same phenomenon as the logit link, just a different curve.
 
 ## Two ways to report a log-link coefficient
 
-- **Rate ratio** ($$e^\beta$$): a *constant* multiplicative effect, valid everywhere — "each unit increase in tree cover multiplies expected abundance by this factor, regardless of rain or temp"
-- **Local slope** ($$\lambda \cdot \beta$$): an *additive*, count-scale effect ("this many more individuals"), but only valid near the specific covariate values used
+- **Rate ratio**: a *constant* multiplicative effect, valid everywhere — "each unit increase in tree cover multiplies expected abundance by this factor, regardless of rain or temp"
+- **Local slope**: an *additive*, count-scale effect ("this many more individuals"), but only valid near the specific covariate values used
+
+## Computing the rate ratio {.table-slide}
 
 ```{r}
 exp(fixef(mod_2)$cond["tree_cov"])  # rate ratio: ~2.08, i.e. a ~108% increase per unit tree cover
@@ -737,7 +746,7 @@ In reality, a species first has to be **present** before we can measure its abun
 - A **binomial** (logit-link) component: does a plot clear the "hurdle" of zero? (occurrence)
 - A **truncated count** component: given it's non-zero, how many individuals? (abundance when present)
 
-Two ways to interpret: each part **separately** (what drives occurrence vs. abundance), or **combined** on the population scale (expected abundance across *all* plots = P(occurrence) × E[abundance | present]).
+Two ways to interpret: each part **separately** (what drives occurrence vs. abundance), or **combined** on the population scale (expected abundance across *all* plots = P(occurrence) × E\[abundance \| present\]).
 
 ## Simulating with an explicit interaction {.smaller}
 
@@ -763,7 +772,7 @@ pop_data <- tibble(
   mutate(across(c(tree_cov, prey, competitors), ~ (.x - mean(.x)) / sd(.x), .names = "scl_{.col}"))
 ```
 
-## Fitting the hurdle model {.smaller}
+## Fitting the hurdle model {.table-slide}
 
 ```{r}
 mod_hu <- glmmTMB(
@@ -777,7 +786,7 @@ summary(mod_hu)$coefficients$cond
 
 `zi = ~ scl_tree_cov`: the zero-inflation (occurrence) part. The conditional formula's `scl_prey * scl_competitors` is an **explicit** interaction, layered on top of the log link's *implicit* one.
 
-## The interaction on the count scale {.smaller .fig-slide}
+## The interaction on the count scale {.fig-slide}
 
 ```{r}
 #| code-fold: true
@@ -793,9 +802,9 @@ slopes(mod_hu, variables = "scl_prey",
   labs(y = "Slope of scl_prey (count scale)", x = "Competitors (scaled)")
 ```
 
-## Isolating the interaction: rate ratios {.smaller}
+## Isolating the interaction: rate ratios {.table-slide}
 
-A rate ratio ($$e^\beta$$) stays constant regardless of where the moderator is evaluated — the cleanest way to report "the interaction itself":
+A rate ratio stays constant regardless of where the moderator is evaluated — the cleanest way to report "the interaction itself":
 
 ```{r}
 avg_slopes(mod_hu, variables = "scl_prey", by = "scl_competitors",
@@ -804,7 +813,7 @@ avg_slopes(mod_hu, variables = "scl_prey", by = "scl_competitors",
   select(scl_competitors, rate_ratio, p.value)
 ```
 
-Prey's rate ratio drops from >1 (helps abundance) at low competitor density to \<1 (hurts abundance) at high competitor density.
+Prey's rate ratio drops from \>1 (helps abundance) at low competitor density to \<1 (hurts abundance) at high competitor density.
 
 ## Interactions are symmetric
 
@@ -812,7 +821,7 @@ Prey's rate ratio drops from >1 (helps abundance) at low competitor density to \
 
 **Practical check**: if you always plot "A moderated by B," try the mirror-image plot ("B moderated by A") before deciding which (or both) to report.
 
-## Population-scale predictions {.smaller .fig-slide}
+## Population-scale predictions {.fig-slide}
 
 Combine both model parts (`type = "response"`) to get expected abundance across *all* plots, accounting for occurrence probability:
 
@@ -889,7 +898,7 @@ Using `mod_hu`:
 
 - `slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = c(min(occ_data$temp), max(occ_data$temp)), rain = c(min(occ_data$rain), max(occ_data$rain))))`
 - The smallest slope occurs at whichever combination pushes predicted probability closest to 0 or 1 (flat ends of the S-curve); the largest occurs near predicted probability ≈ 0.5 (steepest part of the curve)
-- Reporting only the raw coefficient (~1.87) would mislead a reader into thinking tree cover has one fixed effect on occurrence probability, when in fact that effect shrinks or grows depending on rain and temperature — exactly the implicit interaction discussed above
+- Reporting only the raw coefficient (\~1.87) would mislead a reader into thinking tree cover has one fixed effect on occurrence probability, when in fact that effect shrinks or grows depending on rain and temperature — exactly the implicit interaction discussed above
 :::
 
 ::: {.callout-note collapse="true"}
