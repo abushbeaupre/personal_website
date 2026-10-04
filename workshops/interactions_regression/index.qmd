@@ -618,7 +618,7 @@ The logit-link GLM draws a straight line through the **log-odds** of occurrence,
 tibble(log_odds = seq(-6, 6, length.out = 400)) |>
   mutate(probability = plogis(log_odds)) |>
   ggplot(aes(x = log_odds, y = probability)) +
-  geom_line(linewidth = 2) +
+  geom_line(color = "white", linewidth = 2, lineend = "round") +
   labs(x = "log-odds scale (what the coefficient describes)",
        y = "probability scale (what we care about)")
 ```
@@ -645,8 +645,8 @@ slopes(mod_1, variables = "tree_cov",
 #| fig-cap: "The tree-cover slope on the probability scale changes across rain × temp, though no interaction term exists in the model."
 slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = fivenum)) |>
   ggplot() +
-  geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1)) +
-  geom_vline(xintercept = occurence_tree_effect, alpha = .8) +
+  geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1), color = "white") +
+  geom_vline(xintercept = occurence_tree_effect, color = "white", alpha = .8) +
   facet_grid(rain ~ temp) +
   theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.line.y = element_blank())
 ```
@@ -708,7 +708,7 @@ mod_2 <- glmmTMB(abundance ~ tree_cov + rain + temp, family = poisson(link = "lo
 tibble(log_count = seq(-2, 6, length.out = 400)) |>
   mutate(count = exp(log_count)) |>
   ggplot(aes(x = log_count, y = count)) +
-  geom_line(linewidth = 2) +
+  geom_line(color = "white", linewidth = 2, lineend = "round") +
   labs(x = "log scale (what the coefficient describes)", y = "count scale (what we care about)")
 ```
 

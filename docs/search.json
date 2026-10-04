@@ -802,7 +802,7 @@
     "href": "workshops/interactions_regression/index.html#the-implicit-interaction-visualized",
     "title": "Understanding Interactions in Regression Models",
     "section": "The implicit interaction, visualized",
-    "text": "The implicit interaction, visualized\n\n\nCode\nslopes(mod_1, variables = \"tree_cov\", newdata = datagrid(temp = fivenum, rain = fivenum)) |&gt;\n  ggplot() +\n  geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1)) +\n  geom_vline(xintercept = occurence_tree_effect, alpha = .8) +\n  facet_grid(rain ~ temp) +\n  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.line.y = element_blank())\n\n\n\nThe tree-cover slope on the probability scale changes across rain × temp, though no interaction term exists in the model."
+    "text": "The implicit interaction, visualized\n\n\nCode\nslopes(mod_1, variables = \"tree_cov\", newdata = datagrid(temp = fivenum, rain = fivenum)) |&gt;\n  ggplot() +\n  geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1), color = \"white\") +\n  geom_vline(xintercept = occurence_tree_effect, color = \"white\", alpha = .8) +\n  facet_grid(rain ~ temp) +\n  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.line.y = element_blank())\n\n\n\nThe tree-cover slope on the probability scale changes across rain × temp, though no interaction term exists in the model."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#a-note-on-measurement-scale-spake-et-al.-2023",
@@ -1789,7 +1789,7 @@
     "href": "workshops/interactions_regression/index.html#the-logit-link-visualized",
     "title": "Understanding Interactions in Regression Models",
     "section": "The logit link, visualized",
-    "text": "The logit link, visualized\n\n\nCode\ntibble(log_odds = seq(-6, 6, length.out = 400)) |&gt;\n  mutate(probability = plogis(log_odds)) |&gt;\n  ggplot(aes(x = log_odds, y = probability)) +\n  geom_line(linewidth = 2) +\n  labs(x = \"log-odds scale (what the coefficient describes)\",\n       y = \"probability scale (what we care about)\")\n\n\n\nThe logit link bends a straight line into an S-shape."
+    "text": "The logit link, visualized\n\n\nCode\ntibble(log_odds = seq(-6, 6, length.out = 400)) |&gt;\n  mutate(probability = plogis(log_odds)) |&gt;\n  ggplot(aes(x = log_odds, y = probability)) +\n  geom_line(color = \"white\", linewidth = 2, lineend = \"round\") +\n  labs(x = \"log-odds scale (what the coefficient describes)\",\n       y = \"probability scale (what we care about)\")\n\n\n\nThe logit link bends a straight line into an S-shape."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#reading-the-s-curve",
@@ -1810,7 +1810,7 @@
     "href": "workshops/interactions_regression/index.html#the-log-link-bends-a-line-into-a-curve",
     "title": "Understanding Interactions in Regression Models",
     "section": "The log link bends a line into a curve",
-    "text": "The log link bends a line into a curve\n\n\nCode\ntibble(log_count = seq(-2, 6, length.out = 400)) |&gt;\n  mutate(count = exp(log_count)) |&gt;\n  ggplot(aes(x = log_count, y = count)) +\n  geom_line(linewidth = 2) +\n  labs(x = \"log scale (what the coefficient describes)\", y = \"count scale (what we care about)\")"
+    "text": "The log link bends a line into a curve\n\n\nCode\ntibble(log_count = seq(-2, 6, length.out = 400)) |&gt;\n  mutate(count = exp(log_count)) |&gt;\n  ggplot(aes(x = log_count, y = count)) +\n  geom_line(color = \"white\", linewidth = 2, lineend = \"round\") +\n  labs(x = \"log scale (what the coefficient describes)\", y = \"count scale (what we care about)\")"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#from-log-scale-to-counts",
