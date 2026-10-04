@@ -11,9 +11,9 @@ format:
     slide-number: true
     chalkboard: true
     code-line-numbers: true
-    fig-width: 11
-    fig-height: 7.5
-    out-width: "95%"
+    fig-width: 8
+    fig-height: 5.5
+    out-width: "75%"
     footer: "Interactions in Regression Models"
     css: interactions_regression.css
     scrollable: true
