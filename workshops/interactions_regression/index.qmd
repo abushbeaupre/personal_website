@@ -62,6 +62,7 @@ library(marginaleffects) # Compute marginal/conditional effects
 library(patchwork)       # Combine multiple plots
 library(GGally)          # Pairwise plots
 library(distributional)  # Simulate mixture/gamma/normal distributions (Part 3)
+library(ggdist)          # stat_slab() for predicted-distribution plots (Part 3)
 
 # Set ggplot2 theme
 black_theme <- theme(
@@ -194,7 +195,7 @@ Using `bighorn_population`:
 
 1.  Fit `weight ~ sex * snow_depth` with `glmmTMB()`. Call it `mod_mass_true`.
 2.  From the summary, identify which coefficient represents the **male** slope of snow depth. (Hint: it's not printed directly — you have to add two rows together.)
-3.  In one sentence, explain why a naive `weight ~ snow_depth` model (ignoring sex) would mislead a manager trying to understand the effect of a harsh winter.
+3.  In one sentence, explain why a naive `weight ~ snow_depth` model (ignoring sex) would mislead a manager trying to understand the effect of a harsh winter. Can you think of an example of such situation in your own field or research?
 
 *(\~5 minutes — discuss with a neighbor)*
 
@@ -329,7 +330,13 @@ newdata_balanced <- bighorn_mass_2 |>
   ungroup()
 ```
 
-## Comparing biased and unbiased prediction grids
+## Exercise 2
+
+Using the model that was fit to the entire population and the one with a biased sample, use the avg_predictions() function along with a balanced and unbalanced prediction grid to create a plot comparing the marginal predictions between the true population, biased population predictions and corrected population predictions. There should be three trend lines.
+
+*(\~15 minutes)*
+
+## Comparing biased and unbiased prediction grids {.fig-slide}
 
 ```{r}
 #| code-fold: true
@@ -351,16 +358,6 @@ bind_rows(
        x = "Snow depth (cm)",
        color = "Prediction type")
 ```
-
-## Exercise 2
-
-Using `mod_mass_2` (the biased sample model):
-
-1.  Compute `avg_slopes()` **without** correcting for sampling bias, and again **with** the balanced `newdata_balanced` grid.
-2.  Which one is closer to the true average slope, `mean(c(male_loss, female_loss))`?
-3.  Suppose instead you *didn't* know the true sex ratio in the population — what additional data would you need to collect to justify a correction like this?
-
-*(\~7 minutes — try it in your own script, then we'll compare answers)*
 
 ## Part 1 takeaways
 
@@ -500,7 +497,7 @@ predictions(mod_flower_1,
 
 Contour bins are arbitrary and hide uncertainty — good for exploration, risky for publication-quality inference. Prefer line-and-ribbon plots when you can.
 
-## 🧪 Exercise 3
+## Exercise 3
 
 Using `mod_flower_1`:
 
@@ -508,7 +505,7 @@ Using `mod_flower_1`:
 2.  At what value of rain does the temperature effect become non-significant (CI crosses zero), if at all?
 3.  Rewrite the research question this model could answer as a single sentence, identifying which variable is the *exposure* and which is the *moderator*.
 
-*(\~7 minutes)*
+*(\~10 minutes)*
 
 ## Interactions beyond the mean: distributional regression
 
@@ -528,6 +525,26 @@ flower_measurements_2 <- tibble(
     sd = exp(log_sd_intercept + log_sd_temp_slope * temp_centered))
 )
 
+```
+
+## The spread around the trend increases with temperature {.fig-slide}
+
+```{r}
+#| code-fold: true
+ggplot(flower_measurements_2, aes(x = temp_centered + mean(temperature), y = petal_length)) +
+  geom_smooth(method = 'lm',     
+              lineend = "round",
+              linewidth = 2,
+              color = "white",
+              se = F) + 
+  geom_point(color = "white") +
+  labs(x = "Temperature",
+       y = "Observed petal length")
+```
+
+## Specifying the model
+
+```{r}
 mod_flower_2 <- glmmTMB(petal_length ~ temp_centered,
                          dispformula = ~ temp_centered,
                          data = flower_measurements_2)
@@ -550,7 +567,7 @@ ggplot() +
             linewidth = 2, linetype = "dashed") +
   geom_ribbon(data = pred_sd_temp,
               aes(ymin = conf.low, ymax = conf.high, x = temp_centered + mean(temperature)),
-              fill = "red", alpha = 0.6) +
+              fill = "red", alpha = 0.2) +
   geom_line(data = pred_sd_temp,
             aes(x = temp_centered + mean(temperature), y = estimate, color = "Estimated"),
             linewidth = 2, lineend = "round") +
@@ -562,15 +579,76 @@ ggplot() +
 
 `type = "disp"` retrieves predictions/slopes for the dispersion sub-model, exactly as `type = "conditional"` does for the mean.
 
-## 🧪 Exercise 4 (challenge)
+## Simulating and fitting interactions on the standard deviation
 
-Extend `mod_flower_2` by adding `rain_centered` and a `temp_centered * rain_centered` interaction to **both** the conditional formula and the `dispformula`.
+```{r}
+log_sd_rain_slope <- 0.02        
+log_sd_interaction_effect <- 0.005 
 
-1.  Fit the model on simulated data of your own design (or reuse the logic from `flower_measurements_2`, adding a rain effect and interaction term on the log-sd scale).
-2.  Produce one plot showing how the effect of rain on the **standard deviation** of petal length changes across temperature.
-3.  In plain language, describe a real ecological scenario (not necessarily plants) where an interaction on variance, rather than the mean, would be the interesting finding.
+tibble(temp_centered = temperature - mean(temperature),
+       rain_centered = rain - mean(rain),
+       petal_length = rnorm(
+                        n = n_flowers,
+                        mean = avg_petal_length +
+                          temperature_effect * temp_centered +
+                          rain_effect * rain_centered,
+                        sd = exp(log_sd_intercept + 
+                           log_sd_temp_slope * temp_centered +
+                           log_sd_rain_slope * rain_centered +
+                           log_sd_interaction_effect* temp_centered * rain_centered))) -> flower_measurements_3
 
-*(\~10 minutes — this is open-ended; there's no single correct answer)*
+mod_flower_measurements_3 <- glmmTMB(petal_length ~ temp_centered + rain_centered,
+                                     dispformula = ~ temp_centered+ rain_centered + temp_centered*rain_centered,
+                                     data = flower_measurements_3)
+```
+
+## Interpretation
+
+We can interpret the interactive effects of rain and temperature on the standard deviation of petal length in the same way that we would for the average. Examples are shown in the Numerical x Numerical Interactions tutorial online. I want to display another way to communicate the results. Knowing that the two parameters of the Normal distribution act together to generate the observations, we can predict new distributions of observations for different predictor values.
+
+## Predicting new observations {.fig-slide}
+
+```{r}
+predictions(mod_flower_measurements_3,
+            newdata = datagrid(
+              temp_centered = fivenum,
+              rain_centered = fivenum
+            ),
+            type = "conditional") |>
+  as_tibble() |>
+  select(temp_centered, rain_centered, estimate) |>
+  rename(mu = estimate) |>
+  left_join(predictions(mod_flower_measurements_3,
+            newdata = datagrid(
+              temp_centered = fivenum,
+              rain_centered = fivenum
+            ),
+            type = "disp") |>
+  as_tibble() |>
+  select(temp_centered, rain_centered, estimate) |>
+  rename(sd = estimate)) |>
+  rowwise() |>
+  mutate(temp_centered = round(temp_centered),
+         rain_centered = round(rain_centered),
+         pred_obs = dist_normal(mu = mu, sd = sd)) -> predicted_observations
+
+temp_labels <- c(
+  `-38` = "temp = -38",
+  `-9` = "temp = -9",
+  `1` = "temp = 1",
+  `9` = "temp = 9",
+  `36` = "temp = 36")
+
+ggplot(predicted_observations, aes(xdist = pred_obs, color = as.factor(rain_centered))) +
+  stat_slab(fill = NA, normalize = "xy") +
+  scale_color_brewer(palette = "Accent") +
+  facet_wrap(~ as.factor(temp_centered), scales = "free", labeller = as_labeller(temp_labels)) +
+  labs(x = "Predicted petal length", color = "Rain (centered)") +
+  theme(axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        strip.text = element_text(color = "black", face = "bold", size = 12))
+```
 
 ## Part 2 takeaways
 
