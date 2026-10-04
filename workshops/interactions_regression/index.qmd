@@ -24,7 +24,7 @@ execute:
 
 ## Welcome
 
-This workshop is adapted from a two-part tutorial series on interactions in regression models:
+This workshop is adapted from a three-part tutorial series on interactions in regression models:
 
 - Part 1: [Categorical × numerical interactions](../../posts/interactions_categorical_numerical/index.qmd)
 - Part 2: [Numerical × numerical interactions](../../posts/interactions_numerical_numerical/index.qmd)
@@ -611,6 +611,7 @@ We can interpret the interactive effects of rain and temperature on the standard
 ## Predicting new observations {.fig-slide}
 
 ```{r}
+#| code-fold: true
 predictions(mod_flower_measurements_3,
             newdata = datagrid(
               temp_centered = fivenum,
@@ -634,12 +635,12 @@ predictions(mod_flower_measurements_3,
          rain_centered = round(rain_centered),
          pred_obs = dist_normal(mu = mu, sd = sd)) -> predicted_observations
 
-temp_labels <- c(
-  `-38` = "temp = -38",
-  `-9` = "temp = -9",
-  `1` = "temp = 1",
-  `9` = "temp = 9",
-  `36` = "temp = 36")
+# Build facet labels dynamically from the actual rounded temp_centered values
+# (hardcoding them would silently show NA facet labels if the simulated data changes)
+temp_labels <- setNames(
+  paste0("temp = ", sort(unique(predicted_observations$temp_centered))),
+  sort(unique(predicted_observations$temp_centered))
+)
 
 ggplot(predicted_observations, aes(xdist = pred_obs, color = as.factor(rain_centered))) +
   stat_slab(fill = NA, normalize = "xy") +
@@ -1237,58 +1238,258 @@ Unlike the count-scale slide, this one is linear in competitors by construction 
 
 ## Isolating the interaction: rate ratios {.table-slide}
 
-A rate ratio stays constant regardless of where the moderator is evaluated — the cleanest way to report "the interaction itself":
+To isolate something closer to “the interaction itself,” we move to the rate-ratio scale: for each one-SD increase in competitors, by what *factor* does the effect of one extra SD of prey get multiplied? That’s `exp()` of the interaction coefficient, and because it lives on the model’s own additive (log) scale, it doesn’t depend on where competitors are evaluated — unlike the count-scale slope.
 
 ```{r}
-avg_slopes(mod_hu, variables = "scl_prey", by = "scl_competitors",
-           newdata = datagrid(scl_competitors = c(-1, 0, 1)), type = "link") |>
-  mutate(rate_ratio = exp(estimate)) |>
-  select(scl_competitors, rate_ratio, p.value)
+rate_ratio_interaction_tbl <- avg_slopes(mod_hu, variables = "scl_prey",
+                                          by = "scl_competitors",
+                                          newdata = datagrid(scl_competitors = c(-1, 0, 1)),
+                                          type = "link") |>
+  as_tibble() |>
+  mutate(rate_ratio = exp(estimate), rr_low = exp(conf.low), rr_high = exp(conf.high)) |>
+  select(scl_competitors, rate_ratio, rr_low, rr_high, p.value) |>
+  mutate(
+    across(c(rate_ratio, rr_low, rr_high), ~ round(.x, 3)),
+    p.value = if_else(p.value < 0.001, "<0.001", as.character(round(p.value, 3)))
+  ) |>
+  mutate(CI_95 = glue::glue("[{rr_low}, {rr_high}]")) |>
+  select(`Competitors (scaled)` = scl_competitors, `Rate ratio for scl_prey` = rate_ratio, `95% CI` = CI_95, `p-value` = p.value)
+
+rate_ratio_interaction_tbl |>
+  tt(caption = "Rate ratio of scl_prey's effect on abundance, evaluated at three levels of scl_competitors")
 ```
 
-Prey's rate ratio drops from \>1 (helps abundance) at low competitor density to \<1 (hurts abundance) at high competitor density.
+Prey's rate ratio drops from \>1 (increasing abundance) at low competitor density to \<1 (decreasing abundance) at high competitor density.
 
-## Interactions are symmetric
-
-`scl_prey:scl_competitors` is the *same* coefficient as `scl_competitors:scl_prey` — there's no statistical reason to always put one variable on the x-axis and the other as color/facet. Showing only one direction risks reporting half the story (Spake et al. 2023).
-
-**Practical check**: if you always plot "A moderated by B," try the mirror-image plot ("B moderated by A") before deciding which (or both) to report.
-
-## Population-scale predictions {.fig-slide}
-
-Combine both model parts (`type = "response"`) to get expected abundance across *all* plots, accounting for occurrence probability:
+## Predicted abundance, by competitor level {.fig-slide}
 
 ```{r}
 #| code-fold: true
-#| fig-cap: "Population-scale abundance: same prey x competitors shape, shifted by occupancy."
+#| fig-cap: "Abundance-when-present predictions across prey, one line per competitor five-number-summary level."
 predictions(mod_hu,
   newdata = datagrid(
     scl_prey = seq(min(pop_data$scl_prey), max(pop_data$scl_prey), length.out = 30),
     scl_competitors = fivenum
   ),
-  type = "response"
+  type = "conditional"
 ) |>
-  ggplot(aes(x = scl_prey, y = estimate, color = as.factor(scl_competitors), fill = as.factor(scl_competitors))) +
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.2) +
-  geom_line(linewidth = 1.5, lineend = "round") +
-  labs(y = "Predicted population abundance", x = "Prey (scaled)", color = "Competitors", fill = "Competitors")
+  mutate(prey = scl_prey * sd(pop_data$prey) + mean(pop_data$prey),
+         competitors = round(scl_competitors * sd(pop_data$competitors) + mean(pop_data$competitors), 1)) |>
+  ggplot() +
+  geom_ribbon(aes(x = prey, ymin = conf.low, ymax = conf.high, fill = as.factor(competitors)), alpha = 0.2) +
+  geom_line(aes(x = prey, y = estimate, color = as.factor(competitors)), linewidth = 1.5, lineend = "round") +
+  labs(y = "Predicted abundance\n(when present)", x = "Prey", color = "Competitors", fill = "Competitors")
 ```
 
-## 🧪 Exercise 7
+At low competitor density, abundance climbs steeply with prey; by the time competitors are abundant, the prey curve is nearly flat — the same shrinking slope we saw before, now shown as predicted trends rather than slopes.
 
-Using `mod_hu`:
+## Population-scale picture: low vs. high tree cover {.fig-slide}
 
-1.  Compute `avg_slopes()` for `scl_tree_cov` (hint: it only appears in the `zi =` part — you'll need `type = "zprob"` or `type = "response"`, not `"conditional"`).
-2.  In one sentence, explain the difference between `type = "conditional"` and `type = "response"` predictions for this model.
-3.  Build the mirror-image plot from the "interactions are symmetric" slide (competitors on the x-axis, one line per prey level) and describe one thing it shows that the original plot doesn't.
+```{r}
+#| code-fold: true
+#| fig-cap: "Population-scale (response) predictions: prey x competitors, faceted by low vs. high tree cover."
+# Locate the two peaks of tree_cov's bimodal distribution, as scaled values
+d <- density(pop_data$tree_cov)
+peaks <- d$x[which(diff(sign(diff(d$y))) == -2) + 1]
+low_tree_pop <- round(peaks[1], 2)
+high_tree_pop <- round(peaks[length(peaks)], 2)
+low_tree_pop_scl <- (low_tree_pop - mean(pop_data$tree_cov)) / sd(pop_data$tree_cov)
+high_tree_pop_scl <- (high_tree_pop - mean(pop_data$tree_cov)) / sd(pop_data$tree_cov)
 
-*(\~8 minutes)*
+predictions(mod_hu,
+  newdata = datagrid(
+    scl_prey = seq(min(pop_data$scl_prey), max(pop_data$scl_prey), length.out = 30),
+    scl_competitors = fivenum,
+    scl_tree_cov = c(low_tree_pop_scl, high_tree_pop_scl)
+  ),
+  type = "response"
+) |>
+  mutate(prey = scl_prey * sd(pop_data$prey) + mean(pop_data$prey),
+         competitors = round(scl_competitors * sd(pop_data$competitors) + mean(pop_data$competitors), 1),
+         `Tree cover` = if_else(scl_tree_cov == low_tree_pop_scl, "Low tree cover", "High tree cover")) |>
+  ggplot() +
+  geom_ribbon(aes(x = prey, ymin = conf.low, ymax = conf.high, fill = as.factor(competitors)), alpha = 0.2) +
+  geom_line(aes(x = prey, y = estimate, color = as.factor(competitors)), linewidth = 1.5, lineend = "round") +
+  facet_wrap(~ `Tree cover`) +
+  labs(y = "Predicted population abundance", x = "Prey", color = "Competitors", fill = "Competitors")
+```
+
+Within each panel, the prey × competitors shape is the same. But the high-tree-cover panel sits above the low-tree-cover panel overall — more plots are occupied there. Tree cover mostly shifts *how many* plots have the species at all; prey and competitors jointly shape abundance within occupied plots.
+
+## A symmetric interaction, viewed from the other predictor {.fig-slide}
+
+```{r}
+#| code-fold: true
+#| fig-cap: "Same interaction, axes swapped: competitors on x, one line per prey five-number-summary level."
+predictions(mod_hu,
+  newdata = datagrid(
+    scl_competitors = seq(min(pop_data$scl_competitors), max(pop_data$scl_competitors), length.out = 30),
+    scl_prey = fivenum
+  ),
+  type = "conditional"
+) |>
+  mutate(competitors = scl_competitors * sd(pop_data$competitors) + mean(pop_data$competitors),
+         prey = round(scl_prey * sd(pop_data$prey) + mean(pop_data$prey), 1)) |>
+  ggplot() +
+  geom_ribbon(aes(x = competitors, ymin = conf.low, ymax = conf.high, fill = as.factor(prey)), alpha = 0.2) +
+  geom_line(aes(x = competitors, y = estimate, color = as.factor(prey)), linewidth = 1.5, lineend = "round") +
+  labs(y = "Predicted abundance\n(when present)", x = "Competitors", color = "Prey", fill = "Prey")
+```
+
+A two-way interaction is mathematically symmetric: `scl_prey:scl_competitors` is the same coefficient as `scl_competitors:scl_prey`. This view makes a different point than the prey-on-x-axis plot: regardless of prey availability, enough competitors drive abundance down to roughly the same low floor. Neither plot is "more correct" — reporting only one risks showing half the story (Spake et al. 2023).
+
+## Average predictions: one curve per predictor {.fig-slide}
+
+```{r}
+#| code-fold: true
+#| fig-cap: "Abundance-when-present, averaged over the full observed range of the other predictor."
+avg_pred_prey_cond <- avg_predictions(mod_hu,
+  newdata = datagrid(model = mod_hu,
+                      scl_prey = seq(min(pop_data$scl_prey), max(pop_data$scl_prey), length.out = 30),
+                      grid_type = "counterfactual"),
+  by = "scl_prey", type = "conditional"
+) |>
+  mutate(prey = scl_prey * sd(pop_data$prey) + mean(pop_data$prey))
+
+avg_pred_comp_cond <- avg_predictions(mod_hu,
+  newdata = datagrid(model = mod_hu,
+                      scl_competitors = seq(min(pop_data$scl_competitors), max(pop_data$scl_competitors), length.out = 30),
+                      grid_type = "counterfactual"),
+  by = "scl_competitors", type = "conditional"
+) |>
+  mutate(competitors = scl_competitors * sd(pop_data$competitors) + mean(pop_data$competitors))
+
+p_avg_prey_cond <- avg_pred_prey_cond |>
+  ggplot() +
+  geom_ribbon(aes(x = prey, ymin = conf.low, ymax = conf.high), fill = "white", alpha = 0.2) +
+  geom_line(aes(x = prey, y = estimate), color = "white", linewidth = 1.5, lineend = "round") +
+  labs(y = "Average predicted abundance\n(when present)", x = "Prey")
+
+p_avg_comp_cond <- avg_pred_comp_cond |>
+  ggplot() +
+  geom_ribbon(aes(x = competitors, ymin = conf.low, ymax = conf.high), fill = "white", alpha = 0.2) +
+  geom_line(aes(x = competitors, y = estimate), color = "white", linewidth = 1.5, lineend = "round") +
+  labs(y = "Average predicted abundance\n(when present)", x = "Competitors")
+
+p_avg_prey_cond + p_avg_comp_cond
+```
+
+`datagrid(..., grid_type = "counterfactual")` pairs each focal value with every observed row, then averages — a true average over the sample rather than a slope evaluated at the other predictors' means. Averaged over all observed competitor density, prey still shows a positive effect; averaged over all observed prey, competitors show a diminishing-harm shape.
+
+## Population-scale average, by tree cover {.fig-slide}
+
+```{r}
+#| code-fold: true
+#| fig-cap: "Population-scale average curves, one pair per tree-cover peak."
+avg_pred_prey_resp <- avg_predictions(mod_hu,
+  newdata = datagrid(model = mod_hu,
+                      scl_prey = seq(min(pop_data$scl_prey), max(pop_data$scl_prey), length.out = 30),
+                      scl_tree_cov = c(low_tree_pop_scl, high_tree_pop_scl),
+                      grid_type = "counterfactual"),
+  by = c("scl_prey", "scl_tree_cov"), type = "response"
+) |>
+  mutate(prey = scl_prey * sd(pop_data$prey) + mean(pop_data$prey),
+         `Tree cover` = if_else(scl_tree_cov == low_tree_pop_scl, "Low tree cover", "High tree cover"))
+
+avg_pred_comp_resp <- avg_predictions(mod_hu,
+  newdata = datagrid(model = mod_hu,
+                      scl_competitors = seq(min(pop_data$scl_competitors), max(pop_data$scl_competitors), length.out = 30),
+                      scl_tree_cov = c(low_tree_pop_scl, high_tree_pop_scl),
+                      grid_type = "counterfactual"),
+  by = c("scl_competitors", "scl_tree_cov"), type = "response"
+) |>
+  mutate(competitors = scl_competitors * sd(pop_data$competitors) + mean(pop_data$competitors),
+         `Tree cover` = if_else(scl_tree_cov == low_tree_pop_scl, "Low tree cover", "High tree cover"))
+
+p_avg_prey_resp <- avg_pred_prey_resp |>
+  ggplot(aes(x = prey, y = estimate, color = `Tree cover`, fill = `Tree cover`)) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.2, color = NA) +
+  geom_line(linewidth = 1.5, lineend = "round") +
+  labs(y = "Average predicted\npopulation abundance", x = "Prey")
+
+p_avg_comp_resp <- avg_pred_comp_resp |>
+  ggplot(aes(x = competitors, y = estimate, color = `Tree cover`, fill = `Tree cover`)) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.2, color = NA) +
+  geom_line(linewidth = 1.5, lineend = "round") +
+  labs(y = "Average predicted\npopulation abundance", x = "Competitors")
+
+p_avg_prey_resp + p_avg_comp_resp
+```
+
+The shapes barely change between tree-cover panels — the prey × competitors interaction lives entirely in the abundance-when-present part. What changes is the overall height: high-tree-cover populations sit consistently above low-tree-cover ones, a pure occupancy effect, cleanly separated from the abundance-when-present shape.
+
+## A full rate-ratio table, by model component {.table-slide}
+
+```{r}
+# Conditional-model rate ratio for scl_prey, at three levels of scl_competitors
+prey_rr_tbl <- avg_slopes(mod_hu, variables = "scl_prey", by = "scl_competitors",
+                           newdata = datagrid(scl_competitors = c(-1, 0, 1)),
+                           type = "link") |>
+  mutate(rate_ratio = exp(estimate), rr_low = exp(conf.low), rr_high = exp(conf.high),
+         Term = glue::glue("scl_prey (at scl_competitors = {scl_competitors} SD)")) |>
+  select(Term, rate_ratio, rr_low, rr_high, p.value)
+
+# Conditional-model rate ratio for scl_competitors, at three levels of scl_prey
+comp_rr_tbl <- avg_slopes(mod_hu, variables = "scl_competitors", by = "scl_prey",
+                           newdata = datagrid(scl_prey = c(-1, 0, 1)),
+                           type = "link") |>
+  mutate(rate_ratio = exp(estimate), rr_low = exp(conf.low), rr_high = exp(conf.high),
+         Term = glue::glue("scl_competitors (at scl_prey = {scl_prey} SD)")) |>
+  select(Term, rate_ratio, rr_low, rr_high, p.value)
+
+# The interaction itself: ratio of rate ratios per 1-SD increase in the moderator
+hu_confint <- confint(mod_hu)
+hu_coef_cond <- summary(mod_hu)$coefficients$cond
+hu_coef_zi <- summary(mod_hu)$coefficients$zi
+
+interaction_rr_tbl <- tibble(
+  Term = "scl_prey:scl_competitors (interaction)",
+  rate_ratio = exp(hu_coef_cond["scl_prey:scl_competitors", "Estimate"]),
+  rr_low = exp(hu_confint["cond.scl_prey:scl_competitors", "2.5 %"]),
+  rr_high = exp(hu_confint["cond.scl_prey:scl_competitors", "97.5 %"]),
+  p.value = hu_coef_cond["scl_prey:scl_competitors", "Pr(>|z|)"]
+)
+
+# Zero-inflation-model odds ratio for scl_tree_cov (no moderator in this model)
+zi_rr_tbl <- tibble(
+  Term = "scl_tree_cov (zero-inflation)",
+  rate_ratio = exp(hu_coef_zi["scl_tree_cov", "Estimate"]),
+  rr_low = exp(hu_confint["zi.scl_tree_cov", "2.5 %"]),
+  rr_high = exp(hu_confint["zi.scl_tree_cov", "97.5 %"]),
+  p.value = hu_coef_zi["scl_tree_cov", "Pr(>|z|)"]
+)
+
+hu_rr_tbl <- bind_rows(
+  prey_rr_tbl |> mutate(Component = "Conditional (abundance, when present)"),
+  comp_rr_tbl |> mutate(Component = "Conditional (abundance, when present)"),
+  interaction_rr_tbl |> mutate(Component = "Conditional (abundance, when present)"),
+  zi_rr_tbl |> mutate(Component = "Zero-inflation (occupancy, as an odds ratio)")
+) |>
+  relocate(Component) |>
+  mutate(
+    across(c(rate_ratio, rr_low, rr_high), ~ round(.x, 3)),
+    p.value = if_else(p.value < 0.001, "<0.001", as.character(round(p.value, 3))),
+    CI_95 = glue::glue("[{rr_low}, {rr_high}]")
+  ) |>
+  select(Component, Term, `Rate/odds ratio` = rate_ratio, `95% CI` = CI_95, `p-value` = p.value)
+
+hu_rr_tbl |>
+  tt(caption = "Standardized rate ratios (conditional model) and odds ratio (zero-inflation model) for mod_hu") |>
+  style_tt(i = which(hu_rr_tbl$Component != dplyr::lag(hu_rr_tbl$Component, default = "")) - 1,
+           j = 1:5, line = "b", line_color = "black", line_width = 0.05)
+```
+
+Prey's rate ratio crosses 1 somewhere around average competitor density (why its raw `summary()` estimate looked like noise); competitors suppress abundance more as prey increases; the interaction row (\~0.81) is the single number behind both patterns, and it's the *same* number whichever predictor you treat as the moderator — the symmetry point from a few slides back, visible directly in the table. Tree cover's odds ratio in the zero-inflation part tells a simpler, interaction-free story about occupancy alone.
+
+## Exercise 7 / Homework
+
+Now apply what we learned today to your data!
 
 ## Part 3 takeaways
 
 1.  Non-linear link functions (logit, log) create an **implicit interaction**: every predictor's response-scale effect depends on the values of all other predictors, even with no interaction term in the formula
-2.  Raw GLM coefficients live on the link scale; convert them with the link's derivative ($$p(1-p)\cdot\beta$$ for logit, $$\lambda\cdot\beta$$ for log) or let `marginaleffects::slopes()` do it for you
-3.  Multiplicative summaries ($$e^\beta$$, rate ratios / odds ratios) stay constant across the range of other predictors; additive, response-scale summaries do not
+2.  Raw GLM coefficients live on the link scale; `marginaleffects::slopes()` converts them to the natural (probability, count) scale for you
+3.  Multiplicative summaries (rate ratios, odds ratios) stay constant across the range of other predictors; additive, response-scale summaries do not
 4.  Whether an interaction "exists" can depend on the scale you're measuring on (Spake et al. 2023) — this applies just as much to *implicit* link-function interactions as to explicit interaction terms
 5.  **Hurdle/zero-inflated models** separate "does it occur" from "how much, given it occurs" — interpret each part separately, or combine them (`type = "response"`) for a population-scale answer
 6.  Interactions are mathematically **symmetric**: report (or at least check) both "A moderated by B" and "B moderated by A"
@@ -1298,54 +1499,4 @@ Using `mod_hu`:
 - Full write-ups with additional detail and 3D visualizations: [Part 1](../../posts/interactions_categorical_numerical/index.qmd), [Part 2](../../posts/interactions_numerical_numerical/index.qmd), [Part 3](../../posts/interactions_link_functions/index.qmd)
 - `marginaleffects` documentation: <https://marginaleffects.com/>
 - Spake et al. (2023), on interactions in GLMs: <https://onlinelibrary.wiley.com/doi/full/10.1111/brv.12939>
-- A planned Part 4 will extend this material to GAMs
-
-## Exercise solutions (instructor notes)
-
-::: {.callout-note collapse="true"}
-## Exercise 1
-
-- `mod_mass_true <- glmmTMB(weight ~ sex * snow_depth, data = bighorn_population, family = gaussian())`
-- Male slope = `snow_depth` coefficient + `sexmale:snow_depth` coefficient
-- A naive pooled model would show a *positive* (or attenuated) relationship due to Simpson's Paradox: sex confounds both snow exposure and baseline weight, so ignoring it would lead a manager to underestimate (or misjudge the direction of) the harm of a harsh winter.
-:::
-
-::: {.callout-note collapse="true"}
-## Exercise 2
-
-- Uncorrected `avg_slopes()` on the biased sample is pulled toward the male slope (weaker effect) because males are overrepresented
-- Corrected version (using `newdata_balanced`) should land closer to `mean(c(male_loss, female_loss))`
-- Without a known true ratio, you would need an independent, unbiased estimate of population sex ratio (e.g., aerial survey, camera trap monitoring not subject to the same capture bias) to justify reweighting
-:::
-
-::: {.callout-note collapse="true"}
-## Exercise 3
-
-- Mirror the code from the "slope across the range of the moderator" slide, swapping the roles of `temp_centered` and `rain_centered`
-- Answer depends on the random seed / simulated draw — have students report their own CI crossing point
-- Example framing: "Does the effect of temperature (exposure) on petal length depend on rainfall (moderator)?"
-:::
-
-::: {.callout-note collapse="true"}
-## Exercise 5
-
-- `slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = c(min(occ_data$temp), max(occ_data$temp)), rain = c(min(occ_data$rain), max(occ_data$rain))))`
-- The smallest slope occurs at whichever combination pushes predicted probability closest to 0 or 1 (flat ends of the S-curve); the largest occurs near predicted probability ≈ 0.5 (steepest part of the curve)
-- Reporting only the raw coefficient (\~1.87) would mislead a reader into thinking tree cover has one fixed effect on occurrence probability, when in fact that effect shrinks or grows depending on rain and temperature — exactly the implicit interaction discussed above
-:::
-
-::: {.callout-note collapse="true"}
-## Exercise 6
-
-- Rate ratio: `exp(fixef(mod_2)$cond["temp"])` — identical regardless of `rain` or `tree_cov`, since $$e^\beta$$ does not depend on other covariate values
-- Local slope: `lambda * beta_temp` where `lambda <- exp(predict(mod_2, newdata = datagrid(model = mod_2, rain = min(abund_data$rain), tree_cov = mean(abund_data$tree_cov)), type = "link"))` — this **does** change with `tree_cov` (and `rain`), because it's rescaled by the expected count $$\lambda$$ at each point
-- The rate ratio is constant because exponentiating a fixed additive (log-scale) effect always yields the same multiplicative factor; the local slope is not constant because it also depends on the curve's local steepness, i.e., on $$\lambda$$ itself
-:::
-
-::: {.callout-note collapse="true"}
-## Exercise 7
-
-- `avg_slopes(mod_hu, variables = "scl_tree_cov", type = "response")` — `scl_tree_cov` only enters the `zi =` formula, but `type = "response"` still lets you ask how it affects population-scale abundance by way of occupancy
-- `type = "conditional"` gives abundance *given* the plot is occupied (ignores occurrence entirely); `type = "response"` multiplies that by the predicted probability of occurrence, giving abundance across *all* plots
-- The mirror plot (competitors on the x-axis, one line per prey level) makes it easier to see that abundance converges to roughly the same low floor once competitors are abundant, regardless of prey — a pattern that's harder to spot when prey is on the x-axis
-:::
+- Mize (2019), best practices for interaction effects: <https://sociologicalscience.com/articles-v6-4-81/>

@@ -226,7 +226,7 @@ Allen Bush-Beaupré
 </section>
 <section id="welcome" class="slide level2">
 <h2>Welcome</h2>
-<p>This workshop is adapted from a two-part tutorial series on interactions in regression models:</p>
+<p>This workshop is adapted from a three-part tutorial series on interactions in regression models:</p>
 <ul>
 <li>Part 1: <a href="../../posts/interactions_categorical_numerical/index.html">Categorical × numerical interactions</a></li>
 <li>Part 2: <a href="../../posts/interactions_numerical_numerical/index.html">Numerical × numerical interactions</a></li>
@@ -926,6 +926,8 @@ Comparison: dY/dX</code></pre>
 <section id="predicting-new-observations" class="slide level2 fig-slide">
 <h2>Predicting new observations</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_flower_measurements_3,</span>
 <span id="cb39-2"><a aria-label="2"></a>            <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
 <span id="cb39-3"><a aria-label="3"></a>              <span class="at">temp_centered =</span> fivenum,</span>
@@ -949,12 +951,12 @@ Comparison: dY/dX</code></pre>
 <span id="cb39-21"><a aria-label="21"></a>         <span class="at">rain_centered =</span> <span class="fu">round</span>(rain_centered),</span>
 <span id="cb39-22"><a aria-label="22"></a>         <span class="at">pred_obs =</span> <span class="fu">dist_normal</span>(<span class="at">mu =</span> mu, <span class="at">sd =</span> sd)) <span class="ot">-&gt;</span> predicted_observations</span>
 <span id="cb39-23"><a aria-label="23"></a></span>
-<span id="cb39-24"><a aria-label="24"></a>temp_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb39-25"><a aria-label="25"></a>  <span class="st">`</span><span class="at">-38</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"temp = -38"</span>,</span>
-<span id="cb39-26"><a aria-label="26"></a>  <span class="st">`</span><span class="at">-9</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"temp = -9"</span>,</span>
-<span id="cb39-27"><a aria-label="27"></a>  <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"temp = 1"</span>,</span>
-<span id="cb39-28"><a aria-label="28"></a>  <span class="st">`</span><span class="at">9</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"temp = 9"</span>,</span>
-<span id="cb39-29"><a aria-label="29"></a>  <span class="st">`</span><span class="at">36</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"temp = 36"</span>)</span>
+<span id="cb39-24"><a aria-label="24"></a><span class="co"># Build facet labels dynamically from the actual rounded temp_centered values</span></span>
+<span id="cb39-25"><a aria-label="25"></a><span class="co"># (hardcoding them would silently show NA facet labels if the simulated data changes)</span></span>
+<span id="cb39-26"><a aria-label="26"></a>temp_labels <span class="ot">&lt;-</span> <span class="fu">setNames</span>(</span>
+<span id="cb39-27"><a aria-label="27"></a>  <span class="fu">paste0</span>(<span class="st">"temp = "</span>, <span class="fu">sort</span>(<span class="fu">unique</span>(predicted_observations<span class="sc">$</span>temp_centered))),</span>
+<span id="cb39-28"><a aria-label="28"></a>  <span class="fu">sort</span>(<span class="fu">unique</span>(predicted_observations<span class="sc">$</span>temp_centered))</span>
+<span id="cb39-29"><a aria-label="29"></a>)</span>
 <span id="cb39-30"><a aria-label="30"></a></span>
 <span id="cb39-31"><a aria-label="31"></a><span class="fu">ggplot</span>(predicted_observations, <span class="fu">aes</span>(<span class="at">xdist =</span> pred_obs, <span class="at">color =</span> <span class="fu">as.factor</span>(rain_centered))) <span class="sc">+</span></span>
 <span id="cb39-32"><a aria-label="32"></a>  <span class="fu">stat_slab</span>(<span class="at">fill =</span> <span class="cn">NA</span>, <span class="at">normalize =</span> <span class="st">"xy"</span>) <span class="sc">+</span></span>
@@ -965,6 +967,7 @@ Comparison: dY/dX</code></pre>
 <span id="cb39-37"><a aria-label="37"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
 <span id="cb39-38"><a aria-label="38"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(),</span>
 <span id="cb39-39"><a aria-label="39"></a>        <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 
 </div>
 <img data-src="index_files/figure-revealjs/unnamed-chunk-28-1.png" width="768" class="r-stretch"></section>
@@ -1787,64 +1790,436 @@ Comparison: dY/dX</code></pre>
 </section>
 <section id="isolating-the-interaction-rate-ratios" class="slide level2 table-slide">
 <h2>Isolating the interaction: rate ratios</h2>
-<p>A rate ratio stays constant regardless of where the moderator is evaluated — the cleanest way to report “the interaction itself”:</p>
+<p>To isolate something closer to “the interaction itself,” we move to the rate-ratio scale: for each one-SD increase in competitors, by what <em>factor</em> does the effect of one extra SD of prey get multiplied? That’s <code>exp()</code> of the interaction coefficient, and because it lives on the model’s own additive (log) scale, it doesn’t depend on where competitors are evaluated — unlike the count-scale slope.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a aria-label="1"></a><span class="fu">avg_slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_prey"</span>, <span class="at">by =</span> <span class="st">"scl_competitors"</span>,</span>
-<span id="cb64-2"><a aria-label="2"></a>           <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_competitors =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)), <span class="at">type =</span> <span class="st">"link"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb64-3"><a aria-label="3"></a>  <span class="fu">mutate</span>(<span class="at">rate_ratio =</span> <span class="fu">exp</span>(estimate)) <span class="sc">|&gt;</span></span>
-<span id="cb64-4"><a aria-label="4"></a>  <span class="fu">select</span>(scl_competitors, rate_ratio, p.value)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
- Pr(&gt;|z|)
-   &lt;0.001
-    0.329
-   &lt;0.001</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a aria-label="1"></a>rate_ratio_interaction_tbl <span class="ot">&lt;-</span> <span class="fu">avg_slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_prey"</span>,</span>
+<span id="cb64-2"><a aria-label="2"></a>                                          <span class="at">by =</span> <span class="st">"scl_competitors"</span>,</span>
+<span id="cb64-3"><a aria-label="3"></a>                                          <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_competitors =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)),</span>
+<span id="cb64-4"><a aria-label="4"></a>                                          <span class="at">type =</span> <span class="st">"link"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb64-5"><a aria-label="5"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
+<span id="cb64-6"><a aria-label="6"></a>  <span class="fu">mutate</span>(<span class="at">rate_ratio =</span> <span class="fu">exp</span>(estimate), <span class="at">rr_low =</span> <span class="fu">exp</span>(conf.low), <span class="at">rr_high =</span> <span class="fu">exp</span>(conf.high)) <span class="sc">|&gt;</span></span>
+<span id="cb64-7"><a aria-label="7"></a>  <span class="fu">select</span>(scl_competitors, rate_ratio, rr_low, rr_high, p.value) <span class="sc">|&gt;</span></span>
+<span id="cb64-8"><a aria-label="8"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb64-9"><a aria-label="9"></a>    <span class="fu">across</span>(<span class="fu">c</span>(rate_ratio, rr_low, rr_high), <span class="sc">~</span> <span class="fu">round</span>(.x, <span class="dv">3</span>)),</span>
+<span id="cb64-10"><a aria-label="10"></a>    <span class="at">p.value =</span> <span class="fu">if_else</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.001</span>, <span class="st">"&lt;0.001"</span>, <span class="fu">as.character</span>(<span class="fu">round</span>(p.value, <span class="dv">3</span>)))</span>
+<span id="cb64-11"><a aria-label="11"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb64-12"><a aria-label="12"></a>  <span class="fu">mutate</span>(<span class="at">CI_95 =</span> glue<span class="sc">::</span><span class="fu">glue</span>(<span class="st">"[{rr_low}, {rr_high}]"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb64-13"><a aria-label="13"></a>  <span class="fu">select</span>(<span class="st">`</span><span class="at">Competitors (scaled)</span><span class="st">`</span> <span class="ot">=</span> scl_competitors, <span class="st">`</span><span class="at">Rate ratio for scl_prey</span><span class="st">`</span> <span class="ot">=</span> rate_ratio, <span class="st">`</span><span class="at">95% CI</span><span class="st">`</span> <span class="ot">=</span> CI_95, <span class="st">`</span><span class="at">p-value</span><span class="st">`</span> <span class="ot">=</span> p.value)</span>
+<span id="cb64-14"><a aria-label="14"></a></span>
+<span id="cb64-15"><a aria-label="15"></a>rate_ratio_interaction_tbl <span class="sc">|&gt;</span></span>
+<span id="cb64-16"><a aria-label="16"></a>  <span class="fu">tt</span>(<span class="at">caption =</span> <span class="st">"Rate ratio of scl_prey's effect on abundance, evaluated at three levels of scl_competitors"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<!-- preamble start -->
+
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_lzht3p8nwotuhf2aagb0 = TinyTable.createTableFunctions("tinytable_lzht3p8nwotuhf2aagb0");
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: '3', j: 1 }, { i: '3', j: 2 }, { i: '3', j: 3 }, { i: '3', j: 4 } ], css_id: 'tinytable_css_1fiaadsihltsx6w6byv3',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_30kgvha715ns6t22g3kf',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  tableFns_lzht3p8nwotuhf2aagb0.styleCell(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
+    <style>
+    /* tinytable css entries after */
+    #tinytable_lzht3p8nwotuhf2aagb0 td.tinytable_css_1fiaadsihltsx6w6byv3, #tinytable_lzht3p8nwotuhf2aagb0 th.tinytable_css_1fiaadsihltsx6w6byv3 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_lzht3p8nwotuhf2aagb0 td.tinytable_css_30kgvha715ns6t22g3kf, #tinytable_lzht3p8nwotuhf2aagb0 th.tinytable_css_30kgvha715ns6t22g3kf {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    </style>
+    <div class="container">
+      <table class="tinytable" id="tinytable_lzht3p8nwotuhf2aagb0" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        <caption>Rate ratio of scl_prey's effect on abundance, evaluated at three levels of scl_competitors</caption>
+        <thead>
+              <tr>
+                <th scope="col" data-row="0" data-col="1">Competitors (scaled)</th>
+                <th scope="col" data-row="0" data-col="2">Rate ratio for scl_prey</th>
+                <th scope="col" data-row="0" data-col="3">95% CI</th>
+                <th scope="col" data-row="0" data-col="4">p-value</th>
+              </tr>
+        </thead>
+        
+        <tbody>
+                <tr>
+                  <td data-row="1" data-col="1">-1</td>
+                  <td data-row="1" data-col="2">1.249</td>
+                  <td data-row="1" data-col="3">[1.162, 1.343]</td>
+                  <td data-row="1" data-col="4">&lt;0.001</td>
+                </tr>
+                <tr>
+                  <td data-row="2" data-col="1">0</td>
+                  <td data-row="2" data-col="2">0.951</td>
+                  <td data-row="2" data-col="3">[0.861, 1.051]</td>
+                  <td data-row="2" data-col="4">0.329</td>
+                </tr>
+                <tr>
+                  <td data-row="3" data-col="1">1</td>
+                  <td data-row="3" data-col="2">0.725</td>
+                  <td data-row="3" data-col="3">[0.604, 0.869]</td>
+                  <td data-row="3" data-col="4">&lt;0.001</td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- hack to avoid NA insertion in last line -->
 </div>
 </div>
-<p>Prey’s rate ratio drops from &gt;1 (helps abundance) at low competitor density to &lt;1 (hurts abundance) at high competitor density.</p>
+<p>Prey’s rate ratio drops from &gt;1 (increasing abundance) at low competitor density to &lt;1 (decreasing abundance) at high competitor density.</p>
 </section>
-<section id="interactions-are-symmetric" class="slide level2">
-<h2>Interactions are symmetric</h2>
-<p><code>scl_prey:scl_competitors</code> is the <em>same</em> coefficient as <code>scl_competitors:scl_prey</code> — there’s no statistical reason to always put one variable on the x-axis and the other as color/facet. Showing only one direction risks reporting half the story (Spake et al.&nbsp;2023).</p>
-<p><strong>Practical check</strong>: if you always plot “A moderated by B,” try the mirror-image plot (“B moderated by A”) before deciding which (or both) to report.</p>
-</section>
-<section id="population-scale-predictions" class="slide level2 fig-slide">
-<h2>Population-scale predictions</h2>
-<p>Combine both model parts (<code>type = "response"</code>) to get expected abundance across <em>all</em> plots, accounting for occurrence probability:</p>
+<section id="predicted-abundance-by-competitor-level" class="slide level2 fig-slide">
+<h2>Predicted abundance, by competitor level</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_hu,</span>
-<span id="cb66-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
-<span id="cb66-3"><a aria-label="3"></a>    <span class="at">scl_prey =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_prey), <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_prey), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
-<span id="cb66-4"><a aria-label="4"></a>    <span class="at">scl_competitors =</span> fivenum</span>
-<span id="cb66-5"><a aria-label="5"></a>  ),</span>
-<span id="cb66-6"><a aria-label="6"></a>  <span class="at">type =</span> <span class="st">"response"</span></span>
-<span id="cb66-7"><a aria-label="7"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb66-8"><a aria-label="8"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> scl_prey, <span class="at">y =</span> estimate, <span class="at">color =</span> <span class="fu">as.factor</span>(scl_competitors), <span class="at">fill =</span> <span class="fu">as.factor</span>(scl_competitors))) <span class="sc">+</span></span>
-<span id="cb66-9"><a aria-label="9"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb66-10"><a aria-label="10"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
-<span id="cb66-11"><a aria-label="11"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted population abundance"</span>, <span class="at">x =</span> <span class="st">"Prey (scaled)"</span>, <span class="at">color =</span> <span class="st">"Competitors"</span>, <span class="at">fill =</span> <span class="st">"Competitors"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_hu,</span>
+<span id="cb65-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
+<span id="cb65-3"><a aria-label="3"></a>    <span class="at">scl_prey =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_prey), <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_prey), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb65-4"><a aria-label="4"></a>    <span class="at">scl_competitors =</span> fivenum</span>
+<span id="cb65-5"><a aria-label="5"></a>  ),</span>
+<span id="cb65-6"><a aria-label="6"></a>  <span class="at">type =</span> <span class="st">"conditional"</span></span>
+<span id="cb65-7"><a aria-label="7"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb65-8"><a aria-label="8"></a>  <span class="fu">mutate</span>(<span class="at">prey =</span> scl_prey <span class="sc">*</span> <span class="fu">sd</span>(pop_data<span class="sc">$</span>prey) <span class="sc">+</span> <span class="fu">mean</span>(pop_data<span class="sc">$</span>prey),</span>
+<span id="cb65-9"><a aria-label="9"></a>         <span class="at">competitors =</span> <span class="fu">round</span>(scl_competitors <span class="sc">*</span> <span class="fu">sd</span>(pop_data<span class="sc">$</span>competitors) <span class="sc">+</span> <span class="fu">mean</span>(pop_data<span class="sc">$</span>competitors), <span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb65-10"><a aria-label="10"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb65-11"><a aria-label="11"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> prey, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high, <span class="at">fill =</span> <span class="fu">as.factor</span>(competitors)), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb65-12"><a aria-label="12"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> prey, <span class="at">y =</span> estimate, <span class="at">color =</span> <span class="fu">as.factor</span>(competitors)), <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb65-13"><a aria-label="13"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted abundance</span><span class="sc">\n</span><span class="st">(when present)"</span>, <span class="at">x =</span> <span class="st">"Prey"</span>, <span class="at">color =</span> <span class="st">"Competitors"</span>, <span class="at">fill =</span> <span class="st">"Competitors"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-51-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Population-scale abundance: same prey x competitors shape, shifted by occupancy.</p></section>
-<section id="exercise-7" class="slide level2 scrollable">
-<h2>🧪 Exercise 7</h2>
-<p>Using <code>mod_hu</code>:</p>
-<ol type="1">
-<li>Compute <code>avg_slopes()</code> for <code>scl_tree_cov</code> (hint: it only appears in the <code>zi =</code> part — you’ll need <code>type = "zprob"</code> or <code>type = "response"</code>, not <code>"conditional"</code>).</li>
-<li>In one sentence, explain the difference between <code>type = "conditional"</code> and <code>type = "response"</code> predictions for this model.</li>
-<li>Build the mirror-image plot from the “interactions are symmetric” slide (competitors on the x-axis, one line per prey level) and describe one thing it shows that the original plot doesn’t.</li>
-</ol>
-<p><em>(~8 minutes)</em></p>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-51-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Abundance-when-present predictions across prey, one line per competitor five-number-summary level.</p><p>At low competitor density, abundance climbs steeply with prey; by the time competitors are abundant, the prey curve is nearly flat — the same shrinking slope we saw before, now shown as predicted trends rather than slopes.</p>
+</section>
+<section id="population-scale-picture-low-vs.-high-tree-cover" class="slide level2 fig-slide">
+<h2>Population-scale picture: low vs.&nbsp;high tree cover</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a aria-label="1"></a><span class="co"># Locate the two peaks of tree_cov's bimodal distribution, as scaled values</span></span>
+<span id="cb66-2"><a aria-label="2"></a>d <span class="ot">&lt;-</span> <span class="fu">density</span>(pop_data<span class="sc">$</span>tree_cov)</span>
+<span id="cb66-3"><a aria-label="3"></a>peaks <span class="ot">&lt;-</span> d<span class="sc">$</span>x[<span class="fu">which</span>(<span class="fu">diff</span>(<span class="fu">sign</span>(<span class="fu">diff</span>(d<span class="sc">$</span>y))) <span class="sc">==</span> <span class="sc">-</span><span class="dv">2</span>) <span class="sc">+</span> <span class="dv">1</span>]</span>
+<span id="cb66-4"><a aria-label="4"></a>low_tree_pop <span class="ot">&lt;-</span> <span class="fu">round</span>(peaks[<span class="dv">1</span>], <span class="dv">2</span>)</span>
+<span id="cb66-5"><a aria-label="5"></a>high_tree_pop <span class="ot">&lt;-</span> <span class="fu">round</span>(peaks[<span class="fu">length</span>(peaks)], <span class="dv">2</span>)</span>
+<span id="cb66-6"><a aria-label="6"></a>low_tree_pop_scl <span class="ot">&lt;-</span> (low_tree_pop <span class="sc">-</span> <span class="fu">mean</span>(pop_data<span class="sc">$</span>tree_cov)) <span class="sc">/</span> <span class="fu">sd</span>(pop_data<span class="sc">$</span>tree_cov)</span>
+<span id="cb66-7"><a aria-label="7"></a>high_tree_pop_scl <span class="ot">&lt;-</span> (high_tree_pop <span class="sc">-</span> <span class="fu">mean</span>(pop_data<span class="sc">$</span>tree_cov)) <span class="sc">/</span> <span class="fu">sd</span>(pop_data<span class="sc">$</span>tree_cov)</span>
+<span id="cb66-8"><a aria-label="8"></a></span>
+<span id="cb66-9"><a aria-label="9"></a><span class="fu">predictions</span>(mod_hu,</span>
+<span id="cb66-10"><a aria-label="10"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
+<span id="cb66-11"><a aria-label="11"></a>    <span class="at">scl_prey =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_prey), <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_prey), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb66-12"><a aria-label="12"></a>    <span class="at">scl_competitors =</span> fivenum,</span>
+<span id="cb66-13"><a aria-label="13"></a>    <span class="at">scl_tree_cov =</span> <span class="fu">c</span>(low_tree_pop_scl, high_tree_pop_scl)</span>
+<span id="cb66-14"><a aria-label="14"></a>  ),</span>
+<span id="cb66-15"><a aria-label="15"></a>  <span class="at">type =</span> <span class="st">"response"</span></span>
+<span id="cb66-16"><a aria-label="16"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb66-17"><a aria-label="17"></a>  <span class="fu">mutate</span>(<span class="at">prey =</span> scl_prey <span class="sc">*</span> <span class="fu">sd</span>(pop_data<span class="sc">$</span>prey) <span class="sc">+</span> <span class="fu">mean</span>(pop_data<span class="sc">$</span>prey),</span>
+<span id="cb66-18"><a aria-label="18"></a>         <span class="at">competitors =</span> <span class="fu">round</span>(scl_competitors <span class="sc">*</span> <span class="fu">sd</span>(pop_data<span class="sc">$</span>competitors) <span class="sc">+</span> <span class="fu">mean</span>(pop_data<span class="sc">$</span>competitors), <span class="dv">1</span>),</span>
+<span id="cb66-19"><a aria-label="19"></a>         <span class="st">`</span><span class="at">Tree cover</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">if_else</span>(scl_tree_cov <span class="sc">==</span> low_tree_pop_scl, <span class="st">"Low tree cover"</span>, <span class="st">"High tree cover"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb66-20"><a aria-label="20"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb66-21"><a aria-label="21"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> prey, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high, <span class="at">fill =</span> <span class="fu">as.factor</span>(competitors)), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb66-22"><a aria-label="22"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> prey, <span class="at">y =</span> estimate, <span class="at">color =</span> <span class="fu">as.factor</span>(competitors)), <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb66-23"><a aria-label="23"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> <span class="st">`</span><span class="at">Tree cover</span><span class="st">`</span>) <span class="sc">+</span></span>
+<span id="cb66-24"><a aria-label="24"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted population abundance"</span>, <span class="at">x =</span> <span class="st">"Prey"</span>, <span class="at">color =</span> <span class="st">"Competitors"</span>, <span class="at">fill =</span> <span class="st">"Competitors"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+
+</div>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-52-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Population-scale (response) predictions: prey x competitors, faceted by low vs.&nbsp;high tree cover.</p><p>Within each panel, the prey × competitors shape is the same. But the high-tree-cover panel sits above the low-tree-cover panel overall — more plots are occupied there. Tree cover mostly shifts <em>how many</em> plots have the species at all; prey and competitors jointly shape abundance within occupied plots.</p>
+</section>
+<section id="a-symmetric-interaction-viewed-from-the-other-predictor" class="slide level2 fig-slide">
+<h2>A symmetric interaction, viewed from the other predictor</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_hu,</span>
+<span id="cb67-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
+<span id="cb67-3"><a aria-label="3"></a>    <span class="at">scl_competitors =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_competitors), <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_competitors), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb67-4"><a aria-label="4"></a>    <span class="at">scl_prey =</span> fivenum</span>
+<span id="cb67-5"><a aria-label="5"></a>  ),</span>
+<span id="cb67-6"><a aria-label="6"></a>  <span class="at">type =</span> <span class="st">"conditional"</span></span>
+<span id="cb67-7"><a aria-label="7"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb67-8"><a aria-label="8"></a>  <span class="fu">mutate</span>(<span class="at">competitors =</span> scl_competitors <span class="sc">*</span> <span class="fu">sd</span>(pop_data<span class="sc">$</span>competitors) <span class="sc">+</span> <span class="fu">mean</span>(pop_data<span class="sc">$</span>competitors),</span>
+<span id="cb67-9"><a aria-label="9"></a>         <span class="at">prey =</span> <span class="fu">round</span>(scl_prey <span class="sc">*</span> <span class="fu">sd</span>(pop_data<span class="sc">$</span>prey) <span class="sc">+</span> <span class="fu">mean</span>(pop_data<span class="sc">$</span>prey), <span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb67-10"><a aria-label="10"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb67-11"><a aria-label="11"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> competitors, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high, <span class="at">fill =</span> <span class="fu">as.factor</span>(prey)), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb67-12"><a aria-label="12"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> competitors, <span class="at">y =</span> estimate, <span class="at">color =</span> <span class="fu">as.factor</span>(prey)), <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb67-13"><a aria-label="13"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted abundance</span><span class="sc">\n</span><span class="st">(when present)"</span>, <span class="at">x =</span> <span class="st">"Competitors"</span>, <span class="at">color =</span> <span class="st">"Prey"</span>, <span class="at">fill =</span> <span class="st">"Prey"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+
+</div>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-53-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Same interaction, axes swapped: competitors on x, one line per prey five-number-summary level.</p><p>A two-way interaction is mathematically symmetric: <code>scl_prey:scl_competitors</code> is the same coefficient as <code>scl_competitors:scl_prey</code>. This view makes a different point than the prey-on-x-axis plot: regardless of prey availability, enough competitors drive abundance down to roughly the same low floor. Neither plot is “more correct” — reporting only one risks showing half the story (Spake et al.&nbsp;2023).</p>
+</section>
+<section id="average-predictions-one-curve-per-predictor" class="slide level2 fig-slide">
+<h2>Average predictions: one curve per predictor</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a aria-label="1"></a>avg_pred_prey_cond <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_hu,</span>
+<span id="cb68-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">model =</span> mod_hu,</span>
+<span id="cb68-3"><a aria-label="3"></a>                      <span class="at">scl_prey =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_prey), <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_prey), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb68-4"><a aria-label="4"></a>                      <span class="at">grid_type =</span> <span class="st">"counterfactual"</span>),</span>
+<span id="cb68-5"><a aria-label="5"></a>  <span class="at">by =</span> <span class="st">"scl_prey"</span>, <span class="at">type =</span> <span class="st">"conditional"</span></span>
+<span id="cb68-6"><a aria-label="6"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb68-7"><a aria-label="7"></a>  <span class="fu">mutate</span>(<span class="at">prey =</span> scl_prey <span class="sc">*</span> <span class="fu">sd</span>(pop_data<span class="sc">$</span>prey) <span class="sc">+</span> <span class="fu">mean</span>(pop_data<span class="sc">$</span>prey))</span>
+<span id="cb68-8"><a aria-label="8"></a></span>
+<span id="cb68-9"><a aria-label="9"></a>avg_pred_comp_cond <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_hu,</span>
+<span id="cb68-10"><a aria-label="10"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">model =</span> mod_hu,</span>
+<span id="cb68-11"><a aria-label="11"></a>                      <span class="at">scl_competitors =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_competitors), <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_competitors), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb68-12"><a aria-label="12"></a>                      <span class="at">grid_type =</span> <span class="st">"counterfactual"</span>),</span>
+<span id="cb68-13"><a aria-label="13"></a>  <span class="at">by =</span> <span class="st">"scl_competitors"</span>, <span class="at">type =</span> <span class="st">"conditional"</span></span>
+<span id="cb68-14"><a aria-label="14"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb68-15"><a aria-label="15"></a>  <span class="fu">mutate</span>(<span class="at">competitors =</span> scl_competitors <span class="sc">*</span> <span class="fu">sd</span>(pop_data<span class="sc">$</span>competitors) <span class="sc">+</span> <span class="fu">mean</span>(pop_data<span class="sc">$</span>competitors))</span>
+<span id="cb68-16"><a aria-label="16"></a></span>
+<span id="cb68-17"><a aria-label="17"></a>p_avg_prey_cond <span class="ot">&lt;-</span> avg_pred_prey_cond <span class="sc">|&gt;</span></span>
+<span id="cb68-18"><a aria-label="18"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb68-19"><a aria-label="19"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> prey, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">fill =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb68-20"><a aria-label="20"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> prey, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb68-21"><a aria-label="21"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Average predicted abundance</span><span class="sc">\n</span><span class="st">(when present)"</span>, <span class="at">x =</span> <span class="st">"Prey"</span>)</span>
+<span id="cb68-22"><a aria-label="22"></a></span>
+<span id="cb68-23"><a aria-label="23"></a>p_avg_comp_cond <span class="ot">&lt;-</span> avg_pred_comp_cond <span class="sc">|&gt;</span></span>
+<span id="cb68-24"><a aria-label="24"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb68-25"><a aria-label="25"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> competitors, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">fill =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb68-26"><a aria-label="26"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> competitors, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb68-27"><a aria-label="27"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Average predicted abundance</span><span class="sc">\n</span><span class="st">(when present)"</span>, <span class="at">x =</span> <span class="st">"Competitors"</span>)</span>
+<span id="cb68-28"><a aria-label="28"></a></span>
+<span id="cb68-29"><a aria-label="29"></a>p_avg_prey_cond <span class="sc">+</span> p_avg_comp_cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+
+</div>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-54-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Abundance-when-present, averaged over the full observed range of the other predictor.</p><p><code>datagrid(..., grid_type = "counterfactual")</code> pairs each focal value with every observed row, then averages — a true average over the sample rather than a slope evaluated at the other predictors’ means. Averaged over all observed competitor density, prey still shows a positive effect; averaged over all observed prey, competitors show a diminishing-harm shape.</p>
+</section>
+<section id="population-scale-average-by-tree-cover" class="slide level2 fig-slide">
+<h2>Population-scale average, by tree cover</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a aria-label="1"></a>avg_pred_prey_resp <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_hu,</span>
+<span id="cb69-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">model =</span> mod_hu,</span>
+<span id="cb69-3"><a aria-label="3"></a>                      <span class="at">scl_prey =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_prey), <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_prey), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb69-4"><a aria-label="4"></a>                      <span class="at">scl_tree_cov =</span> <span class="fu">c</span>(low_tree_pop_scl, high_tree_pop_scl),</span>
+<span id="cb69-5"><a aria-label="5"></a>                      <span class="at">grid_type =</span> <span class="st">"counterfactual"</span>),</span>
+<span id="cb69-6"><a aria-label="6"></a>  <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"scl_prey"</span>, <span class="st">"scl_tree_cov"</span>), <span class="at">type =</span> <span class="st">"response"</span></span>
+<span id="cb69-7"><a aria-label="7"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb69-8"><a aria-label="8"></a>  <span class="fu">mutate</span>(<span class="at">prey =</span> scl_prey <span class="sc">*</span> <span class="fu">sd</span>(pop_data<span class="sc">$</span>prey) <span class="sc">+</span> <span class="fu">mean</span>(pop_data<span class="sc">$</span>prey),</span>
+<span id="cb69-9"><a aria-label="9"></a>         <span class="st">`</span><span class="at">Tree cover</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">if_else</span>(scl_tree_cov <span class="sc">==</span> low_tree_pop_scl, <span class="st">"Low tree cover"</span>, <span class="st">"High tree cover"</span>))</span>
+<span id="cb69-10"><a aria-label="10"></a></span>
+<span id="cb69-11"><a aria-label="11"></a>avg_pred_comp_resp <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_hu,</span>
+<span id="cb69-12"><a aria-label="12"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">model =</span> mod_hu,</span>
+<span id="cb69-13"><a aria-label="13"></a>                      <span class="at">scl_competitors =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_competitors), <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_competitors), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb69-14"><a aria-label="14"></a>                      <span class="at">scl_tree_cov =</span> <span class="fu">c</span>(low_tree_pop_scl, high_tree_pop_scl),</span>
+<span id="cb69-15"><a aria-label="15"></a>                      <span class="at">grid_type =</span> <span class="st">"counterfactual"</span>),</span>
+<span id="cb69-16"><a aria-label="16"></a>  <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"scl_competitors"</span>, <span class="st">"scl_tree_cov"</span>), <span class="at">type =</span> <span class="st">"response"</span></span>
+<span id="cb69-17"><a aria-label="17"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb69-18"><a aria-label="18"></a>  <span class="fu">mutate</span>(<span class="at">competitors =</span> scl_competitors <span class="sc">*</span> <span class="fu">sd</span>(pop_data<span class="sc">$</span>competitors) <span class="sc">+</span> <span class="fu">mean</span>(pop_data<span class="sc">$</span>competitors),</span>
+<span id="cb69-19"><a aria-label="19"></a>         <span class="st">`</span><span class="at">Tree cover</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">if_else</span>(scl_tree_cov <span class="sc">==</span> low_tree_pop_scl, <span class="st">"Low tree cover"</span>, <span class="st">"High tree cover"</span>))</span>
+<span id="cb69-20"><a aria-label="20"></a></span>
+<span id="cb69-21"><a aria-label="21"></a>p_avg_prey_resp <span class="ot">&lt;-</span> avg_pred_prey_resp <span class="sc">|&gt;</span></span>
+<span id="cb69-22"><a aria-label="22"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> prey, <span class="at">y =</span> estimate, <span class="at">color =</span> <span class="st">`</span><span class="at">Tree cover</span><span class="st">`</span>, <span class="at">fill =</span> <span class="st">`</span><span class="at">Tree cover</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb69-23"><a aria-label="23"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb69-24"><a aria-label="24"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb69-25"><a aria-label="25"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Average predicted</span><span class="sc">\n</span><span class="st">population abundance"</span>, <span class="at">x =</span> <span class="st">"Prey"</span>)</span>
+<span id="cb69-26"><a aria-label="26"></a></span>
+<span id="cb69-27"><a aria-label="27"></a>p_avg_comp_resp <span class="ot">&lt;-</span> avg_pred_comp_resp <span class="sc">|&gt;</span></span>
+<span id="cb69-28"><a aria-label="28"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> competitors, <span class="at">y =</span> estimate, <span class="at">color =</span> <span class="st">`</span><span class="at">Tree cover</span><span class="st">`</span>, <span class="at">fill =</span> <span class="st">`</span><span class="at">Tree cover</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb69-29"><a aria-label="29"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb69-30"><a aria-label="30"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb69-31"><a aria-label="31"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Average predicted</span><span class="sc">\n</span><span class="st">population abundance"</span>, <span class="at">x =</span> <span class="st">"Competitors"</span>)</span>
+<span id="cb69-32"><a aria-label="32"></a></span>
+<span id="cb69-33"><a aria-label="33"></a>p_avg_prey_resp <span class="sc">+</span> p_avg_comp_resp</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+
+</div>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-55-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Population-scale average curves, one pair per tree-cover peak.</p><p>The shapes barely change between tree-cover panels — the prey × competitors interaction lives entirely in the abundance-when-present part. What changes is the overall height: high-tree-cover populations sit consistently above low-tree-cover ones, a pure occupancy effect, cleanly separated from the abundance-when-present shape.</p>
+</section>
+<section id="a-full-rate-ratio-table-by-model-component" class="slide level2 table-slide">
+<h2>A full rate-ratio table, by model component</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a aria-label="1"></a><span class="co"># Conditional-model rate ratio for scl_prey, at three levels of scl_competitors</span></span>
+<span id="cb70-2"><a aria-label="2"></a>prey_rr_tbl <span class="ot">&lt;-</span> <span class="fu">avg_slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_prey"</span>, <span class="at">by =</span> <span class="st">"scl_competitors"</span>,</span>
+<span id="cb70-3"><a aria-label="3"></a>                           <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_competitors =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)),</span>
+<span id="cb70-4"><a aria-label="4"></a>                           <span class="at">type =</span> <span class="st">"link"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb70-5"><a aria-label="5"></a>  <span class="fu">mutate</span>(<span class="at">rate_ratio =</span> <span class="fu">exp</span>(estimate), <span class="at">rr_low =</span> <span class="fu">exp</span>(conf.low), <span class="at">rr_high =</span> <span class="fu">exp</span>(conf.high),</span>
+<span id="cb70-6"><a aria-label="6"></a>         <span class="at">Term =</span> glue<span class="sc">::</span><span class="fu">glue</span>(<span class="st">"scl_prey (at scl_competitors = {scl_competitors} SD)"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb70-7"><a aria-label="7"></a>  <span class="fu">select</span>(Term, rate_ratio, rr_low, rr_high, p.value)</span>
+<span id="cb70-8"><a aria-label="8"></a></span>
+<span id="cb70-9"><a aria-label="9"></a><span class="co"># Conditional-model rate ratio for scl_competitors, at three levels of scl_prey</span></span>
+<span id="cb70-10"><a aria-label="10"></a>comp_rr_tbl <span class="ot">&lt;-</span> <span class="fu">avg_slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_competitors"</span>, <span class="at">by =</span> <span class="st">"scl_prey"</span>,</span>
+<span id="cb70-11"><a aria-label="11"></a>                           <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_prey =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)),</span>
+<span id="cb70-12"><a aria-label="12"></a>                           <span class="at">type =</span> <span class="st">"link"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb70-13"><a aria-label="13"></a>  <span class="fu">mutate</span>(<span class="at">rate_ratio =</span> <span class="fu">exp</span>(estimate), <span class="at">rr_low =</span> <span class="fu">exp</span>(conf.low), <span class="at">rr_high =</span> <span class="fu">exp</span>(conf.high),</span>
+<span id="cb70-14"><a aria-label="14"></a>         <span class="at">Term =</span> glue<span class="sc">::</span><span class="fu">glue</span>(<span class="st">"scl_competitors (at scl_prey = {scl_prey} SD)"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb70-15"><a aria-label="15"></a>  <span class="fu">select</span>(Term, rate_ratio, rr_low, rr_high, p.value)</span>
+<span id="cb70-16"><a aria-label="16"></a></span>
+<span id="cb70-17"><a aria-label="17"></a><span class="co"># The interaction itself: ratio of rate ratios per 1-SD increase in the moderator</span></span>
+<span id="cb70-18"><a aria-label="18"></a>hu_confint <span class="ot">&lt;-</span> <span class="fu">confint</span>(mod_hu)</span>
+<span id="cb70-19"><a aria-label="19"></a>hu_coef_cond <span class="ot">&lt;-</span> <span class="fu">summary</span>(mod_hu)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span>
+<span id="cb70-20"><a aria-label="20"></a>hu_coef_zi <span class="ot">&lt;-</span> <span class="fu">summary</span>(mod_hu)<span class="sc">$</span>coefficients<span class="sc">$</span>zi</span>
+<span id="cb70-21"><a aria-label="21"></a></span>
+<span id="cb70-22"><a aria-label="22"></a>interaction_rr_tbl <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb70-23"><a aria-label="23"></a>  <span class="at">Term =</span> <span class="st">"scl_prey:scl_competitors (interaction)"</span>,</span>
+<span id="cb70-24"><a aria-label="24"></a>  <span class="at">rate_ratio =</span> <span class="fu">exp</span>(hu_coef_cond[<span class="st">"scl_prey:scl_competitors"</span>, <span class="st">"Estimate"</span>]),</span>
+<span id="cb70-25"><a aria-label="25"></a>  <span class="at">rr_low =</span> <span class="fu">exp</span>(hu_confint[<span class="st">"cond.scl_prey:scl_competitors"</span>, <span class="st">"2.5 %"</span>]),</span>
+<span id="cb70-26"><a aria-label="26"></a>  <span class="at">rr_high =</span> <span class="fu">exp</span>(hu_confint[<span class="st">"cond.scl_prey:scl_competitors"</span>, <span class="st">"97.5 %"</span>]),</span>
+<span id="cb70-27"><a aria-label="27"></a>  <span class="at">p.value =</span> hu_coef_cond[<span class="st">"scl_prey:scl_competitors"</span>, <span class="st">"Pr(&gt;|z|)"</span>]</span>
+<span id="cb70-28"><a aria-label="28"></a>)</span>
+<span id="cb70-29"><a aria-label="29"></a></span>
+<span id="cb70-30"><a aria-label="30"></a><span class="co"># Zero-inflation-model odds ratio for scl_tree_cov (no moderator in this model)</span></span>
+<span id="cb70-31"><a aria-label="31"></a>zi_rr_tbl <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb70-32"><a aria-label="32"></a>  <span class="at">Term =</span> <span class="st">"scl_tree_cov (zero-inflation)"</span>,</span>
+<span id="cb70-33"><a aria-label="33"></a>  <span class="at">rate_ratio =</span> <span class="fu">exp</span>(hu_coef_zi[<span class="st">"scl_tree_cov"</span>, <span class="st">"Estimate"</span>]),</span>
+<span id="cb70-34"><a aria-label="34"></a>  <span class="at">rr_low =</span> <span class="fu">exp</span>(hu_confint[<span class="st">"zi.scl_tree_cov"</span>, <span class="st">"2.5 %"</span>]),</span>
+<span id="cb70-35"><a aria-label="35"></a>  <span class="at">rr_high =</span> <span class="fu">exp</span>(hu_confint[<span class="st">"zi.scl_tree_cov"</span>, <span class="st">"97.5 %"</span>]),</span>
+<span id="cb70-36"><a aria-label="36"></a>  <span class="at">p.value =</span> hu_coef_zi[<span class="st">"scl_tree_cov"</span>, <span class="st">"Pr(&gt;|z|)"</span>]</span>
+<span id="cb70-37"><a aria-label="37"></a>)</span>
+<span id="cb70-38"><a aria-label="38"></a></span>
+<span id="cb70-39"><a aria-label="39"></a>hu_rr_tbl <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb70-40"><a aria-label="40"></a>  prey_rr_tbl <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Component =</span> <span class="st">"Conditional (abundance, when present)"</span>),</span>
+<span id="cb70-41"><a aria-label="41"></a>  comp_rr_tbl <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Component =</span> <span class="st">"Conditional (abundance, when present)"</span>),</span>
+<span id="cb70-42"><a aria-label="42"></a>  interaction_rr_tbl <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Component =</span> <span class="st">"Conditional (abundance, when present)"</span>),</span>
+<span id="cb70-43"><a aria-label="43"></a>  zi_rr_tbl <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Component =</span> <span class="st">"Zero-inflation (occupancy, as an odds ratio)"</span>)</span>
+<span id="cb70-44"><a aria-label="44"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb70-45"><a aria-label="45"></a>  <span class="fu">relocate</span>(Component) <span class="sc">|&gt;</span></span>
+<span id="cb70-46"><a aria-label="46"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb70-47"><a aria-label="47"></a>    <span class="fu">across</span>(<span class="fu">c</span>(rate_ratio, rr_low, rr_high), <span class="sc">~</span> <span class="fu">round</span>(.x, <span class="dv">3</span>)),</span>
+<span id="cb70-48"><a aria-label="48"></a>    <span class="at">p.value =</span> <span class="fu">if_else</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.001</span>, <span class="st">"&lt;0.001"</span>, <span class="fu">as.character</span>(<span class="fu">round</span>(p.value, <span class="dv">3</span>))),</span>
+<span id="cb70-49"><a aria-label="49"></a>    <span class="at">CI_95 =</span> glue<span class="sc">::</span><span class="fu">glue</span>(<span class="st">"[{rr_low}, {rr_high}]"</span>)</span>
+<span id="cb70-50"><a aria-label="50"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb70-51"><a aria-label="51"></a>  <span class="fu">select</span>(Component, Term, <span class="st">`</span><span class="at">Rate/odds ratio</span><span class="st">`</span> <span class="ot">=</span> rate_ratio, <span class="st">`</span><span class="at">95% CI</span><span class="st">`</span> <span class="ot">=</span> CI_95, <span class="st">`</span><span class="at">p-value</span><span class="st">`</span> <span class="ot">=</span> p.value)</span>
+<span id="cb70-52"><a aria-label="52"></a></span>
+<span id="cb70-53"><a aria-label="53"></a>hu_rr_tbl <span class="sc">|&gt;</span></span>
+<span id="cb70-54"><a aria-label="54"></a>  <span class="fu">tt</span>(<span class="at">caption =</span> <span class="st">"Standardized rate ratios (conditional model) and odds ratio (zero-inflation model) for mod_hu"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb70-55"><a aria-label="55"></a>  <span class="fu">style_tt</span>(<span class="at">i =</span> <span class="fu">which</span>(hu_rr_tbl<span class="sc">$</span>Component <span class="sc">!=</span> dplyr<span class="sc">::</span><span class="fu">lag</span>(hu_rr_tbl<span class="sc">$</span>Component, <span class="at">default =</span> <span class="st">""</span>)) <span class="sc">-</span> <span class="dv">1</span>,</span>
+<span id="cb70-56"><a aria-label="56"></a>           <span class="at">j =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">line =</span> <span class="st">"b"</span>, <span class="at">line_color =</span> <span class="st">"black"</span>, <span class="at">line_width =</span> <span class="fl">0.05</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<!-- preamble start -->
+
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_6fmn5wxht0f592yueqky = TinyTable.createTableFunctions("tinytable_6fmn5wxht0f592yueqky");
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: '8', j: 1 }, { i: '8', j: 2 }, { i: '8', j: 3 }, { i: '8', j: 4 }, { i: '8', j: 5 } ], css_id: 'tinytable_css_bhho0ihvctw6fhrw26l0',}, 
+          { positions: [ { i: '7', j: 1 }, { i: '7', j: 2 }, { i: '7', j: 3 }, { i: '7', j: 4 }, { i: '7', j: 5 } ], css_id: 'tinytable_css_xapkuni56h3ar8qdp89w',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_mf1lsk9g4phq4ar4nxce',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  tableFns_6fmn5wxht0f592yueqky.styleCell(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
+    <style>
+    /* tinytable css entries after */
+    #tinytable_6fmn5wxht0f592yueqky td.tinytable_css_bhho0ihvctw6fhrw26l0, #tinytable_6fmn5wxht0f592yueqky th.tinytable_css_bhho0ihvctw6fhrw26l0 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_6fmn5wxht0f592yueqky td.tinytable_css_xapkuni56h3ar8qdp89w, #tinytable_6fmn5wxht0f592yueqky th.tinytable_css_xapkuni56h3ar8qdp89w {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_6fmn5wxht0f592yueqky td.tinytable_css_mf1lsk9g4phq4ar4nxce, #tinytable_6fmn5wxht0f592yueqky th.tinytable_css_mf1lsk9g4phq4ar4nxce {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    </style>
+    <div class="container">
+      <table class="tinytable" id="tinytable_6fmn5wxht0f592yueqky" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        <caption>Standardized rate ratios (conditional model) and odds ratio (zero-inflation model) for mod_hu</caption>
+        <thead>
+              <tr>
+                <th scope="col" data-row="0" data-col="1">Component</th>
+                <th scope="col" data-row="0" data-col="2">Term</th>
+                <th scope="col" data-row="0" data-col="3">Rate/odds ratio</th>
+                <th scope="col" data-row="0" data-col="4">95% CI</th>
+                <th scope="col" data-row="0" data-col="5">p-value</th>
+              </tr>
+        </thead>
+        
+        <tbody>
+                <tr>
+                  <td data-row="1" data-col="1">Conditional (abundance, when present)</td>
+                  <td data-row="1" data-col="2">scl_prey (at scl_competitors = -1 SD)</td>
+                  <td data-row="1" data-col="3">1.249</td>
+                  <td data-row="1" data-col="4">[1.162, 1.343]</td>
+                  <td data-row="1" data-col="5">&lt;0.001</td>
+                </tr>
+                <tr>
+                  <td data-row="2" data-col="1">Conditional (abundance, when present)</td>
+                  <td data-row="2" data-col="2">scl_prey (at scl_competitors = 0 SD)</td>
+                  <td data-row="2" data-col="3">0.951</td>
+                  <td data-row="2" data-col="4">[0.861, 1.051]</td>
+                  <td data-row="2" data-col="5">0.329</td>
+                </tr>
+                <tr>
+                  <td data-row="3" data-col="1">Conditional (abundance, when present)</td>
+                  <td data-row="3" data-col="2">scl_prey (at scl_competitors = 1 SD)</td>
+                  <td data-row="3" data-col="3">0.725</td>
+                  <td data-row="3" data-col="4">[0.604, 0.869]</td>
+                  <td data-row="3" data-col="5">&lt;0.001</td>
+                </tr>
+                <tr>
+                  <td data-row="4" data-col="1">Conditional (abundance, when present)</td>
+                  <td data-row="4" data-col="2">scl_competitors (at scl_prey = -1 SD)</td>
+                  <td data-row="4" data-col="3">0.666</td>
+                  <td data-row="4" data-col="4">[0.576, 0.77]</td>
+                  <td data-row="4" data-col="5">&lt;0.001</td>
+                </tr>
+                <tr>
+                  <td data-row="5" data-col="1">Conditional (abundance, when present)</td>
+                  <td data-row="5" data-col="2">scl_competitors (at scl_prey = 0 SD)</td>
+                  <td data-row="5" data-col="3">0.507</td>
+                  <td data-row="5" data-col="4">[0.458, 0.562]</td>
+                  <td data-row="5" data-col="5">&lt;0.001</td>
+                </tr>
+                <tr>
+                  <td data-row="6" data-col="1">Conditional (abundance, when present)</td>
+                  <td data-row="6" data-col="2">scl_competitors (at scl_prey = 1 SD)</td>
+                  <td data-row="6" data-col="3">0.387</td>
+                  <td data-row="6" data-col="4">[0.338, 0.442]</td>
+                  <td data-row="6" data-col="5">&lt;0.001</td>
+                </tr>
+                <tr>
+                  <td data-row="7" data-col="1">Conditional (abundance, when present)</td>
+                  <td data-row="7" data-col="2">scl_prey:scl_competitors (interaction)</td>
+                  <td data-row="7" data-col="3">0.762</td>
+                  <td data-row="7" data-col="4">[0.692, 0.838]</td>
+                  <td data-row="7" data-col="5">&lt;0.001</td>
+                </tr>
+                <tr>
+                  <td data-row="8" data-col="1">Zero-inflation (occupancy, as an odds ratio)</td>
+                  <td data-row="8" data-col="2">scl_tree_cov (zero-inflation)</td>
+                  <td data-row="8" data-col="3">0.846</td>
+                  <td data-row="8" data-col="4">[0.763, 0.938]</td>
+                  <td data-row="8" data-col="5">0.001</td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- hack to avoid NA insertion in last line -->
+</div>
+</div>
+<p>Prey’s rate ratio crosses 1 somewhere around average competitor density (why its raw <code>summary()</code> estimate looked like noise); competitors suppress abundance more as prey increases; the interaction row (~0.81) is the single number behind both patterns, and it’s the <em>same</em> number whichever predictor you treat as the moderator — the symmetry point from a few slides back, visible directly in the table. Tree cover’s odds ratio in the zero-inflation part tells a simpler, interaction-free story about occupancy alone.</p>
+</section>
+<section id="exercise-7-homework" class="slide level2">
+<h2>Exercise 7 / Homework</h2>
+<p>Now apply what we learned today to your data!</p>
 </section>
 <section id="part-3-takeaways" class="slide level2 scrollable">
 <h2>Part 3 takeaways</h2>
 <ol type="1">
 <li>Non-linear link functions (logit, log) create an <strong>implicit interaction</strong>: every predictor’s response-scale effect depends on the values of all other predictors, even with no interaction term in the formula</li>
-<li>Raw GLM coefficients live on the link scale; convert them with the link’s derivative (<span class="math display">\[p(1-p)\cdot\beta\]</span> for logit, <span class="math display">\[\lambda\cdot\beta\]</span> for log) or let <code>marginaleffects::slopes()</code> do it for you</li>
-<li>Multiplicative summaries (<span class="math display">\[e^\beta\]</span>, rate ratios / odds ratios) stay constant across the range of other predictors; additive, response-scale summaries do not</li>
+<li>Raw GLM coefficients live on the link scale; <code>marginaleffects::slopes()</code> converts them to the natural (probability, count) scale for you</li>
+<li>Multiplicative summaries (rate ratios, odds ratios) stay constant across the range of other predictors; additive, response-scale summaries do not</li>
 <li>Whether an interaction “exists” can depend on the scale you’re measuring on (Spake et al.&nbsp;2023) — this applies just as much to <em>implicit</em> link-function interactions as to explicit interaction terms</li>
 <li><strong>Hurdle/zero-inflated models</strong> separate “does it occur” from “how much, given it occurs” — interpret each part separately, or combine them (<code>type = "response"</code>) for a population-scale answer</li>
 <li>Interactions are mathematically <strong>symmetric</strong>: report (or at least check) both “A moderated by B” and “B moderated by A”</li>
@@ -1856,113 +2231,8 @@ Comparison: dY/dX</code></pre>
 <li>Full write-ups with additional detail and 3D visualizations: <a href="../../posts/interactions_categorical_numerical/index.html">Part 1</a>, <a href="../../posts/interactions_numerical_numerical/index.html">Part 2</a>, <a href="../../posts/interactions_link_functions/index.html">Part 3</a></li>
 <li><code>marginaleffects</code> documentation: <a href="https://marginaleffects.com/" class="uri">https://marginaleffects.com/</a></li>
 <li>Spake et al.&nbsp;(2023), on interactions in GLMs: <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/brv.12939" class="uri">https://onlinelibrary.wiley.com/doi/full/10.1111/brv.12939</a></li>
-<li>A planned Part 4 will extend this material to GAMs</li>
+<li>Mize (2019), best practices for interaction effects: <a href="https://sociologicalscience.com/articles-v6-4-81/" class="uri">https://sociologicalscience.com/articles-v6-4-81/</a></li>
 </ul>
-</section>
-<section id="exercise-solutions-instructor-notes" class="slide level2">
-<h2>Exercise solutions (instructor notes)</h2>
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Exercise 1</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li><code>mod_mass_true &lt;- glmmTMB(weight ~ sex * snow_depth, data = bighorn_population, family = gaussian())</code></li>
-<li>Male slope = <code>snow_depth</code> coefficient + <code>sexmale:snow_depth</code> coefficient</li>
-<li>A naive pooled model would show a <em>positive</em> (or attenuated) relationship due to Simpson’s Paradox: sex confounds both snow exposure and baseline weight, so ignoring it would lead a manager to underestimate (or misjudge the direction of) the harm of a harsh winter.</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Exercise 2</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>Uncorrected <code>avg_slopes()</code> on the biased sample is pulled toward the male slope (weaker effect) because males are overrepresented</li>
-<li>Corrected version (using <code>newdata_balanced</code>) should land closer to <code>mean(c(male_loss, female_loss))</code></li>
-<li>Without a known true ratio, you would need an independent, unbiased estimate of population sex ratio (e.g., aerial survey, camera trap monitoring not subject to the same capture bias) to justify reweighting</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Exercise 3</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>Mirror the code from the “slope across the range of the moderator” slide, swapping the roles of <code>temp_centered</code> and <code>rain_centered</code></li>
-<li>Answer depends on the random seed / simulated draw — have students report their own CI crossing point</li>
-<li>Example framing: “Does the effect of temperature (exposure) on petal length depend on rainfall (moderator)?”</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Exercise 5</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li><code>slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = c(min(occ_data$temp), max(occ_data$temp)), rain = c(min(occ_data$rain), max(occ_data$rain))))</code></li>
-<li>The smallest slope occurs at whichever combination pushes predicted probability closest to 0 or 1 (flat ends of the S-curve); the largest occurs near predicted probability ≈ 0.5 (steepest part of the curve)</li>
-<li>Reporting only the raw coefficient (~1.87) would mislead a reader into thinking tree cover has one fixed effect on occurrence probability, when in fact that effect shrinks or grows depending on rain and temperature — exactly the implicit interaction discussed above</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Exercise 6</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li>Rate ratio: <code>exp(fixef(mod_2)$cond["temp"])</code> — identical regardless of <code>rain</code> or <code>tree_cov</code>, since <span class="math display">\[e^\beta\]</span> does not depend on other covariate values</li>
-<li>Local slope: <code>lambda * beta_temp</code> where <code>lambda &lt;- exp(predict(mod_2, newdata = datagrid(model = mod_2, rain = min(abund_data$rain), tree_cov = mean(abund_data$tree_cov)), type = "link"))</code> — this <strong>does</strong> change with <code>tree_cov</code> (and <code>rain</code>), because it’s rescaled by the expected count <span class="math display">\[\lambda\]</span> at each point</li>
-<li>The rate ratio is constant because exponentiating a fixed additive (log-scale) effect always yields the same multiplicative factor; the local slope is not constant because it also depends on the curve’s local steepness, i.e., on <span class="math display">\[\lambda\]</span> itself</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="callout callout-note callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Exercise 7</strong></p>
-</div>
-<div class="callout-content">
-<ul>
-<li><code>avg_slopes(mod_hu, variables = "scl_tree_cov", type = "response")</code> — <code>scl_tree_cov</code> only enters the <code>zi =</code> formula, but <code>type = "response"</code> still lets you ask how it affects population-scale abundance by way of occupancy</li>
-<li><code>type = "conditional"</code> gives abundance <em>given</em> the plot is occupied (ignores occurrence entirely); <code>type = "response"</code> multiplies that by the predicted probability of occurrence, giving abundance across <em>all</em> plots</li>
-<li>The mirror plot (competitors on the x-axis, one line per prey level) makes it easier to see that abundance converges to roughly the same low floor once competitors are abundant, regardless of prey — a pattern that’s harder to spot when prey is on the x-axis</li>
-</ul>
-</div>
-</div>
-</div>
 
 
 </section></section>
