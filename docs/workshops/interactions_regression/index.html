@@ -390,9 +390,10 @@ Allen Bush-Beaupré
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a aria-label="1"></a><span class="fu">ggplot</span>(bighorn_population, <span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
-<span id="cb4-2"><a aria-label="2"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb4-3"><a aria-label="3"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a aria-label="1"></a><span class="fu">ggplot</span>(bighorn_population) <span class="sc">+</span></span>
+<span id="cb4-2"><a aria-label="2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
+<span id="cb4-3"><a aria-label="3"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight), <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb4-4"><a aria-label="4"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> weight, <span class="at">color =</span> sex), <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
@@ -925,11 +926,35 @@ attr(,"ddf")
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a aria-label="1"></a><span class="fu">tibble</span>(<span class="at">log_odds =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>, <span class="at">length.out =</span> <span class="dv">400</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb37-2"><a aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">probability =</span> <span class="fu">plogis</span>(log_odds)) <span class="sc">|&gt;</span></span>
-<span id="cb37-3"><a aria-label="3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> log_odds, <span class="at">y =</span> probability)) <span class="sc">+</span></span>
-<span id="cb37-4"><a aria-label="4"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
-<span id="cb37-5"><a aria-label="5"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"log-odds scale (what the coefficient describes)"</span>,</span>
-<span id="cb37-6"><a aria-label="6"></a>       <span class="at">y =</span> <span class="st">"probability scale (what we care about)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb37-2"><a aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">probability =</span> <span class="fu">plogis</span>(log_odds)) <span class="ot">-&gt;</span> logistic_curve</span>
+<span id="cb37-3"><a aria-label="3"></a></span>
+<span id="cb37-4"><a aria-label="4"></a><span class="fu">tibble</span>(</span>
+<span id="cb37-5"><a aria-label="5"></a>  <span class="at">log_odds =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="sc">-</span><span class="fl">4.2</span>, <span class="fl">4.2</span>),</span>
+<span id="cb37-6"><a aria-label="6"></a>  <span class="at">probability =</span> <span class="fu">plogis</span>(log_odds),</span>
+<span id="cb37-7"><a aria-label="7"></a>  <span class="at">label =</span> <span class="fu">c</span>(<span class="st">"steep middle:</span><span class="sc">\n</span><span class="st">a small push here</span><span class="sc">\n</span><span class="st">moves probability a lot"</span>,</span>
+<span id="cb37-8"><a aria-label="8"></a>            <span class="st">"flat end:</span><span class="sc">\n</span><span class="st">a push here barely</span><span class="sc">\n</span><span class="st">moves probability"</span>,</span>
+<span id="cb37-9"><a aria-label="9"></a>            <span class="st">"flat end:</span><span class="sc">\n</span><span class="st">a push here barely</span><span class="sc">\n</span><span class="st">moves probability"</span>)</span>
+<span id="cb37-10"><a aria-label="10"></a>) <span class="ot">-&gt;</span> annot</span>
+<span id="cb37-11"><a aria-label="11"></a></span>
+<span id="cb37-12"><a aria-label="12"></a><span class="fu">ggplot</span>(logistic_curve, <span class="fu">aes</span>(<span class="at">x =</span> log_odds, <span class="at">y =</span> probability)) <span class="sc">+</span></span>
+<span id="cb37-13"><a aria-label="13"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb37-14"><a aria-label="14"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> annot, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb37-15"><a aria-label="15"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb37-16"><a aria-label="16"></a>    <span class="at">data =</span> annot,</span>
+<span id="cb37-17"><a aria-label="17"></a>    <span class="fu">aes</span>(<span class="at">label =</span> label),</span>
+<span id="cb37-18"><a aria-label="18"></a>    <span class="at">color =</span> <span class="st">"white"</span>,</span>
+<span id="cb37-19"><a aria-label="19"></a>    <span class="at">size =</span> <span class="fl">4.5</span>,</span>
+<span id="cb37-20"><a aria-label="20"></a>    <span class="at">fontface =</span> <span class="st">"bold"</span>,</span>
+<span id="cb37-21"><a aria-label="21"></a>    <span class="at">lineheight =</span> <span class="fl">0.9</span>,</span>
+<span id="cb37-22"><a aria-label="22"></a>    <span class="at">vjust =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.4</span>, <span class="sc">-</span><span class="fl">0.6</span>, <span class="fl">1.6</span>),</span>
+<span id="cb37-23"><a aria-label="23"></a>    <span class="at">hjust =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>)</span>
+<span id="cb37-24"><a aria-label="24"></a>  ) <span class="sc">+</span></span>
+<span id="cb37-25"><a aria-label="25"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.1</span>, <span class="fl">1.05</span>)) <span class="sc">+</span></span>
+<span id="cb37-26"><a aria-label="26"></a>  <span class="fu">labs</span>(</span>
+<span id="cb37-27"><a aria-label="27"></a>    <span class="at">x =</span> <span class="st">"log-odds scale (what the model's coefficient describes)"</span>,</span>
+<span id="cb37-28"><a aria-label="28"></a>    <span class="at">y =</span> <span class="st">"probability scale"</span>,</span>
+<span id="cb37-29"><a aria-label="29"></a>    <span class="at">title =</span> <span class="st">"The logit link bends a straight line into an S-shape"</span></span>
+<span id="cb37-30"><a aria-label="30"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
@@ -1025,10 +1050,34 @@ Comparison: dY/dX</code></pre>
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a aria-label="1"></a><span class="fu">tibble</span>(<span class="at">log_count =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">6</span>, <span class="at">length.out =</span> <span class="dv">400</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb42-2"><a aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">count =</span> <span class="fu">exp</span>(log_count)) <span class="sc">|&gt;</span></span>
-<span id="cb42-3"><a aria-label="3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> log_count, <span class="at">y =</span> count)) <span class="sc">+</span></span>
-<span id="cb42-4"><a aria-label="4"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
-<span id="cb42-5"><a aria-label="5"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"log scale (what the coefficient describes)"</span>, <span class="at">y =</span> <span class="st">"count scale (what we care about)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb42-2"><a aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">count =</span> <span class="fu">exp</span>(log_count)) <span class="ot">-&gt;</span> exp_curve</span>
+<span id="cb42-3"><a aria-label="3"></a></span>
+<span id="cb42-4"><a aria-label="4"></a><span class="fu">tibble</span>(</span>
+<span id="cb42-5"><a aria-label="5"></a>  <span class="at">log_count =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.5</span>, <span class="dv">2</span>, <span class="fl">4.5</span>),</span>
+<span id="cb42-6"><a aria-label="6"></a>  <span class="at">count =</span> <span class="fu">exp</span>(log_count),</span>
+<span id="cb42-7"><a aria-label="7"></a>  <span class="at">label =</span> <span class="fu">c</span>(<span class="st">"flat end:</span><span class="sc">\n</span><span class="st">a push here barely</span><span class="sc">\n</span><span class="st">moves the expected count"</span>,</span>
+<span id="cb42-8"><a aria-label="8"></a>            <span class="st">"moderate slope:</span><span class="sc">\n</span><span class="st">a push here moves</span><span class="sc">\n</span><span class="st">the expected count some"</span>,</span>
+<span id="cb42-9"><a aria-label="9"></a>            <span class="st">"steep end:</span><span class="sc">\n</span><span class="st">a push here moves</span><span class="sc">\n</span><span class="st">the expected count a lot"</span>)</span>
+<span id="cb42-10"><a aria-label="10"></a>) <span class="ot">-&gt;</span> annot_exp</span>
+<span id="cb42-11"><a aria-label="11"></a></span>
+<span id="cb42-12"><a aria-label="12"></a><span class="fu">ggplot</span>(exp_curve, <span class="fu">aes</span>(<span class="at">x =</span> log_count, <span class="at">y =</span> count)) <span class="sc">+</span></span>
+<span id="cb42-13"><a aria-label="13"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb42-14"><a aria-label="14"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> annot_exp, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb42-15"><a aria-label="15"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb42-16"><a aria-label="16"></a>    <span class="at">data =</span> annot_exp,</span>
+<span id="cb42-17"><a aria-label="17"></a>    <span class="fu">aes</span>(<span class="at">label =</span> label),</span>
+<span id="cb42-18"><a aria-label="18"></a>    <span class="at">color =</span> <span class="st">"white"</span>,</span>
+<span id="cb42-19"><a aria-label="19"></a>    <span class="at">size =</span> <span class="fl">4.5</span>,</span>
+<span id="cb42-20"><a aria-label="20"></a>    <span class="at">fontface =</span> <span class="st">"bold"</span>,</span>
+<span id="cb42-21"><a aria-label="21"></a>    <span class="at">lineheight =</span> <span class="fl">0.9</span>,</span>
+<span id="cb42-22"><a aria-label="22"></a>    <span class="at">vjust =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.4</span>, <span class="sc">-</span><span class="fl">0.6</span>, <span class="fl">1.6</span>),</span>
+<span id="cb42-23"><a aria-label="23"></a>    <span class="at">hjust =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>)</span>
+<span id="cb42-24"><a aria-label="24"></a>  ) <span class="sc">+</span></span>
+<span id="cb42-25"><a aria-label="25"></a>  <span class="fu">labs</span>(</span>
+<span id="cb42-26"><a aria-label="26"></a>    <span class="at">x =</span> <span class="st">"log scale (what the model's coefficient describes)"</span>,</span>
+<span id="cb42-27"><a aria-label="27"></a>    <span class="at">y =</span> <span class="st">"count scale"</span>,</span>
+<span id="cb42-28"><a aria-label="28"></a>    <span class="at">title =</span> <span class="st">"The log link bends a straight line into an exponential curve"</span></span>
+<span id="cb42-29"><a aria-label="29"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
@@ -1129,10 +1178,11 @@ attr(,"ddf")
 <span id="cb48-3"><a aria-label="3"></a>                                                 <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_competitors), <span class="at">length.out =</span> <span class="dv">30</span>)),</span>
 <span id="cb48-4"><a aria-label="4"></a>       <span class="at">type =</span> <span class="st">"response"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb48-5"><a aria-label="5"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> scl_competitors, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
-<span id="cb48-6"><a aria-label="6"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb48-6"><a aria-label="6"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
 <span id="cb48-7"><a aria-label="7"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">fill =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
 <span id="cb48-8"><a aria-label="8"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb48-9"><a aria-label="9"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Slope of scl_prey (count scale)"</span>, <span class="at">x =</span> <span class="st">"Competitors (scaled)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb48-9"><a aria-label="9"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Slope of scl_prey</span><span class="sc">\n</span><span class="st">(count scale, individuals present)"</span>, <span class="at">x =</span> <span class="st">"Competitors (scaled)"</span>,</span>
+<span id="cb48-10"><a aria-label="10"></a>       <span class="at">title =</span> <span class="st">"Count-scale effect of prey availability weakens as competitors increase"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>

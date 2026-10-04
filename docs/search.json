@@ -557,7 +557,7 @@
     "href": "workshops/interactions_regression/index.html#within-sex-trends",
     "title": "Understanding Interactions in Regression Models",
     "section": "Within-sex trends",
-    "text": "Within-sex trends\n\n\nCode\nggplot(bighorn_population, aes(x = snow_depth, y = weight, color = sex)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = FALSE)\n\n\n\nWithin-sex trends are negative, as expected."
+    "text": "Within-sex trends\n\n\nCode\nggplot(bighorn_population) +\n  geom_point(aes(x = snow_depth, y = weight, color = sex)) +\n  geom_smooth(aes(x = snow_depth, y = weight), method = \"lm\", se = FALSE, color = \"red\", linewidth = 2) +\n  geom_smooth(aes(x = snow_depth, y = weight, color = sex), method = \"lm\", se = FALSE)\n\n\n\nWithin-sex trends are negative, as expected."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#exercise-1",
@@ -872,7 +872,7 @@
     "href": "workshops/interactions_regression/index.html#the-interaction-on-the-count-scale",
     "title": "Understanding Interactions in Regression Models",
     "section": "The interaction on the count scale",
-    "text": "The interaction on the count scale\n\n\nCode\nslopes(mod_hu, variables = \"scl_prey\",\n       newdata = datagrid(scl_competitors = seq(min(pop_data$scl_competitors),\n                                                 max(pop_data$scl_competitors), length.out = 30)),\n       type = \"response\") |&gt;\n  ggplot(aes(x = scl_competitors, y = estimate)) +\n  geom_hline(yintercept = 0, color = \"blue\", linetype = 2) +\n  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.4, fill = \"lightgrey\") +\n  geom_line(linewidth = 1.5, lineend = \"round\", color = \"white\") +\n  labs(y = \"Slope of scl_prey (count scale)\", x = \"Competitors (scaled)\")\n\n\n\nCount-scale effect of prey weakens (and reverses) as competitors increase."
+    "text": "The interaction on the count scale\n\n\nCode\nslopes(mod_hu, variables = \"scl_prey\",\n       newdata = datagrid(scl_competitors = seq(min(pop_data$scl_competitors),\n                                                 max(pop_data$scl_competitors), length.out = 30)),\n       type = \"response\") |&gt;\n  ggplot(aes(x = scl_competitors, y = estimate)) +\n  geom_hline(yintercept = 0, color = \"blue\", linewidth = 1, linetype = 2) +\n  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.4, fill = \"lightgrey\") +\n  geom_line(linewidth = 1.5, lineend = \"round\", color = \"white\") +\n  labs(y = \"Slope of scl_prey\\n(count scale, individuals present)\", x = \"Competitors (scaled)\",\n       title = \"Count-scale effect of prey availability weakens as competitors increase\")\n\n\n\nCount-scale effect of prey weakens (and reverses) as competitors increase."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#isolating-the-interaction-rate-ratios",
@@ -1789,7 +1789,7 @@
     "href": "workshops/interactions_regression/index.html#the-logit-link-visualized",
     "title": "Understanding Interactions in Regression Models",
     "section": "The logit link, visualized",
-    "text": "The logit link, visualized\n\n\nCode\ntibble(log_odds = seq(-6, 6, length.out = 400)) |&gt;\n  mutate(probability = plogis(log_odds)) |&gt;\n  ggplot(aes(x = log_odds, y = probability)) +\n  geom_line(color = \"white\", linewidth = 2, lineend = \"round\") +\n  labs(x = \"log-odds scale (what the coefficient describes)\",\n       y = \"probability scale (what we care about)\")\n\n\n\nThe logit link bends a straight line into an S-shape."
+    "text": "The logit link, visualized\n\n\nCode\ntibble(log_odds = seq(-6, 6, length.out = 400)) |&gt;\n  mutate(probability = plogis(log_odds)) -&gt; logistic_curve\n\ntibble(\n  log_odds = c(0, -4.2, 4.2),\n  probability = plogis(log_odds),\n  label = c(\"steep middle:\\na small push here\\nmoves probability a lot\",\n            \"flat end:\\na push here barely\\nmoves probability\",\n            \"flat end:\\na push here barely\\nmoves probability\")\n) -&gt; annot\n\nggplot(logistic_curve, aes(x = log_odds, y = probability)) +\n  geom_line(color = \"white\", linewidth = 1.5, lineend = \"round\") +\n  geom_point(data = annot, color = \"white\", size = 3) +\n  geom_text(\n    data = annot,\n    aes(label = label),\n    color = \"white\",\n    size = 4.5,\n    fontface = \"bold\",\n    lineheight = 0.9,\n    vjust = c(-0.4, -0.6, 1.6),\n    hjust = c(0.5, 0.5, 0.5)\n  ) +\n  scale_y_continuous(limits = c(-0.1, 1.05)) +\n  labs(\n    x = \"log-odds scale (what the model's coefficient describes)\",\n    y = \"probability scale\",\n    title = \"The logit link bends a straight line into an S-shape\"\n  )\n\n\n\nThe logit link bends a straight line into an S-shape."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#reading-the-s-curve",
@@ -1810,7 +1810,7 @@
     "href": "workshops/interactions_regression/index.html#the-log-link-bends-a-line-into-a-curve",
     "title": "Understanding Interactions in Regression Models",
     "section": "The log link bends a line into a curve",
-    "text": "The log link bends a line into a curve\n\n\nCode\ntibble(log_count = seq(-2, 6, length.out = 400)) |&gt;\n  mutate(count = exp(log_count)) |&gt;\n  ggplot(aes(x = log_count, y = count)) +\n  geom_line(color = \"white\", linewidth = 2, lineend = \"round\") +\n  labs(x = \"log scale (what the coefficient describes)\", y = \"count scale (what we care about)\")"
+    "text": "The log link bends a line into a curve\n\n\nCode\ntibble(log_count = seq(-2, 6, length.out = 400)) |&gt;\n  mutate(count = exp(log_count)) -&gt; exp_curve\n\ntibble(\n  log_count = c(-1.5, 2, 4.5),\n  count = exp(log_count),\n  label = c(\"flat end:\\na push here barely\\nmoves the expected count\",\n            \"moderate slope:\\na push here moves\\nthe expected count some\",\n            \"steep end:\\na push here moves\\nthe expected count a lot\")\n) -&gt; annot_exp\n\nggplot(exp_curve, aes(x = log_count, y = count)) +\n  geom_line(color = \"white\", linewidth = 1.5, lineend = \"round\") +\n  geom_point(data = annot_exp, color = \"white\", size = 3) +\n  geom_text(\n    data = annot_exp,\n    aes(label = label),\n    color = \"white\",\n    size = 4.5,\n    fontface = \"bold\",\n    lineheight = 0.9,\n    vjust = c(-0.4, -0.6, 1.6),\n    hjust = c(0.5, 0.5, 0.5)\n  ) +\n  labs(\n    x = \"log scale (what the model's coefficient describes)\",\n    y = \"count scale\",\n    title = \"The log link bends a straight line into an exponential curve\"\n  )"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#from-log-scale-to-counts",

@@ -179,9 +179,10 @@ Pooled: snow depth looks **positively** associated with weight — even though b
 ```{r}
 #| code-fold: true
 #| fig-cap: "Within-sex trends are negative, as expected."
-ggplot(bighorn_population, aes(x = snow_depth, y = weight, color = sex)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE)
+ggplot(bighorn_population) +
+  geom_point(aes(x = snow_depth, y = weight, color = sex)) +
+  geom_smooth(aes(x = snow_depth, y = weight), method = "lm", se = FALSE, color = "red", linewidth = 2) +
+  geom_smooth(aes(x = snow_depth, y = weight, color = sex), method = "lm", se = FALSE)
 ```
 
 ## 🧪 Exercise 1
@@ -616,11 +617,35 @@ The logit-link GLM draws a straight line through the **log-odds** of occurrence,
 #| code-fold: true
 #| fig-cap: "The logit link bends a straight line into an S-shape."
 tibble(log_odds = seq(-6, 6, length.out = 400)) |>
-  mutate(probability = plogis(log_odds)) |>
-  ggplot(aes(x = log_odds, y = probability)) +
-  geom_line(color = "white", linewidth = 2, lineend = "round") +
-  labs(x = "log-odds scale (what the coefficient describes)",
-       y = "probability scale (what we care about)")
+  mutate(probability = plogis(log_odds)) -> logistic_curve
+
+tibble(
+  log_odds = c(0, -4.2, 4.2),
+  probability = plogis(log_odds),
+  label = c("steep middle:\na small push here\nmoves probability a lot",
+            "flat end:\na push here barely\nmoves probability",
+            "flat end:\na push here barely\nmoves probability")
+) -> annot
+
+ggplot(logistic_curve, aes(x = log_odds, y = probability)) +
+  geom_line(color = "white", linewidth = 1.5, lineend = "round") +
+  geom_point(data = annot, color = "white", size = 3) +
+  geom_text(
+    data = annot,
+    aes(label = label),
+    color = "white",
+    size = 4.5,
+    fontface = "bold",
+    lineheight = 0.9,
+    vjust = c(-0.4, -0.6, 1.6),
+    hjust = c(0.5, 0.5, 0.5)
+  ) +
+  scale_y_continuous(limits = c(-0.1, 1.05)) +
+  labs(
+    x = "log-odds scale (what the model's coefficient describes)",
+    y = "probability scale",
+    title = "The logit link bends a straight line into an S-shape"
+  )
 ```
 
 ## Reading the S-curve
@@ -706,10 +731,34 @@ mod_2 <- glmmTMB(abundance ~ tree_cov + rain + temp, family = poisson(link = "lo
 ```{r}
 #| code-fold: true
 tibble(log_count = seq(-2, 6, length.out = 400)) |>
-  mutate(count = exp(log_count)) |>
-  ggplot(aes(x = log_count, y = count)) +
-  geom_line(color = "white", linewidth = 2, lineend = "round") +
-  labs(x = "log scale (what the coefficient describes)", y = "count scale (what we care about)")
+  mutate(count = exp(log_count)) -> exp_curve
+
+tibble(
+  log_count = c(-1.5, 2, 4.5),
+  count = exp(log_count),
+  label = c("flat end:\na push here barely\nmoves the expected count",
+            "moderate slope:\na push here moves\nthe expected count some",
+            "steep end:\na push here moves\nthe expected count a lot")
+) -> annot_exp
+
+ggplot(exp_curve, aes(x = log_count, y = count)) +
+  geom_line(color = "white", linewidth = 1.5, lineend = "round") +
+  geom_point(data = annot_exp, color = "white", size = 3) +
+  geom_text(
+    data = annot_exp,
+    aes(label = label),
+    color = "white",
+    size = 4.5,
+    fontface = "bold",
+    lineheight = 0.9,
+    vjust = c(-0.4, -0.6, 1.6),
+    hjust = c(0.5, 0.5, 0.5)
+  ) +
+  labs(
+    x = "log scale (what the model's coefficient describes)",
+    y = "count scale",
+    title = "The log link bends a straight line into an exponential curve"
+  )
 ```
 
 ## From log scale to counts
@@ -796,10 +845,11 @@ slopes(mod_hu, variables = "scl_prey",
                                                  max(pop_data$scl_competitors), length.out = 30)),
        type = "response") |>
   ggplot(aes(x = scl_competitors, y = estimate)) +
-  geom_hline(yintercept = 0, color = "blue", linetype = 2) +
+  geom_hline(yintercept = 0, color = "blue", linewidth = 1, linetype = 2) +
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.4, fill = "lightgrey") +
   geom_line(linewidth = 1.5, lineend = "round", color = "white") +
-  labs(y = "Slope of scl_prey (count scale)", x = "Competitors (scaled)")
+  labs(y = "Slope of scl_prey\n(count scale, individuals present)", x = "Competitors (scaled)",
+       title = "Count-scale effect of prey availability weakens as competitors increase")
 ```
 
 ## Isolating the interaction: rate ratios {.table-slide}
