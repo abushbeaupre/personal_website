@@ -615,6 +615,8 @@ Comparison: dY/dX</code></pre>
 <section id="comparing-biased-and-unbiased-prediction-grids" class="slide level2">
 <h2>Comparing biased and unbiased prediction grids</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a aria-label="1"></a>mod_mass_true <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(weight <span class="sc">~</span> sex <span class="sc">*</span> snow_depth,</span>
 <span id="cb25-2"><a aria-label="2"></a>                          <span class="at">data =</span> bighorn_population, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
 <span id="cb25-3"><a aria-label="3"></a></span>
@@ -632,6 +634,7 @@ Comparison: dY/dX</code></pre>
 <span id="cb25-15"><a aria-label="15"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted weight (kg)"</span>,</span>
 <span id="cb25-16"><a aria-label="16"></a>       <span class="at">x =</span> <span class="st">"Snow depth (cm)"</span>,</span>
 <span id="cb25-17"><a aria-label="17"></a>       <span class="at">color =</span> <span class="st">"Prediction type"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 
 </div>
 <img data-src="index_files/figure-revealjs/unnamed-chunk-16-1.png" width="768" class="r-stretch"></section>

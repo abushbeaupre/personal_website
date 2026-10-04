@@ -332,6 +332,7 @@ newdata_balanced <- bighorn_mass_2 |>
 ## Comparing biased and unbiased prediction grids
 
 ```{r}
+#| code-fold: true
 mod_mass_true <- glmmTMB(weight ~ sex * snow_depth,
                           data = bighorn_population, family = gaussian())
 
