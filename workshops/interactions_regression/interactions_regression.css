@@ -51,9 +51,14 @@
 }
 
 .reveal .slide.fig-slide .cell-output-display img {
-  max-height: 85vh;
-  width: auto;
-  max-width: 100%;
+  /* Fixed height (not max-height) so every plot is scaled to the same visual
+     size regardless of its native pixel dimensions (which vary slightly by
+     chunk depending on legend size, facets, etc.). width: auto preserves
+     each image's own aspect ratio; !important overrides the HTML width=
+     attribute pandoc writes on each <img> from fig-width/fig-height. */
+  height: 80vh !important;
+  width: auto !important;
+  max-width: 100% !important;
 }
 
 /* Dedicated slides for a single printed table (predictions()/slopes()/
