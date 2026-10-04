@@ -13,7 +13,7 @@ format:
     code-line-numbers: true
     fig-width: 8
     fig-height: 5.5
-    out-width: "75%"
+    out-width: "100%"
     footer: "Interactions in Regression Models"
     css: interactions_regression.css
     scrollable: true
