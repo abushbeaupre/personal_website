@@ -996,7 +996,7 @@ Comparison: dY/dX</code></pre>
 <span id="cb40-3"><a aria-label="3"></a>avg_yearly_rain <span class="ot">&lt;-</span> <span class="fu">dist_gamma</span>(<span class="at">shape =</span> <span class="dv">3</span>, <span class="at">rate =</span> <span class="fl">0.7</span>)</span>
 <span id="cb40-4"><a aria-label="4"></a>avg_yearly_temp <span class="ot">&lt;-</span> <span class="fu">dist_normal</span>(<span class="at">mu =</span> <span class="dv">20</span>, <span class="at">sd =</span> <span class="dv">10</span>)</span>
 <span id="cb40-5"><a aria-label="5"></a></span>
-<span id="cb40-6"><a aria-label="6"></a>occurence_intercept <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">3</span>)</span>
+<span id="cb40-6"><a aria-label="6"></a>occurence_intercept <span class="ot">&lt;-</span> <span class="fl">0.047</span></span>
 <span id="cb40-7"><a aria-label="7"></a>occurence_tree_effect <span class="ot">&lt;-</span> <span class="fl">0.45</span></span>
 <span id="cb40-8"><a aria-label="8"></a>occurence_rain_effect <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
 <span id="cb40-9"><a aria-label="9"></a>occurence_temp_effect <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
@@ -1094,7 +1094,7 @@ Type: response
 Comparison: dY/dX</code></pre>
 </div>
 </div>
-<p><code>slopes()</code> asks: “at these covariate values, how much does <em>predicted probability</em> change for a small increase in tree cover?” — a probability-scale answer, directly comparable to how we simulated the data.</p>
+<p><code>slopes()</code> in this case asks: “at these covariate values, how much does <em>predicted probability</em> change for a small increase in tree cover?” — a probability-scale answer, directly comparable to how we simulated the data.</p>
 </section>
 <section id="the-implicit-interaction-visualized" class="slide level2 fig-slide">
 <h2>The implicit interaction, visualized</h2>
@@ -1106,7 +1106,7 @@ Comparison: dY/dX</code></pre>
 <span id="cb46-3"><a aria-label="3"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">xmin =</span> conf.low, <span class="at">xmax =</span> conf.high, <span class="at">y =</span> <span class="dv">1</span>), <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
 <span id="cb46-4"><a aria-label="4"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> occurence_tree_effect, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> .<span class="dv">8</span>) <span class="sc">+</span></span>
 <span id="cb46-5"><a aria-label="5"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp) <span class="sc">+</span></span>
-<span id="cb46-6"><a aria-label="6"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.line.y =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb46-6"><a aria-label="6"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.line.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">4</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
@@ -1125,8 +1125,72 @@ Comparison: dY/dX</code></pre>
 </ul>
 <p>Getting the scale question wrong is one way real interactions get mis-detected or mis-sized (a “Type-D” error in Spake et al.’s terminology).</p>
 </section>
+<section id="response-vs.-link-scale-across-each-moderator" class="slide level2 fig-slide">
+<h2>Response vs.&nbsp;link scale, across each moderator</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a aria-label="1"></a>slopes_by_temp_response <span class="ot">&lt;-</span> <span class="fu">slopes</span>(mod_1,</span>
+<span id="cb47-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> <span class="fu">seq</span>(<span class="fu">min</span>(occ_data<span class="sc">$</span>temp), <span class="fu">max</span>(occ_data<span class="sc">$</span>temp), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb47-3"><a aria-label="3"></a>                      <span class="at">rain =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>rain)),</span>
+<span id="cb47-4"><a aria-label="4"></a>  <span class="at">variables =</span> <span class="st">"tree_cov"</span>, <span class="at">by =</span> <span class="st">"temp"</span>, <span class="at">type =</span> <span class="st">"response"</span>) <span class="sc">|&gt;</span> <span class="fu">as_tibble</span>()</span>
+<span id="cb47-5"><a aria-label="5"></a></span>
+<span id="cb47-6"><a aria-label="6"></a>slopes_by_temp_link <span class="ot">&lt;-</span> <span class="fu">slopes</span>(mod_1,</span>
+<span id="cb47-7"><a aria-label="7"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> <span class="fu">seq</span>(<span class="fu">min</span>(occ_data<span class="sc">$</span>temp), <span class="fu">max</span>(occ_data<span class="sc">$</span>temp), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb47-8"><a aria-label="8"></a>                      <span class="at">rain =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>rain)),</span>
+<span id="cb47-9"><a aria-label="9"></a>  <span class="at">variables =</span> <span class="st">"tree_cov"</span>, <span class="at">by =</span> <span class="st">"temp"</span>, <span class="at">type =</span> <span class="st">"link"</span>) <span class="sc">|&gt;</span> <span class="fu">as_tibble</span>()</span>
+<span id="cb47-10"><a aria-label="10"></a></span>
+<span id="cb47-11"><a aria-label="11"></a>slopes_by_rain_response <span class="ot">&lt;-</span> <span class="fu">slopes</span>(mod_1,</span>
+<span id="cb47-12"><a aria-label="12"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">rain =</span> <span class="fu">seq</span>(<span class="fu">min</span>(occ_data<span class="sc">$</span>rain), <span class="fu">max</span>(occ_data<span class="sc">$</span>rain), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb47-13"><a aria-label="13"></a>                      <span class="at">temp =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>temp)),</span>
+<span id="cb47-14"><a aria-label="14"></a>  <span class="at">variables =</span> <span class="st">"tree_cov"</span>, <span class="at">by =</span> <span class="st">"rain"</span>, <span class="at">type =</span> <span class="st">"response"</span>) <span class="sc">|&gt;</span> <span class="fu">as_tibble</span>()</span>
+<span id="cb47-15"><a aria-label="15"></a></span>
+<span id="cb47-16"><a aria-label="16"></a>slopes_by_rain_link <span class="ot">&lt;-</span> <span class="fu">slopes</span>(mod_1,</span>
+<span id="cb47-17"><a aria-label="17"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">rain =</span> <span class="fu">seq</span>(<span class="fu">min</span>(occ_data<span class="sc">$</span>rain), <span class="fu">max</span>(occ_data<span class="sc">$</span>rain), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb47-18"><a aria-label="18"></a>                      <span class="at">temp =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>temp)),</span>
+<span id="cb47-19"><a aria-label="19"></a>  <span class="at">variables =</span> <span class="st">"tree_cov"</span>, <span class="at">by =</span> <span class="st">"rain"</span>, <span class="at">type =</span> <span class="st">"link"</span>) <span class="sc">|&gt;</span> <span class="fu">as_tibble</span>()</span>
+<span id="cb47-20"><a aria-label="20"></a></span>
+<span id="cb47-21"><a aria-label="21"></a>plot_slope <span class="ot">&lt;-</span> <span class="cf">function</span>(data, x, y_lab, scale_title) {</span>
+<span id="cb47-22"><a aria-label="22"></a>  <span class="fu">ggplot</span>(data) <span class="sc">+</span></span>
+<span id="cb47-23"><a aria-label="23"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb47-24"><a aria-label="24"></a>    <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> .data[[x]], <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">fill =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
+<span id="cb47-25"><a aria-label="25"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> .data[[x]], <span class="at">y =</span> estimate), <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb47-26"><a aria-label="26"></a>    <span class="fu">labs</span>(<span class="at">y =</span> y_lab, <span class="at">x =</span> x, <span class="at">title =</span> scale_title)</span>
+<span id="cb47-27"><a aria-label="27"></a>}</span>
+<span id="cb47-28"><a aria-label="28"></a></span>
+<span id="cb47-29"><a aria-label="29"></a>(<span class="fu">plot_slope</span>(slopes_by_temp_response, <span class="st">"temp"</span>, <span class="st">"Slope of tree_cov</span><span class="sc">\n</span><span class="st">(probability scale)"</span>, <span class="st">"Response scale"</span>) <span class="sc">+</span></span>
+<span id="cb47-30"><a aria-label="30"></a> <span class="fu">plot_slope</span>(slopes_by_temp_link, <span class="st">"temp"</span>, <span class="st">"Slope of tree_cov</span><span class="sc">\n</span><span class="st">(log-odds scale)"</span>, <span class="st">"Link scale"</span>)) <span class="sc">/</span></span>
+<span id="cb47-31"><a aria-label="31"></a>(<span class="fu">plot_slope</span>(slopes_by_rain_response, <span class="st">"rain"</span>, <span class="st">"Slope of tree_cov</span><span class="sc">\n</span><span class="st">(probability scale)"</span>, <span class="st">"Response scale"</span>) <span class="sc">+</span></span>
+<span id="cb47-32"><a aria-label="32"></a> <span class="fu">plot_slope</span>(slopes_by_rain_link, <span class="st">"rain"</span>, <span class="st">"Slope of tree_cov</span><span class="sc">\n</span><span class="st">(log-odds scale)"</span>, <span class="st">"Link scale"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+
+</div>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-34-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Slope of tree_cov across temp (top) and rain (bottom), on the probability (left) vs.&nbsp;log-odds (right) scale. On the link scale the slope is flat — no explicit interaction was fit.</p></section>
+<section id="reading-these-panels" class="slide level2">
+<h2>Reading these panels</h2>
+<ul>
+<li><strong>Link (log-odds) scale</strong>: the slope of <code>tree_cov</code> is flat (~1.87) across both moderators — exactly as it should be, since <code>mod_1</code>’s formula has no interaction term at all.</li>
+<li><strong>Response (probability) scale</strong>: the slope visibly curves with temp (and more weakly with rain) — the implicit interaction made concrete, purely from the logit link’s curvature.</li>
+<li>With three predictors, a focal variable’s slope can no longer be shown across “the” moderator in one 2D plot — each panel above holds the <em>other</em> remaining predictor fixed at its mean. Alternatives: facet by the third variable, use small multiples at representative (e.g.&nbsp;five-number-summary) values, or report a single <code>avg_slopes()</code> that integrates over the observed distribution instead of fixing it.</li>
+</ul>
+</section>
+<section id="the-overall-effect-of-tree-cover" class="slide level2 fig-slide">
+<h2>The “overall” effect of tree cover</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a aria-label="1"></a><span class="fu">avg_predictions</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree_cov"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb48-2"><a aria-label="2"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb48-3"><a aria-label="3"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree_cov, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">fill =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb48-4"><a aria-label="4"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree_cov, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb48-5"><a aria-label="5"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted occurence"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+
+</div>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-35-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Predicted probability of occurrence across tree_cov, averaged over the observed rain and temp values (counterfactual averaging).</p><p><code>avg_predictions()</code>/<code>avg_slopes()</code> give one number (or curve) per focal value, integrating over rain and temp as observed in the sample — a marginal, “average effect” alternative to picking a single moderator value to condition on.</p>
+</section>
 <section id="exercise-5" class="slide level2 scrollable">
-<h2>🧪 Exercise 5</h2>
+<h2>Exercise 5</h2>
 <p>Using <code>mod_1</code>:</p>
 <ol type="1">
 <li>Compute the probability-scale slope of <code>tree_cov</code> at the <em>minimum</em> and <em>maximum</em> observed values of <code>rain</code> and <code>temp</code> (four combinations total, via <code>datagrid()</code>).</li>
@@ -1139,24 +1203,24 @@ Comparison: dY/dX</code></pre>
 <h2>Case study: species abundance</h2>
 <p>The same phenomenon shows up with <strong>count</strong> data. Abundance (when present) as a function of the same three predictors, fit with a Poisson GLM (log link), again <strong>no interaction terms</strong>:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a aria-label="1"></a>abundance_intercept <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="dv">1</span>)</span>
-<span id="cb47-2"><a aria-label="2"></a>abundance_tree_effect <span class="ot">&lt;-</span> <span class="fl">4.5</span></span>
-<span id="cb47-3"><a aria-label="3"></a>abundance_rain_effect <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
-<span id="cb47-4"><a aria-label="4"></a>abundance_temp_effect <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
-<span id="cb47-5"><a aria-label="5"></a></span>
-<span id="cb47-6"><a aria-label="6"></a>abund_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb47-7"><a aria-label="7"></a>  <span class="at">tree_cov =</span> <span class="fu">generate</span>(tree_cover, n_plots),</span>
-<span id="cb47-8"><a aria-label="8"></a>  <span class="at">rain =</span> <span class="fu">generate</span>(avg_yearly_rain, n_plots),</span>
-<span id="cb47-9"><a aria-label="9"></a>  <span class="at">temp =</span> <span class="fu">generate</span>(avg_yearly_temp, n_plots)</span>
-<span id="cb47-10"><a aria-label="10"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb47-11"><a aria-label="11"></a>  <span class="fu">unnest</span>(<span class="fu">everything</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb47-12"><a aria-label="12"></a>  <span class="fu">mutate</span>(<span class="at">abundance =</span> <span class="fu">rpois</span>(n_plots, <span class="at">lambda =</span></span>
-<span id="cb47-13"><a aria-label="13"></a>    abundance_intercept <span class="sc">+</span></span>
-<span id="cb47-14"><a aria-label="14"></a>    abundance_tree_effect <span class="sc">*</span> tree_cov <span class="sc">+</span></span>
-<span id="cb47-15"><a aria-label="15"></a>    abundance_rain_effect <span class="sc">*</span> rain <span class="sc">+</span></span>
-<span id="cb47-16"><a aria-label="16"></a>    abundance_temp_effect <span class="sc">*</span> temp))</span>
-<span id="cb47-17"><a aria-label="17"></a></span>
-<span id="cb47-18"><a aria-label="18"></a>mod_2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(abundance <span class="sc">~</span> tree_cov <span class="sc">+</span> rain <span class="sc">+</span> temp, <span class="at">family =</span> <span class="fu">poisson</span>(<span class="at">link =</span> <span class="st">"log"</span>), <span class="at">data =</span> abund_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a aria-label="1"></a>abundance_intercept <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="dv">1</span>)</span>
+<span id="cb49-2"><a aria-label="2"></a>abundance_tree_effect <span class="ot">&lt;-</span> <span class="fl">4.5</span></span>
+<span id="cb49-3"><a aria-label="3"></a>abundance_rain_effect <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
+<span id="cb49-4"><a aria-label="4"></a>abundance_temp_effect <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
+<span id="cb49-5"><a aria-label="5"></a></span>
+<span id="cb49-6"><a aria-label="6"></a>abund_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb49-7"><a aria-label="7"></a>  <span class="at">tree_cov =</span> <span class="fu">generate</span>(tree_cover, n_plots),</span>
+<span id="cb49-8"><a aria-label="8"></a>  <span class="at">rain =</span> <span class="fu">generate</span>(avg_yearly_rain, n_plots),</span>
+<span id="cb49-9"><a aria-label="9"></a>  <span class="at">temp =</span> <span class="fu">generate</span>(avg_yearly_temp, n_plots)</span>
+<span id="cb49-10"><a aria-label="10"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb49-11"><a aria-label="11"></a>  <span class="fu">unnest</span>(<span class="fu">everything</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb49-12"><a aria-label="12"></a>  <span class="fu">mutate</span>(<span class="at">abundance =</span> <span class="fu">rpois</span>(n_plots, <span class="at">lambda =</span></span>
+<span id="cb49-13"><a aria-label="13"></a>    abundance_intercept <span class="sc">+</span></span>
+<span id="cb49-14"><a aria-label="14"></a>    abundance_tree_effect <span class="sc">*</span> tree_cov <span class="sc">+</span></span>
+<span id="cb49-15"><a aria-label="15"></a>    abundance_rain_effect <span class="sc">*</span> rain <span class="sc">+</span></span>
+<span id="cb49-16"><a aria-label="16"></a>    abundance_temp_effect <span class="sc">*</span> temp))</span>
+<span id="cb49-17"><a aria-label="17"></a></span>
+<span id="cb49-18"><a aria-label="18"></a>mod_2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(abundance <span class="sc">~</span> tree_cov <span class="sc">+</span> rain <span class="sc">+</span> temp, <span class="at">family =</span> <span class="fu">poisson</span>(<span class="at">link =</span> <span class="st">"log"</span>), <span class="at">data =</span> abund_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="the-log-link-bends-a-line-into-a-curve" class="slide level2 fig-slide">
@@ -1164,39 +1228,39 @@ Comparison: dY/dX</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a aria-label="1"></a><span class="fu">tibble</span>(<span class="at">log_count =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">6</span>, <span class="at">length.out =</span> <span class="dv">400</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb48-2"><a aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">count =</span> <span class="fu">exp</span>(log_count)) <span class="ot">-&gt;</span> exp_curve</span>
-<span id="cb48-3"><a aria-label="3"></a></span>
-<span id="cb48-4"><a aria-label="4"></a><span class="fu">tibble</span>(</span>
-<span id="cb48-5"><a aria-label="5"></a>  <span class="at">log_count =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.5</span>, <span class="dv">2</span>, <span class="fl">4.5</span>),</span>
-<span id="cb48-6"><a aria-label="6"></a>  <span class="at">count =</span> <span class="fu">exp</span>(log_count),</span>
-<span id="cb48-7"><a aria-label="7"></a>  <span class="at">label =</span> <span class="fu">c</span>(<span class="st">"flat end:</span><span class="sc">\n</span><span class="st">a push here barely</span><span class="sc">\n</span><span class="st">moves the expected count"</span>,</span>
-<span id="cb48-8"><a aria-label="8"></a>            <span class="st">"moderate slope:</span><span class="sc">\n</span><span class="st">a push here moves</span><span class="sc">\n</span><span class="st">the expected count some"</span>,</span>
-<span id="cb48-9"><a aria-label="9"></a>            <span class="st">"steep end:</span><span class="sc">\n</span><span class="st">a push here moves</span><span class="sc">\n</span><span class="st">the expected count a lot"</span>)</span>
-<span id="cb48-10"><a aria-label="10"></a>) <span class="ot">-&gt;</span> annot_exp</span>
-<span id="cb48-11"><a aria-label="11"></a></span>
-<span id="cb48-12"><a aria-label="12"></a><span class="fu">ggplot</span>(exp_curve, <span class="fu">aes</span>(<span class="at">x =</span> log_count, <span class="at">y =</span> count)) <span class="sc">+</span></span>
-<span id="cb48-13"><a aria-label="13"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
-<span id="cb48-14"><a aria-label="14"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> annot_exp, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb48-15"><a aria-label="15"></a>  <span class="fu">geom_text</span>(</span>
-<span id="cb48-16"><a aria-label="16"></a>    <span class="at">data =</span> annot_exp,</span>
-<span id="cb48-17"><a aria-label="17"></a>    <span class="fu">aes</span>(<span class="at">label =</span> label),</span>
-<span id="cb48-18"><a aria-label="18"></a>    <span class="at">color =</span> <span class="st">"white"</span>,</span>
-<span id="cb48-19"><a aria-label="19"></a>    <span class="at">size =</span> <span class="fl">4.5</span>,</span>
-<span id="cb48-20"><a aria-label="20"></a>    <span class="at">fontface =</span> <span class="st">"bold"</span>,</span>
-<span id="cb48-21"><a aria-label="21"></a>    <span class="at">lineheight =</span> <span class="fl">0.9</span>,</span>
-<span id="cb48-22"><a aria-label="22"></a>    <span class="at">vjust =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.4</span>, <span class="sc">-</span><span class="fl">0.6</span>, <span class="fl">1.6</span>),</span>
-<span id="cb48-23"><a aria-label="23"></a>    <span class="at">hjust =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>)</span>
-<span id="cb48-24"><a aria-label="24"></a>  ) <span class="sc">+</span></span>
-<span id="cb48-25"><a aria-label="25"></a>  <span class="fu">labs</span>(</span>
-<span id="cb48-26"><a aria-label="26"></a>    <span class="at">x =</span> <span class="st">"log scale (what the model's coefficient describes)"</span>,</span>
-<span id="cb48-27"><a aria-label="27"></a>    <span class="at">y =</span> <span class="st">"count scale"</span>,</span>
-<span id="cb48-28"><a aria-label="28"></a>    <span class="at">title =</span> <span class="st">"The log link bends a straight line into an exponential curve"</span></span>
-<span id="cb48-29"><a aria-label="29"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a aria-label="1"></a><span class="fu">tibble</span>(<span class="at">log_count =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">6</span>, <span class="at">length.out =</span> <span class="dv">400</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb50-2"><a aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">count =</span> <span class="fu">exp</span>(log_count)) <span class="ot">-&gt;</span> exp_curve</span>
+<span id="cb50-3"><a aria-label="3"></a></span>
+<span id="cb50-4"><a aria-label="4"></a><span class="fu">tibble</span>(</span>
+<span id="cb50-5"><a aria-label="5"></a>  <span class="at">log_count =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.5</span>, <span class="dv">2</span>, <span class="fl">4.5</span>),</span>
+<span id="cb50-6"><a aria-label="6"></a>  <span class="at">count =</span> <span class="fu">exp</span>(log_count),</span>
+<span id="cb50-7"><a aria-label="7"></a>  <span class="at">label =</span> <span class="fu">c</span>(<span class="st">"flat end:</span><span class="sc">\n</span><span class="st">a push here barely</span><span class="sc">\n</span><span class="st">moves the expected count"</span>,</span>
+<span id="cb50-8"><a aria-label="8"></a>            <span class="st">"moderate slope:</span><span class="sc">\n</span><span class="st">a push here moves</span><span class="sc">\n</span><span class="st">the expected count some"</span>,</span>
+<span id="cb50-9"><a aria-label="9"></a>            <span class="st">"steep end:</span><span class="sc">\n</span><span class="st">a push here moves</span><span class="sc">\n</span><span class="st">the expected count a lot"</span>)</span>
+<span id="cb50-10"><a aria-label="10"></a>) <span class="ot">-&gt;</span> annot_exp</span>
+<span id="cb50-11"><a aria-label="11"></a></span>
+<span id="cb50-12"><a aria-label="12"></a><span class="fu">ggplot</span>(exp_curve, <span class="fu">aes</span>(<span class="at">x =</span> log_count, <span class="at">y =</span> count)) <span class="sc">+</span></span>
+<span id="cb50-13"><a aria-label="13"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb50-14"><a aria-label="14"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> annot_exp, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb50-15"><a aria-label="15"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb50-16"><a aria-label="16"></a>    <span class="at">data =</span> annot_exp,</span>
+<span id="cb50-17"><a aria-label="17"></a>    <span class="fu">aes</span>(<span class="at">label =</span> label),</span>
+<span id="cb50-18"><a aria-label="18"></a>    <span class="at">color =</span> <span class="st">"white"</span>,</span>
+<span id="cb50-19"><a aria-label="19"></a>    <span class="at">size =</span> <span class="fl">4.5</span>,</span>
+<span id="cb50-20"><a aria-label="20"></a>    <span class="at">fontface =</span> <span class="st">"bold"</span>,</span>
+<span id="cb50-21"><a aria-label="21"></a>    <span class="at">lineheight =</span> <span class="fl">0.9</span>,</span>
+<span id="cb50-22"><a aria-label="22"></a>    <span class="at">vjust =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.4</span>, <span class="sc">-</span><span class="fl">0.6</span>, <span class="fl">1.6</span>),</span>
+<span id="cb50-23"><a aria-label="23"></a>    <span class="at">hjust =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>)</span>
+<span id="cb50-24"><a aria-label="24"></a>  ) <span class="sc">+</span></span>
+<span id="cb50-25"><a aria-label="25"></a>  <span class="fu">labs</span>(</span>
+<span id="cb50-26"><a aria-label="26"></a>    <span class="at">x =</span> <span class="st">"log scale (what the model's coefficient describes)"</span>,</span>
+<span id="cb50-27"><a aria-label="27"></a>    <span class="at">y =</span> <span class="st">"count scale"</span>,</span>
+<span id="cb50-28"><a aria-label="28"></a>    <span class="at">title =</span> <span class="st">"The log link bends a straight line into an exponential curve"</span></span>
+<span id="cb50-29"><a aria-label="29"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-35-1.png" width="768" class="r-stretch"></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-37-1.png" width="768" class="r-stretch"></section>
 <section id="from-log-scale-to-counts" class="slide level2">
 <h2>From log scale to counts</h2>
 <p>The log-scale <code>tree_cov</code> coefficient is <strong>~0.73</strong>, not 4.5 — the same phenomenon as the logit link, just a different curve.</p>
@@ -1211,7 +1275,7 @@ Comparison: dY/dX</code></pre>
 <section id="computing-the-rate-ratio" class="slide level2 table-slide">
 <h2>Computing the rate ratio</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a aria-label="1"></a><span class="fu">exp</span>(<span class="fu">fixef</span>(mod_2)<span class="sc">$</span>cond[<span class="st">"tree_cov"</span>])  <span class="co"># rate ratio: ~2.08, i.e. a ~108% increase per unit tree cover</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a aria-label="1"></a><span class="fu">exp</span>(<span class="fu">fixef</span>(mod_2)<span class="sc">$</span>cond[<span class="st">"tree_cov"</span>])  <span class="co"># rate ratio: ~2.08, i.e. a ~108% increase per unit tree cover</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tree_cov 
 1.770493 </code></pre>
@@ -1242,35 +1306,35 @@ Comparison: dY/dX</code></pre>
 <h2>Simulating with an explicit interaction</h2>
 <p>Prey and competitors interact in their effect on abundance (when present); tree cover drives occurrence only. Predictors are simulated through the model’s own inverse link (<code>exp()</code>, <code>plogis()</code>) so they stay in a valid range:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a aria-label="1"></a>more_plots <span class="ot">&lt;-</span> <span class="dv">4000</span></span>
-<span id="cb51-2"><a aria-label="2"></a>prey_abun <span class="ot">&lt;-</span> <span class="fu">dist_poisson</span>(<span class="at">lambda =</span> <span class="dv">6</span>)</span>
-<span id="cb51-3"><a aria-label="3"></a>competitor_abun <span class="ot">&lt;-</span> <span class="fu">dist_poisson</span>(<span class="at">lambda =</span> <span class="dv">3</span>)</span>
-<span id="cb51-4"><a aria-label="4"></a></span>
-<span id="cb51-5"><a aria-label="5"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb51-6"><a aria-label="6"></a>  <span class="at">tree_cov =</span> <span class="fu">generate</span>(tree_cover, more_plots),</span>
-<span id="cb51-7"><a aria-label="7"></a>  <span class="at">prey =</span> <span class="fu">generate</span>(prey_abun, more_plots),</span>
-<span id="cb51-8"><a aria-label="8"></a>  <span class="at">competitors =</span> <span class="fu">generate</span>(competitor_abun, more_plots)</span>
-<span id="cb51-9"><a aria-label="9"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb51-10"><a aria-label="10"></a>  <span class="fu">unnest</span>(<span class="fu">everything</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb51-11"><a aria-label="11"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb51-12"><a aria-label="12"></a>    <span class="at">abundance_pres =</span> <span class="fu">rpois</span>(more_plots,</span>
-<span id="cb51-13"><a aria-label="13"></a>      <span class="at">lambda =</span> <span class="fu">exp</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.12</span> <span class="sc">*</span> prey <span class="sc">-</span> <span class="fl">0.15</span> <span class="sc">*</span> competitors <span class="sc">-</span> <span class="fl">0.045</span> <span class="sc">*</span> prey <span class="sc">*</span> competitors)),</span>
-<span id="cb51-14"><a aria-label="14"></a>    <span class="at">occurence =</span> <span class="fu">rbinom</span>(more_plots, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.45</span> <span class="sc">*</span> tree_cov)),</span>
-<span id="cb51-15"><a aria-label="15"></a>    <span class="at">abundance_pop =</span> abundance_pres <span class="sc">*</span> occurence</span>
-<span id="cb51-16"><a aria-label="16"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb51-17"><a aria-label="17"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(tree_cov, prey, competitors), <span class="sc">~</span> (.x <span class="sc">-</span> <span class="fu">mean</span>(.x)) <span class="sc">/</span> <span class="fu">sd</span>(.x), <span class="at">.names =</span> <span class="st">"scl_{.col}"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a aria-label="1"></a>more_plots <span class="ot">&lt;-</span> <span class="dv">4000</span></span>
+<span id="cb53-2"><a aria-label="2"></a>prey_abun <span class="ot">&lt;-</span> <span class="fu">dist_poisson</span>(<span class="at">lambda =</span> <span class="dv">6</span>)</span>
+<span id="cb53-3"><a aria-label="3"></a>competitor_abun <span class="ot">&lt;-</span> <span class="fu">dist_poisson</span>(<span class="at">lambda =</span> <span class="dv">3</span>)</span>
+<span id="cb53-4"><a aria-label="4"></a></span>
+<span id="cb53-5"><a aria-label="5"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb53-6"><a aria-label="6"></a>  <span class="at">tree_cov =</span> <span class="fu">generate</span>(tree_cover, more_plots),</span>
+<span id="cb53-7"><a aria-label="7"></a>  <span class="at">prey =</span> <span class="fu">generate</span>(prey_abun, more_plots),</span>
+<span id="cb53-8"><a aria-label="8"></a>  <span class="at">competitors =</span> <span class="fu">generate</span>(competitor_abun, more_plots)</span>
+<span id="cb53-9"><a aria-label="9"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb53-10"><a aria-label="10"></a>  <span class="fu">unnest</span>(<span class="fu">everything</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb53-11"><a aria-label="11"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb53-12"><a aria-label="12"></a>    <span class="at">abundance_pres =</span> <span class="fu">rpois</span>(more_plots,</span>
+<span id="cb53-13"><a aria-label="13"></a>      <span class="at">lambda =</span> <span class="fu">exp</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.12</span> <span class="sc">*</span> prey <span class="sc">-</span> <span class="fl">0.15</span> <span class="sc">*</span> competitors <span class="sc">-</span> <span class="fl">0.045</span> <span class="sc">*</span> prey <span class="sc">*</span> competitors)),</span>
+<span id="cb53-14"><a aria-label="14"></a>    <span class="at">occurence =</span> <span class="fu">rbinom</span>(more_plots, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.45</span> <span class="sc">*</span> tree_cov)),</span>
+<span id="cb53-15"><a aria-label="15"></a>    <span class="at">abundance_pop =</span> abundance_pres <span class="sc">*</span> occurence</span>
+<span id="cb53-16"><a aria-label="16"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb53-17"><a aria-label="17"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(tree_cov, prey, competitors), <span class="sc">~</span> (.x <span class="sc">-</span> <span class="fu">mean</span>(.x)) <span class="sc">/</span> <span class="fu">sd</span>(.x), <span class="at">.names =</span> <span class="st">"scl_{.col}"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="fitting-the-hurdle-model" class="slide level2 table-slide">
 <h2>Fitting the hurdle model</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a aria-label="1"></a>mod_hu <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(</span>
-<span id="cb52-2"><a aria-label="2"></a>  abundance_pop <span class="sc">~</span> scl_prey <span class="sc">*</span> scl_competitors,</span>
-<span id="cb52-3"><a aria-label="3"></a>  <span class="at">zi =</span> <span class="sc">~</span> scl_tree_cov,</span>
-<span id="cb52-4"><a aria-label="4"></a>  <span class="at">family =</span> truncated_poisson,</span>
-<span id="cb52-5"><a aria-label="5"></a>  <span class="at">data =</span> pop_data</span>
-<span id="cb52-6"><a aria-label="6"></a>)</span>
-<span id="cb52-7"><a aria-label="7"></a><span class="fu">summary</span>(mod_hu)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a aria-label="1"></a>mod_hu <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(</span>
+<span id="cb54-2"><a aria-label="2"></a>  abundance_pop <span class="sc">~</span> scl_prey <span class="sc">*</span> scl_competitors,</span>
+<span id="cb54-3"><a aria-label="3"></a>  <span class="at">zi =</span> <span class="sc">~</span> scl_tree_cov,</span>
+<span id="cb54-4"><a aria-label="4"></a>  <span class="at">family =</span> truncated_poisson,</span>
+<span id="cb54-5"><a aria-label="5"></a>  <span class="at">data =</span> pop_data</span>
+<span id="cb54-6"><a aria-label="6"></a>)</span>
+<span id="cb54-7"><a aria-label="7"></a><span class="fu">summary</span>(mod_hu)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                            Estimate Std. Error     z value     Pr(&gt;|z|)
 (Intercept)               0.45179207 0.05311827   8.5053982 1.809734e-17
@@ -1288,28 +1352,28 @@ attr(,"ddf")
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a aria-label="1"></a><span class="fu">slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_prey"</span>,</span>
-<span id="cb54-2"><a aria-label="2"></a>       <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_competitors =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_competitors),</span>
-<span id="cb54-3"><a aria-label="3"></a>                                                 <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_competitors), <span class="at">length.out =</span> <span class="dv">30</span>)),</span>
-<span id="cb54-4"><a aria-label="4"></a>       <span class="at">type =</span> <span class="st">"response"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb54-5"><a aria-label="5"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> scl_competitors, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
-<span id="cb54-6"><a aria-label="6"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb54-7"><a aria-label="7"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">fill =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
-<span id="cb54-8"><a aria-label="8"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb54-9"><a aria-label="9"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Slope of scl_prey</span><span class="sc">\n</span><span class="st">(count scale, individuals present)"</span>, <span class="at">x =</span> <span class="st">"Competitors (scaled)"</span>,</span>
-<span id="cb54-10"><a aria-label="10"></a>       <span class="at">title =</span> <span class="st">"Count-scale effect of prey availability weakens as competitors increase"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a aria-label="1"></a><span class="fu">slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_prey"</span>,</span>
+<span id="cb56-2"><a aria-label="2"></a>       <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_competitors =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_competitors),</span>
+<span id="cb56-3"><a aria-label="3"></a>                                                 <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_competitors), <span class="at">length.out =</span> <span class="dv">30</span>)),</span>
+<span id="cb56-4"><a aria-label="4"></a>       <span class="at">type =</span> <span class="st">"response"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb56-5"><a aria-label="5"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> scl_competitors, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb56-6"><a aria-label="6"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb56-7"><a aria-label="7"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">fill =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
+<span id="cb56-8"><a aria-label="8"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb56-9"><a aria-label="9"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Slope of scl_prey</span><span class="sc">\n</span><span class="st">(count scale, individuals present)"</span>, <span class="at">x =</span> <span class="st">"Competitors (scaled)"</span>,</span>
+<span id="cb56-10"><a aria-label="10"></a>       <span class="at">title =</span> <span class="st">"Count-scale effect of prey availability weakens as competitors increase"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-39-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Count-scale effect of prey weakens (and reverses) as competitors increase.</p></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-41-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Count-scale effect of prey weakens (and reverses) as competitors increase.</p></section>
 <section id="isolating-the-interaction-rate-ratios" class="slide level2 table-slide">
 <h2>Isolating the interaction: rate ratios</h2>
 <p>A rate ratio stays constant regardless of where the moderator is evaluated — the cleanest way to report “the interaction itself”:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a aria-label="1"></a><span class="fu">avg_slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_prey"</span>, <span class="at">by =</span> <span class="st">"scl_competitors"</span>,</span>
-<span id="cb55-2"><a aria-label="2"></a>           <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_competitors =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)), <span class="at">type =</span> <span class="st">"link"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb55-3"><a aria-label="3"></a>  <span class="fu">mutate</span>(<span class="at">rate_ratio =</span> <span class="fu">exp</span>(estimate)) <span class="sc">|&gt;</span></span>
-<span id="cb55-4"><a aria-label="4"></a>  <span class="fu">select</span>(scl_competitors, rate_ratio, p.value)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a aria-label="1"></a><span class="fu">avg_slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_prey"</span>, <span class="at">by =</span> <span class="st">"scl_competitors"</span>,</span>
+<span id="cb57-2"><a aria-label="2"></a>           <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_competitors =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)), <span class="at">type =</span> <span class="st">"link"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb57-3"><a aria-label="3"></a>  <span class="fu">mutate</span>(<span class="at">rate_ratio =</span> <span class="fu">exp</span>(estimate)) <span class="sc">|&gt;</span></span>
+<span id="cb57-4"><a aria-label="4"></a>  <span class="fu">select</span>(scl_competitors, rate_ratio, p.value)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Pr(&gt;|z|)
@@ -1331,21 +1395,21 @@ attr(,"ddf")
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_hu,</span>
-<span id="cb57-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
-<span id="cb57-3"><a aria-label="3"></a>    <span class="at">scl_prey =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_prey), <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_prey), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
-<span id="cb57-4"><a aria-label="4"></a>    <span class="at">scl_competitors =</span> fivenum</span>
-<span id="cb57-5"><a aria-label="5"></a>  ),</span>
-<span id="cb57-6"><a aria-label="6"></a>  <span class="at">type =</span> <span class="st">"response"</span></span>
-<span id="cb57-7"><a aria-label="7"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb57-8"><a aria-label="8"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> scl_prey, <span class="at">y =</span> estimate, <span class="at">color =</span> <span class="fu">as.factor</span>(scl_competitors), <span class="at">fill =</span> <span class="fu">as.factor</span>(scl_competitors))) <span class="sc">+</span></span>
-<span id="cb57-9"><a aria-label="9"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb57-10"><a aria-label="10"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
-<span id="cb57-11"><a aria-label="11"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted population abundance"</span>, <span class="at">x =</span> <span class="st">"Prey (scaled)"</span>, <span class="at">color =</span> <span class="st">"Competitors"</span>, <span class="at">fill =</span> <span class="st">"Competitors"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_hu,</span>
+<span id="cb59-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
+<span id="cb59-3"><a aria-label="3"></a>    <span class="at">scl_prey =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_prey), <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_prey), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb59-4"><a aria-label="4"></a>    <span class="at">scl_competitors =</span> fivenum</span>
+<span id="cb59-5"><a aria-label="5"></a>  ),</span>
+<span id="cb59-6"><a aria-label="6"></a>  <span class="at">type =</span> <span class="st">"response"</span></span>
+<span id="cb59-7"><a aria-label="7"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb59-8"><a aria-label="8"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> scl_prey, <span class="at">y =</span> estimate, <span class="at">color =</span> <span class="fu">as.factor</span>(scl_competitors), <span class="at">fill =</span> <span class="fu">as.factor</span>(scl_competitors))) <span class="sc">+</span></span>
+<span id="cb59-9"><a aria-label="9"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb59-10"><a aria-label="10"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb59-11"><a aria-label="11"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted population abundance"</span>, <span class="at">x =</span> <span class="st">"Prey (scaled)"</span>, <span class="at">color =</span> <span class="st">"Competitors"</span>, <span class="at">fill =</span> <span class="st">"Competitors"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-41-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Population-scale abundance: same prey x competitors shape, shifted by occupancy.</p></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-43-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Population-scale abundance: same prey x competitors shape, shifted by occupancy.</p></section>
 <section id="exercise-7" class="slide level2 scrollable">
 <h2>🧪 Exercise 7</h2>
 <p>Using <code>mod_hu</code>:</p>

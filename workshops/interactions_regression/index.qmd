@@ -678,7 +678,7 @@ tree_cover <- dist_mixture(dist_beta(4, 0.8), dist_beta(0.8, 4), weights = c(0.5
 avg_yearly_rain <- dist_gamma(shape = 3, rate = 0.7)
 avg_yearly_temp <- dist_normal(mu = 20, sd = 10)
 
-occurence_intercept <- plogis(-3)
+occurence_intercept <- 0.047
 occurence_tree_effect <- 0.45
 occurence_rain_effect <- 0.01
 occurence_temp_effect <- 0.01
@@ -759,7 +759,7 @@ slopes(mod_1, variables = "tree_cov",
        newdata = datagrid(temp = mean(occ_data$temp), rain = mean(occ_data$rain)))
 ```
 
-`slopes()` asks: "at these covariate values, how much does *predicted probability* change for a small increase in tree cover?" — a probability-scale answer, directly comparable to how we simulated the data.
+`slopes()` in this case asks: "at these covariate values, how much does *predicted probability* change for a small increase in tree cover?" — a probability-scale answer, directly comparable to how we simulated the data.
 
 ## The implicit interaction, visualized {.fig-slide}
 
@@ -771,7 +771,7 @@ slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = 
   geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1), color = "white") +
   geom_vline(xintercept = occurence_tree_effect, color = "white", alpha = .8) +
   facet_grid(rain ~ temp) +
-  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.line.y = element_blank())
+  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.line.y = element_blank(), axis.text.x = element_text(size = 4))
 ```
 
 ## Why the slope moves around
@@ -789,7 +789,66 @@ Whether an interaction "exists" can depend on which scale you look at: **additiv
 
 Getting the scale question wrong is one way real interactions get mis-detected or mis-sized (a "Type-D" error in Spake et al.'s terminology).
 
-## 🧪 Exercise 5
+## Response vs. link scale, across each moderator {.fig-slide}
+
+```{r}
+#| code-fold: true
+#| fig-cap: "Slope of tree_cov across temp (top) and rain (bottom), on the probability (left) vs. log-odds (right) scale. On the link scale the slope is flat — no explicit interaction was fit."
+slopes_by_temp_response <- slopes(mod_1,
+  newdata = datagrid(temp = seq(min(occ_data$temp), max(occ_data$temp), length.out = 30),
+                      rain = mean(occ_data$rain)),
+  variables = "tree_cov", by = "temp", type = "response") |> as_tibble()
+
+slopes_by_temp_link <- slopes(mod_1,
+  newdata = datagrid(temp = seq(min(occ_data$temp), max(occ_data$temp), length.out = 30),
+                      rain = mean(occ_data$rain)),
+  variables = "tree_cov", by = "temp", type = "link") |> as_tibble()
+
+slopes_by_rain_response <- slopes(mod_1,
+  newdata = datagrid(rain = seq(min(occ_data$rain), max(occ_data$rain), length.out = 30),
+                      temp = mean(occ_data$temp)),
+  variables = "tree_cov", by = "rain", type = "response") |> as_tibble()
+
+slopes_by_rain_link <- slopes(mod_1,
+  newdata = datagrid(rain = seq(min(occ_data$rain), max(occ_data$rain), length.out = 30),
+                      temp = mean(occ_data$temp)),
+  variables = "tree_cov", by = "rain", type = "link") |> as_tibble()
+
+plot_slope <- function(data, x, y_lab, scale_title) {
+  ggplot(data) +
+    geom_hline(yintercept = 0, color = "blue", linewidth = 1, linetype = 2) +
+    geom_ribbon(aes(x = .data[[x]], ymin = conf.low, ymax = conf.high), alpha = 0.4, fill = "lightgrey") +
+    geom_line(aes(x = .data[[x]], y = estimate), linewidth = 1.5, lineend = "round", color = "white") +
+    labs(y = y_lab, x = x, title = scale_title)
+}
+
+(plot_slope(slopes_by_temp_response, "temp", "Slope of tree_cov\n(probability scale)", "Response scale") +
+ plot_slope(slopes_by_temp_link, "temp", "Slope of tree_cov\n(log-odds scale)", "Link scale")) /
+(plot_slope(slopes_by_rain_response, "rain", "Slope of tree_cov\n(probability scale)", "Response scale") +
+ plot_slope(slopes_by_rain_link, "rain", "Slope of tree_cov\n(log-odds scale)", "Link scale"))
+```
+
+## Reading these panels
+
+- **Link (log-odds) scale**: the slope of `tree_cov` is flat (~1.87) across both moderators — exactly as it should be, since `mod_1`'s formula has no interaction term at all.
+- **Response (probability) scale**: the slope visibly curves with temp (and more weakly with rain) — the implicit interaction made concrete, purely from the logit link's curvature.
+- With three predictors, a focal variable's slope can no longer be shown across "the" moderator in one 2D plot — each panel above holds the *other* remaining predictor fixed at its mean. Alternatives: facet by the third variable, use small multiples at representative (e.g. five-number-summary) values, or report a single `avg_slopes()` that integrates over the observed distribution instead of fixing it.
+
+## The "overall" effect of tree cover {.fig-slide}
+
+```{r}
+#| code-fold: true
+#| fig-cap: "Predicted probability of occurrence across tree_cov, averaged over the observed rain and temp values (counterfactual averaging)."
+avg_predictions(mod_1, variables = "tree_cov", vcov = TRUE) |>
+  ggplot() +
+  geom_ribbon(aes(x = tree_cov, ymin = conf.low, ymax = conf.high), fill = "white", alpha = 0.2) +
+  geom_line(aes(x = tree_cov, y = estimate), color = "white", linewidth = 1.5, lineend = "round") +
+  labs(y = "Predicted occurence")
+```
+
+`avg_predictions()`/`avg_slopes()` give one number (or curve) per focal value, integrating over rain and temp as observed in the sample — a marginal, "average effect" alternative to picking a single moderator value to condition on.
+
+## Exercise 5
 
 Using `mod_1`:
 
