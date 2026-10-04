@@ -61,7 +61,7 @@
    fixed height regardless of that JS, using !important to win over the
    inline style. */
 .reveal .slide.fig-slide img.r-stretch {
-  height: 80vh !important;
+  height: 55vh !important;
   width: auto !important;
   max-width: 100% !important;
   max-height: none !important;
