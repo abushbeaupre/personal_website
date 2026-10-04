@@ -12,7 +12,7 @@ format:
     chalkboard: true
     code-line-numbers: true
     fig-width: 8
-    fig-height: 5.5
+    fig-height: 4
     out-width: "50%"
     footer: "Interactions in Regression Models"
     css: interactions_regression.css
