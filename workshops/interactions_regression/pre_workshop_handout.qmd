@@ -1,0 +1,178 @@
+---
+title: "Interactions in Regression Models — Pre-Workshop Handout"
+subtitle: "Install the packages and get familiar with the tools before we meet"
+author: "Your name here"
+date: 10-05-2026
+format:
+  html:
+    toc: true
+    code-fold: false
+execute:
+  echo: true
+  warning: false
+---
+
+## What this handout is for
+
+This is a **short, pre-workshop** document — please work through it before the session. It only does two things:
+
+1.  Gets `R` set up with every package we'll use, so workshop time goes to interactions, not troubleshooting installs.
+2.  Introduces the coding conventions and functions you'll see on repeat during the workshop, so they look familiar rather than new.
+
+**You do not need to master anything here.** The goal of the workshop is to teach you how to think about, analyze, and report interactions between predictors in a regression model — that's the skill you're here to build. Everything below is scaffolding to get you there faster.
+
+## A note on simulated data
+
+Every example in this workshop uses **simulated** data: we invent a "true" relationship (an intercept, some slopes, maybe an interaction), generate fake data from it with functions like `rnorm()` or `rbinom()`, and then fit a model to see if it recovers what we put in.
+
+We do this on purpose — not because real ecological datasets are unavailable, but because simulation lets us check our work: we *know* the ground truth, so we can confirm the model and the `marginaleffects` output are behaving the way we expect before trusting them on real data where the truth is unknown.
+
+**You are not expected to understand every line of the simulation code.** Skim it, get the gist ("okay, they're making fake sheep weights that depend on sex and snow depth"), and move on. What matters for the workshop's learning objectives is what comes *after* the simulation: how to fit the model, how to extract the right quantity from it, and how to report that quantity correctly. If you can follow the *logic* of a simulation without tracing every function call, you're in good shape.
+
+## Before you start: install packages
+
+Run the chunk below **once** to install everything you need. It's written to avoid the most common `glmmTMB` installation failures:
+
+- **Binary vs. source mismatch**: `glmmTMB` links against `TMB` and `Matrix`, which must be built with compatible ABI versions. Installing all three together from the same repository snapshot (rather than upgrading one in isolation) avoids "package was installed with a different version" load-time errors.
+- **Stale compiled objects after an R or `Matrix` upgrade**: if you've upgraded R recently and see an error like `Error: package or namespace load failed for 'glmmTMB' ... unable to load shared object`, reinstalling `TMB` and `glmmTMB` from source with `--no-multiarch` (via `install.packages(type = "source")`) usually fixes it.
+- **Missing compiler toolchain**: source installs of `TMB`/`glmmTMB` need a working C++ compiler. On Windows this means Rtools; on macOS, Xcode command line tools. The check below tells you if compilation is unavailable *before* you hit a cryptic error.
+
+```{r}
+#| label: install-packages
+#| eval: false
+
+required_pkgs <- c("tidyverse", "glmmTMB", "marginaleffects", "patchwork", "GGally", "distributional", "tinytable", "performance", "TMB", "Matrix")
+
+# Reinstalling Matrix/TMB/glmmTMB together (rather than one at a time) avoids the
+# most common cause of glmmTMB load failures: an ABI mismatch between glmmTMB's
+# compiled code and the Matrix/TMB versions it was linked against.
+missing_pkgs <- required_pkgs[!vapply(required_pkgs, requireNamespace, logical(1), quietly = TRUE)]
+
+if (length(missing_pkgs) > 0) {
+  install.packages(missing_pkgs)
+}
+
+# Verify glmmTMB actually loads and can fit a trivial model - this is the step
+# that catches ABI mismatches that "successful" installation can still leave behind.
+glmmtmb_ok <- tryCatch({
+  library(glmmTMB)
+  test_fit <- glmmTMB(mpg ~ wt, data = mtcars)
+  TRUE
+}, error = function(e) {
+  message("glmmTMB failed to load/fit: ", conditionMessage(e))
+  FALSE
+})
+
+if (!glmmtmb_ok) {
+  message("Reinstalling TMB and glmmTMB from source to resolve a likely ABI mismatch...")
+  install.packages(c("TMB", "glmmTMB"), type = "source")
+
+  # Re-check after the source reinstall
+  glmmtmb_ok <- tryCatch({
+    library(glmmTMB)
+    glmmTMB(mpg ~ wt, data = mtcars)
+    TRUE
+  }, error = function(e) {
+    message("Still failing: ", conditionMessage(e))
+    message("If this persists, check that you have a working C++ compiler installed ",
+            "(Rtools on Windows, Xcode command line tools on macOS), then restart R and re-run this chunk.")
+    FALSE
+  })
+}
+
+stopifnot("glmmTMB did not install/load successfully - see messages above" = glmmtmb_ok)
+```
+
+If the chunk reports failure and the suggested fixes don't resolve it, email me *before* the workshop (not the morning of) so we have time to sort it out.
+
+## Setup
+
+Run this at the start of every session (after the install chunk above has succeeded once). We'll reuse this exact chunk at the start of the workshop.
+
+```{r}
+#| label: setup
+library(tidyverse)       # Data manipulation and plotting
+library(glmmTMB)         # Generalized linear (mixed) models
+library(marginaleffects) # Compute marginal/conditional effects
+library(patchwork)       # Combine multiple plots
+library(GGally)          # Pairwise plots
+library(distributional)  # Simulate mixture/gamma/normal distributions (Part 3)
+library(tinytable)       # Format results tables (Part 3)
+library(performance)     # Compute R2/pseudo-R2 for model fit (Part 3)
+
+theme_set(theme_minimal(base_size = 14))
+
+set.seed(4127)
+```
+
+## Quick check: does `glmmTMB` actually run?
+
+The install chunk above already fits a trivial model behind the scenes to verify `glmmTMB` loads correctly, but it does so silently. Run the chunk below to see it work end-to-end on a tiny built-in dataset (`mtcars`) — a model summary with coefficients, standard errors, and p-values should print below the code.
+
+```{r}
+#| label: glmmtmb-check
+test_mod <- glmmTMB(mpg ~ wt, data = mtcars, family = gaussian())
+summary(test_mod)
+```
+
+If this errors out, it means something about the install didn't take — re-run the install chunk above, restart R, and try again before the workshop. If you still see an error afterward, email me with the exact message.
+
+## Coding style & functions used throughout
+
+Here's a quick reference for the conventions and workhorse functions used repeatedly in the workshop. Treat this as a glossary to skim now and flip back to later — not something to memorize.
+
+**The native pipe, `|>`.** Wherever you see `data |> mutate(...) |> ggplot(...)`, read it left-to-right as "take `data`, *and then* apply `mutate()`, *and then* pass the result to `ggplot()`". It's equivalent to nesting the calls (`ggplot(mutate(data, ...))`), just easier to read and edit in sequence. We use the base-R pipe (`|>`), not the older `magrittr` pipe (`%>%`) — for our purposes here they behave the same way.
+
+**Simulating data with `tibble()` and random-draw functions.** Every case study starts by *simulating* data rather than loading a real dataset (see "A note on simulated data" above). We pick "true" parameter values (an intercept, one or more slopes) up front, then generate observations from a known random process:
+
+- `rnorm(n, mean, sd)` — draws from a Normal distribution (continuous outcomes, e.g. weight, petal length)
+- `rbinom(n, size = 1, prob)` — draws from a Bernoulli/Binomial distribution (presence/absence outcomes)
+- `rpois(n, lambda)` — draws from a Poisson distribution (count outcomes, e.g. abundance)
+- `runif(n, min, max)` — draws from a Uniform distribution (often used to simulate a predictor, not an outcome)
+
+Simulating this way means we *know the ground truth* (the exact intercept and slopes used to generate the data), so we can directly check whether a fitted model recovers it — a habit worth carrying into your own work whenever you want to sanity-check a modeling approach before applying it to real data.
+
+**Fitting models with `glmmTMB()`.** Our model-fitting workhorse throughout is `glmmTMB(response ~ predictors, data = ..., family = ...)`. Key things to know:
+
+- `y ~ x1 * x2` expands to `y ~ x1 + x2 + x1:x2` — main effects for both predictors *and* their interaction, all in one shorthand
+- `family = gaussian()` for continuous outcomes, `binomial(link = "logit")` for presence/absence, `poisson(link = "log")` for counts
+- `dispformula = ~ x` lets predictors affect the *variance* of the outcome, not just its mean
+
+**The `marginaleffects` package.** This is the central tool for the workshop's core goal — extracting and reporting the right quantity from a model with an interaction. Raw model coefficients (from `summary()`) are often not the quantity you actually want to report — especially with interactions or non-linear link functions. `marginaleffects` converts coefficients into direct, interpretable answers:
+
+- `predictions()` — the model-implied value of the outcome at specific covariate values (a **conditional** prediction)
+- `avg_predictions()` — the same, but averaged over a distribution of covariate values (a **marginal** prediction)
+- `slopes()` — the model-implied *effect* (derivative/slope) of one predictor on the outcome, at specific covariate values
+- `avg_slopes()` — the same, averaged over a distribution of covariate values
+- `datagrid(...)` — builds the covariate grid at which `predictions()`/`slopes()` are evaluated; arguments can be fixed values, functions like `mean` or `fivenum` (the [five-number summary](https://en.wikipedia.org/wiki/Five-number_summary)), or vectors of values
+- `by = "group"` — instead of collapsing (averaging) over a variable, keep results broken out by its levels
+- `hypotheses(hypothesis = "b1 - b2 = 0")` — tests linear combinations of estimates, e.g. "is the slope for group A different from the slope for group B?"
+
+**`set.seed()`.** Called once near the top of each script (or before an exercise you want to be able to compare answers on) so that "random" simulation is actually reproducible — running the same code twice gives identical numbers. If your results differ from a classmate's despite identical code, check whether you both used the same seed at the same point in the script.
+
+**The `distributional` package.** Used in Part 3 (link functions) to simulate *predictors*, not just outcomes. Rather than drawing straight from base-R functions like `rnorm()`/`rgamma()`, we first describe a distribution as an object, then generate values from it:
+
+- `dist_normal(mu, sd)`, `dist_gamma(shape, rate)`, `dist_beta(shape1, shape2)`, `dist_poisson(lambda)` — each builds a distribution *object* with those parameters, without drawing any numbers yet
+- `dist_mixture(dist_1, dist_2, weights = c(w1, w2))` — combines two or more distribution objects into a mixture (e.g., a bimodal "tree cover" variable built from two beta distributions, one skewed low and one skewed high)
+- `generate(dist_object, n)` — draws `n` random values from a distribution object (the equivalent of calling `rnorm()`/`rgamma()`/etc. directly, but works uniformly across any distribution you built with the functions above)
+
+Why bother with this instead of just calling `rbeta()`/`rgamma()` directly? Mainly convenience when a predictor's distribution is more complex than a single named family — `dist_mixture()` in particular makes it easy to build a bimodal or multimodal predictor (like patches clustering at low vs. high tree cover) by combining two standard distributions, something that's awkward to do with base-R `r*()` functions alone. As with the rest of the simulation code, you don't need to be able to construct one of these from scratch — just recognize `dist_*()` as "defining a distribution" and `generate()` as "drawing numbers from it."
+
+**A few other functions you'll see used for reporting, not simulation:**
+
+- `plogis(x)` / `qlogis(p)` — the inverse-logit and logit functions, i.e. converting between the log-odds scale and the probability scale by hand (used alongside, or instead of, `marginaleffects`' `type = "response"` vs. `type = "link"` argument)
+- `fixef(model)` — pulls the fixed-effect coefficients out of a fitted `glmmTMB` object directly, useful when you want to do a by-hand calculation (e.g., verifying a `slopes()` result) rather than relying on `marginaleffects`
+- `predict(model, newdata, type = "link")` — base-R model predictions on the link (e.g., log-odds) scale; `marginaleffects::predictions()` is generally preferred for anything involving uncertainty, but `predict()` shows up in by-hand derivations
+- `performance::r2()` (and the related `r2_tjur()`, `r2_nagelkerke()`) — computes a model's R² (or an appropriate pseudo-R² for GLMs where plain R² doesn't apply), used in results tables alongside effect estimates
+- `tinytable::tt()` — turns a data frame into a nicely formatted table for a report or manuscript; you'll see it capping off most of the results-table code chunks
+- `glue::glue("[{low}, {high}]")` — a convenience for building formatted strings (e.g., assembling a "\[lower, upper\]" confidence interval label from two numeric columns) that's easier to read than `paste0()`
+
+## What to actually focus on before the workshop
+
+Given everything above, here's where your pre-reading time is best spent:
+
+1.  **Get the install chunk to run successfully.** This is the one non-negotiable item — do it now, not the morning of the workshop.
+2.  **Read the `marginaleffects` bullet points twice.** These five functions (`predictions`, `avg_predictions`, `slopes`, `avg_slopes`, `hypotheses`) are the actual analytical toolkit we'll use to interpret and report interactions. Everything else in this handout exists to support using them correctly.
+3.  **Don't worry about the simulation mechanics.** You'll see `rnorm()`, `tibble()`, `ifelse()`, etc. doing the work of inventing fake sheep, flowers, and plots — the point of those lines is to produce data with a known interaction, not to teach you simulation itself.
+
+See you at the workshop — bring questions about interpreting and reporting interaction effects, since that's what we'll spend most of our time on.

@@ -92,7 +92,7 @@ code {
 
 /* Inline code */
 :not(pre) > code {
-  background: var(--card-bg);
+  background-color: #e0e0e0;
   padding: 0.2em 0.4em;
   border-radius: 3px;
   color: #000000 !important;

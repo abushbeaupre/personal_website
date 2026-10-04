@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Allen Bush-Beaupré">
+<meta name="dcterms.date" content="2026-10-05">
+<meta name="keywords" content="Allen Bush-Beaupré, ecological statistics, agricultural entomology, integrated pest management, Bayesian statistics, statistical consulting, GLMM, Université de Sherbrooke, CREUS, Bishop’s University">
+
+<title>Interactions dans les modèles de régression — Document préparatoire – Allen Bush-Beaupré</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-b85bc7c33db8c58e0ec93c3465666fed.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-8eb29c9e01b987971622c3e6fcc5b0a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Interactions dans les modèles de régression — Document préparatoire – Allen Bush-Beaupré">
+<meta property="og:description" content="Research Scientist in ecological statistics and agricultural entomology at Université de Sherbrooke. Research in integrated pest management, statistical modeling, and reproducible science.">
+<meta property="og:site_name" content="Allen Bush-Beaupré">
+<meta property="og:locale" content="en_US">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Allen Bush-Beaupré</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../consultation.html"> 
+<span class="menu-text">Consultations CREUS</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../teaching.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+    <div class="dropdown">
+      <a href="" title="" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label=""><i class="bi bi-github"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item quarto-navbar-tools-item" href="">
+            Source Code
+            </a>
+          </li>
+      </ul>
+    </div>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Interactions dans les modèles de régression — Document préparatoire</h1>
+            <p class="subtitle lead">Installez les librairies et familiarisez-vous avec les outils avant notre rencontre</p>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Votre nom ici </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">October 5, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+
+  <div>
+    <div class="keywords">
+      <div class="block-title">Keywords</div>
+      <p>Allen Bush-Beaupré, ecological statistics, agricultural entomology, integrated pest management, Bayesian statistics, statistical consulting, GLMM, Université de Sherbrooke, CREUS, Bishop’s University</p>
+    </div>
+  </div>
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#à-quoi-sert-ce-document" id="toc-à-quoi-sert-ce-document" class="nav-link active" data-scroll-target="#à-quoi-sert-ce-document">À quoi sert ce document</a></li>
+  <li><a href="#une-remarque-sur-les-données-simulées" id="toc-une-remarque-sur-les-données-simulées" class="nav-link" data-scroll-target="#une-remarque-sur-les-données-simulées">Une remarque sur les données simulées</a></li>
+  <li><a href="#avant-de-commencer-installer-les-librairies" id="toc-avant-de-commencer-installer-les-librairies" class="nav-link" data-scroll-target="#avant-de-commencer-installer-les-librairies">Avant de commencer : installer les librairies</a></li>
+  <li><a href="#préparation-de-la-session" id="toc-préparation-de-la-session" class="nav-link" data-scroll-target="#préparation-de-la-session">Préparation de la session</a></li>
+  <li><a href="#vérification-rapide-est-ce-que-glmmtmb-fonctionne-bien" id="toc-vérification-rapide-est-ce-que-glmmtmb-fonctionne-bien" class="nav-link" data-scroll-target="#vérification-rapide-est-ce-que-glmmtmb-fonctionne-bien">Vérification rapide : est-ce que <code>glmmTMB</code> fonctionne bien ?</a></li>
+  <li><a href="#conventions-de-code-et-fonctions-utilisées-tout-au-long" id="toc-conventions-de-code-et-fonctions-utilisées-tout-au-long" class="nav-link" data-scroll-target="#conventions-de-code-et-fonctions-utilisées-tout-au-long">Conventions de code et fonctions utilisées tout au long</a></li>
+  <li><a href="#où-concentrer-votre-attention-avant-latelier" id="toc-où-concentrer-votre-attention-avant-latelier" class="nav-link" data-scroll-target="#où-concentrer-votre-attention-avant-latelier">Où concentrer votre attention avant l’atelier</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="à-quoi-sert-ce-document" class="level2">
+<h2 class="anchored" data-anchor-id="à-quoi-sert-ce-document">À quoi sert ce document</h2>
+<p>Ceci est un <strong>court document préparatoire</strong> — veuillez le parcourir avant la séance. Il sert à deux choses seulement :</p>
+<ol type="1">
+<li>Préparer votre installation de <code>R</code> avec toutes les librairies dont nous aurons besoin, afin que le temps de l’atelier soit consacré aux interactions, et non au dépannage d’installations.</li>
+<li>Présenter les conventions de code et les fonctions que vous verrez revenir tout au long de l’atelier, pour qu’elles vous soient familières plutôt que nouvelles.</li>
+</ol>
+<p><strong>Vous n’avez pas besoin de tout maîtriser ici.</strong> L’objectif de l’atelier est de vous apprendre à penser, analyser et rapporter les interactions entre prédicteurs dans un modèle de régression — c’est la compétence que vous venez développer. Tout ce qui suit n’est qu’un échafaudage pour vous y amener plus rapidement.</p>
+</section>
+<section id="une-remarque-sur-les-données-simulées" class="level2">
+<h2 class="anchored" data-anchor-id="une-remarque-sur-les-données-simulées">Une remarque sur les données simulées</h2>
+<p>Chaque exemple de cet atelier utilise des données <strong>simulées</strong> : nous inventons une « vraie » relation (une ordonnée à l’origine, des pentes, parfois une interaction), nous générons des données fictives à partir de celle-ci avec des fonctions comme <code>rnorm()</code> ou <code>rbinom()</code>, puis nous ajustons un modèle pour voir s’il retrouve ce que nous y avons mis.</p>
+<p>Nous faisons cela délibérément — non pas parce que de vrais jeux de données écologiques ne sont pas disponibles, mais parce que la simulation nous permet de vérifier notre travail : nous <em>connaissons</em> la vérité terrain, donc nous pouvons confirmer que le modèle et les résultats de <code>marginaleffects</code> se comportent comme prévu, avant de leur faire confiance sur de vraies données où la vérité est inconnue.</p>
+<p><strong>Vous n’êtes pas tenus de comprendre chaque ligne du code de simulation.</strong> Survolez-le, saisissez l’idée générale (« d’accord, on invente des poids de mouflons fictifs qui dépendent du sexe et de la profondeur de neige »), et passez à la suite. Ce qui compte pour les objectifs d’apprentissage de l’atelier, c’est ce qui vient <em>après</em> la simulation : comment ajuster le modèle, comment en extraire la bonne quantité, et comment rapporter cette quantité correctement. Si vous arrivez à suivre la <em>logique</em> d’une simulation sans retracer chaque appel de fonction, vous êtes en bonne posture.</p>
+</section>
+<section id="avant-de-commencer-installer-les-librairies" class="level2">
+<h2 class="anchored" data-anchor-id="avant-de-commencer-installer-les-librairies">Avant de commencer : installer les librairies</h2>
+<p>Exécutez le bloc ci-dessous <strong>une seule fois</strong> pour installer tout ce dont vous avez besoin. Il est écrit pour éviter les échecs d’installation les plus fréquents de <code>glmmTMB</code> :</p>
+<ul>
+<li><strong>Incompatibilité binaire vs source</strong> : <code>glmmTMB</code> est lié à <code>TMB</code> et <code>Matrix</code>, qui doivent être compilés avec des versions ABI compatibles. Installer les trois ensemble à partir du même instantané de dépôt (plutôt que de mettre à jour un seul à la fois) évite les erreurs de chargement du type « package was installed with a different version ».</li>
+<li><strong>Objets compilés périmés après une mise à jour de R ou de <code>Matrix</code></strong> : si vous avez récemment mis à jour R et que vous voyez une erreur du type <code>Error: package or namespace load failed for 'glmmTMB' ... unable to load shared object</code>, réinstaller <code>TMB</code> et <code>glmmTMB</code> à partir des sources avec <code>--no-multiarch</code> (via <code>install.packages(type = "source")</code>) règle généralement le problème.</li>
+<li><strong>Chaîne de compilation manquante</strong> : les installations à partir des sources de <code>TMB</code>/<code>glmmTMB</code> nécessitent un compilateur C++ fonctionnel. Sous Windows, cela signifie Rtools; sous macOS, les outils en ligne de commande de Xcode. Le test ci-dessous vous indique si la compilation est indisponible <em>avant</em> que vous ne rencontriez une erreur cryptique.</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>required_pkgs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"tidyverse"</span>, <span class="st">"glmmTMB"</span>, <span class="st">"marginaleffects"</span>, <span class="st">"patchwork"</span>, <span class="st">"GGally"</span>, <span class="st">"distributional"</span>, <span class="st">"tinytable"</span>, <span class="st">"performance"</span>, <span class="st">"TMB"</span>, <span class="st">"Matrix"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Reinstalling Matrix/TMB/glmmTMB together (rather than one at a time) avoids the</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># most common cause of glmmTMB load failures: an ABI mismatch between glmmTMB's</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># compiled code and the Matrix/TMB versions it was linked against.</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>missing_pkgs <span class="ot">&lt;-</span> required_pkgs[<span class="sc">!</span><span class="fu">vapply</span>(required_pkgs, requireNamespace, <span class="fu">logical</span>(<span class="dv">1</span>), <span class="at">quietly =</span> <span class="cn">TRUE</span>)]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(missing_pkgs) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">install.packages</span>(missing_pkgs)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify glmmTMB actually loads and can fit a trivial model - this is the step</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># that catches ABI mismatches that "successful" installation can still leave behind.</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>glmmtmb_ok <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>({</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(glmmTMB)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  test_fit <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> mtcars)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="cn">TRUE</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>}, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"glmmTMB failed to load/fit: "</span>, <span class="fu">conditionMessage</span>(e))</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="cn">FALSE</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>glmmtmb_ok) {</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"Reinstalling TMB and glmmTMB from source to resolve a likely ABI mismatch..."</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">"TMB"</span>, <span class="st">"glmmTMB"</span>), <span class="at">type =</span> <span class="st">"source"</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Re-check after the source reinstall</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  glmmtmb_ok <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>({</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(glmmTMB)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">glmmTMB</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> mtcars)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">"Still failing: "</span>, <span class="fu">conditionMessage</span>(e))</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">"If this persists, check that you have a working C++ compiler installed "</span>,</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>            <span class="st">"(Rtools on Windows, Xcode command line tools on macOS), then restart R and re-run this chunk."</span>)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="cn">FALSE</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="st">"glmmTMB did not install/load successfully - see messages above"</span> <span class="ot">=</span> glmmtmb_ok)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Si le bloc signale un échec et que les solutions suggérées ne le résolvent pas, écrivez-moi <em>avant</em> l’atelier (pas le matin même) afin que nous ayons le temps de régler la situation.</p>
+</section>
+<section id="préparation-de-la-session" class="level2">
+<h2 class="anchored" data-anchor-id="préparation-de-la-session">Préparation de la session</h2>
+<p>Exécutez ceci au début de chaque session (une fois que le bloc d’installation ci-dessus a réussi une première fois). Nous réutiliserons exactement ce bloc en début d’atelier.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)       <span class="co"># Data manipulation and plotting</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmmTMB)         <span class="co"># Generalized linear (mixed) models</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(marginaleffects) <span class="co"># Compute marginal/conditional effects</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)       <span class="co"># Combine multiple plots</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GGally)          <span class="co"># Pairwise plots</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(distributional)  <span class="co"># Simulate mixture/gamma/normal distributions (Part 3)</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tinytable)       <span class="co"># Format results tables (Part 3)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(performance)     <span class="co"># Compute R2/pseudo-R2 for model fit (Part 3)</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>))</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">4127</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="vérification-rapide-est-ce-que-glmmtmb-fonctionne-bien" class="level2">
+<h2 class="anchored" data-anchor-id="vérification-rapide-est-ce-que-glmmtmb-fonctionne-bien">Vérification rapide : est-ce que <code>glmmTMB</code> fonctionne bien ?</h2>
+<p>Le bloc d’installation ci-dessus ajuste déjà un modèle trivial en coulisses pour vérifier que <code>glmmTMB</code> se charge correctement, mais il le fait silencieusement. Exécutez le bloc ci-dessous pour le voir fonctionner de bout en bout sur un petit jeu de données intégré (<code>mtcars</code>) — un résumé de modèle avec coefficients, erreurs-types et valeurs-p devrait s’afficher sous le code.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>test_mod <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> mtcars, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(test_mod)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: gaussian  ( identity )
+Formula:          mpg ~ wt
+Data: mtcars
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+    166.0     170.4     -80.0     160.0        29 
+
+
+Dispersion estimate for gaussian family (sigma^2):  8.7 
+
+Conditional model:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)  37.2851     1.8180  20.509   &lt;2e-16 ***
+wt           -5.3445     0.5413  -9.873   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>Si cela produit une erreur, cela signifie qu’un aspect de l’installation n’a pas fonctionné — réexécutez le bloc d’installation ci-dessus, redémarrez R, et réessayez avant l’atelier. Si l’erreur persiste, écrivez-moi avec le message exact.</p>
+</section>
+<section id="conventions-de-code-et-fonctions-utilisées-tout-au-long" class="level2">
+<h2 class="anchored" data-anchor-id="conventions-de-code-et-fonctions-utilisées-tout-au-long">Conventions de code et fonctions utilisées tout au long</h2>
+<p>Voici un aide-mémoire rapide des conventions et des fonctions incontournables utilisées à répétition pendant l’atelier. Considérez ceci comme un glossaire à survoler maintenant et à consulter plus tard — pas quelque chose à mémoriser.</p>
+<p><strong>Le pipe natif, <code>|&gt;</code>.</strong> Partout où vous voyez <code>data |&gt; mutate(...) |&gt; ggplot(...)</code>, lisez de gauche à droite comme « prendre <code>data</code>, <em>et ensuite</em> appliquer <code>mutate()</code>, <em>et ensuite</em> transmettre le résultat à <code>ggplot()</code> ». C’est équivalent à imbriquer les appels (<code>ggplot(mutate(data, ...))</code>), mais plus facile à lire et à modifier séquentiellement. Nous utilisons le pipe natif de R (<code>|&gt;</code>), pas l’ancien pipe de <code>magrittr</code> (<code>%&gt;%</code>) — pour nos besoins ici, ils se comportent de la même façon.</p>
+<p><strong>Simuler des données avec <code>tibble()</code> et des fonctions de tirage aléatoire.</strong> Chaque étude de cas commence par <em>simuler</em> des données plutôt que de charger un jeu de données réel (voir « Une remarque sur les données simulées » ci-dessus). Nous choisissons d’abord des valeurs de paramètres « vraies » (une ordonnée à l’origine, une ou plusieurs pentes), puis nous générons des observations à partir d’un processus aléatoire connu :</p>
+<ul>
+<li><code>rnorm(n, mean, sd)</code> — tire d’une distribution Normale (variables réponses continues, p.&nbsp;ex. poids, longueur de pétale)</li>
+<li><code>rbinom(n, size = 1, prob)</code> — tire d’une distribution de Bernoulli/Binomiale (variables réponses de présence/absence)</li>
+<li><code>rpois(n, lambda)</code> — tire d’une distribution de Poisson (variables réponses de comptage, p.&nbsp;ex. abondance)</li>
+<li><code>runif(n, min, max)</code> — tire d’une distribution Uniforme (souvent utilisée pour simuler un prédicteur, pas une variable réponse)</li>
+</ul>
+<p>Simuler de cette façon signifie que nous <em>connaissons la vérité terrain</em> (l’ordonnée à l’origine et les pentes exactes utilisées pour générer les données), ce qui nous permet de vérifier directement si un modèle ajusté la retrouve — une habitude qui vaut la peine d’être conservée dans votre propre travail chaque fois que vous voulez valider une approche de modélisation avant de l’appliquer à de vraies données.</p>
+<p><strong>Ajuster des modèles avec <code>glmmTMB()</code>.</strong> Notre fonction de référence pour l’ajustement de modèles tout au long de l’atelier est <code>glmmTMB(reponse ~ predicteurs, data = ..., family = ...)</code>. Points clés à retenir :</p>
+<ul>
+<li><code>y ~ x1 * x2</code> se développe en <code>y ~ x1 + x2 + x1:x2</code> — les effets principaux des deux prédicteurs <em>et</em> leur interaction, le tout en un raccourci</li>
+<li><code>family = gaussian()</code> pour les variables réponses continues, <code>binomial(link = "logit")</code> pour la présence/absence, <code>poisson(link = "log")</code> pour les comptages</li>
+<li><code>dispformula = ~ x</code> permet à des prédicteurs d’affecter la <em>variance</em> de la variable réponse, pas seulement sa moyenne</li>
+</ul>
+<p><strong>La librairie <code>marginaleffects</code>.</strong> C’est l’outil central pour l’objectif principal de l’atelier — extraire et rapporter la bonne quantité à partir d’un modèle comportant une interaction. Les coefficients bruts d’un modèle (issus de <code>summary()</code>) ne sont souvent pas la quantité que vous voulez réellement rapporter — particulièrement en présence d’interactions ou de fonctions de lien non linéaires. <code>marginaleffects</code> convertit les coefficients en réponses directes et interprétables :</p>
+<ul>
+<li><code>predictions()</code> — la valeur prédite par le modèle pour la variable réponse à des valeurs précises des covariables (une prédiction <strong>conditionnelle</strong>)</li>
+<li><code>avg_predictions()</code> — la même chose, mais moyennée sur une distribution de valeurs des covariables (une prédiction <strong>marginale</strong>)</li>
+<li><code>slopes()</code> — l’<em>effet</em> prédit par le modèle (la dérivée/pente) d’un prédicteur sur la variable réponse, à des valeurs précises des covariables</li>
+<li><code>avg_slopes()</code> — la même chose, moyennée sur une distribution de valeurs des covariables</li>
+<li><code>datagrid(...)</code> — construit la grille de covariables à laquelle <code>predictions()</code>/<code>slopes()</code> sont évaluées; les arguments peuvent être des valeurs fixes, des fonctions comme <code>mean</code> ou <code>fivenum</code> (le <a href="https://fr.wikipedia.org/wiki/R%C3%A9sum%C3%A9_%C3%A0_cinq_chiffres">résumé en cinq nombres</a>), ou des vecteurs de valeurs</li>
+<li><code>by = "group"</code> — plutôt que de regrouper (moyenner) sur une variable, garder les résultats répartis selon ses niveaux</li>
+<li><code>hypotheses(hypothesis = "b1 - b2 = 0")</code> — teste des combinaisons linéaires d’estimations, p.&nbsp;ex. « la pente du groupe A est-elle différente de celle du groupe B ? »</li>
+</ul>
+<p><strong><code>set.seed()</code>.</strong> Appelé une fois près du début de chaque script (ou avant un exercice pour lequel vous voulez pouvoir comparer vos réponses) afin que la simulation « aléatoire » soit réellement reproductible — exécuter le même code deux fois donne des nombres identiques. Si vos résultats diffèrent de ceux d’un collègue malgré un code identique, vérifiez si vous avez tous les deux utilisé la même graine (seed) au même endroit dans le script.</p>
+<p><strong>La librairie <code>distributional</code>.</strong> Utilisée dans la Partie 3 (fonctions de lien) pour simuler des <em>prédicteurs</em>, pas seulement des variables réponses. Plutôt que de tirer directement avec des fonctions de base de R comme <code>rnorm()</code>/<code>rgamma()</code>, nous décrivons d’abord une distribution comme un objet, puis nous en générons des valeurs :</p>
+<ul>
+<li><code>dist_normal(mu, sd)</code>, <code>dist_gamma(shape, rate)</code>, <code>dist_beta(shape1, shape2)</code>, <code>dist_poisson(lambda)</code> — chacune construit un <em>objet</em> de distribution avec ces paramètres, sans tirer de nombres pour l’instant</li>
+<li><code>dist_mixture(dist_1, dist_2, weights = c(w1, w2))</code> — combine deux ou plusieurs objets de distribution en un mélange (p.&nbsp;ex. une variable « couvert forestier » bimodale construite à partir de deux distributions bêta, l’une asymétrique vers le bas et l’autre vers le haut)</li>
+<li><code>generate(dist_object, n)</code> — tire <code>n</code> valeurs aléatoires d’un objet de distribution (l’équivalent d’appeler directement <code>rnorm()</code>/<code>rgamma()</code>/etc., mais qui fonctionne de façon uniforme pour n’importe quelle distribution construite avec les fonctions ci-dessus)</li>
+</ul>
+<p>Pourquoi s’embêter avec ceci plutôt que d’appeler directement <code>rbeta()</code>/<code>rgamma()</code> ? Principalement par commodité lorsque la distribution d’un prédicteur est plus complexe qu’une seule famille nommée — <code>dist_mixture()</code> en particulier facilite la construction d’un prédicteur bimodal ou multimodal (comme des parcelles regroupées à faible ou à fort couvert forestier) en combinant deux distributions standards, ce qui est malaisé à faire avec les seules fonctions <code>r*()</code> de base de R. Comme pour le reste du code de simulation, vous n’avez pas besoin de pouvoir en construire une à partir de zéro — reconnaissez simplement <code>dist_*()</code> comme « définir une distribution » et <code>generate()</code> comme « en tirer des nombres ».</p>
+<p><strong>Quelques autres fonctions que vous verrez utilisées pour le rapport de résultats, et non pour la simulation :</strong></p>
+<ul>
+<li><code>plogis(x)</code> / <code>qlogis(p)</code> — les fonctions logit inverse et logit, c’est-à-dire la conversion manuelle entre l’échelle log-cote (log-odds) et l’échelle de probabilité (utilisées en complément, ou à la place, de l’argument <code>type = "response"</code> vs <code>type = "link"</code> de <code>marginaleffects</code>)</li>
+<li><code>fixef(model)</code> — extrait directement les coefficients à effets fixes d’un objet <code>glmmTMB</code> ajusté, utile lorsque vous voulez faire un calcul manuel (p.&nbsp;ex. vérifier un résultat de <code>slopes()</code>) plutôt que de vous fier uniquement à <code>marginaleffects</code></li>
+<li><code>predict(model, newdata, type = "link")</code> — prédictions de modèle en R de base sur l’échelle du lien (p.&nbsp;ex. log-cote); <code>marginaleffects::predictions()</code> est généralement préférable dès qu’il s’agit d’incertitude, mais <code>predict()</code> apparaît dans les dérivations manuelles</li>
+<li><code>performance::r2()</code> (et les fonctions apparentées <code>r2_tjur()</code>, <code>r2_nagelkerke()</code>) — calcule le R² d’un modèle (ou un pseudo-R² approprié pour les modèles linéaires généralisés où le R² ordinaire ne s’applique pas), utilisé dans les tableaux de résultats aux côtés des estimations d’effets</li>
+<li><code>tinytable::tt()</code> — transforme un tableau de données en un tableau bien mis en forme pour un rapport ou un manuscrit; vous le verrez clore la plupart des blocs de code produisant des tableaux de résultats</li>
+<li><code>glue::glue("[{low}, {high}]")</code> — une commodité pour construire des chaînes de caractères formatées (p.&nbsp;ex. assembler une étiquette d’intervalle de confiance « [borne inférieure, borne supérieure] » à partir de deux colonnes numériques), plus facile à lire que <code>paste0()</code></li>
+</ul>
+</section>
+<section id="où-concentrer-votre-attention-avant-latelier" class="level2">
+<h2 class="anchored" data-anchor-id="où-concentrer-votre-attention-avant-latelier">Où concentrer votre attention avant l’atelier</h2>
+<p>Compte tenu de tout ce qui précède, voici où votre temps de lecture préparatoire est le mieux investi :</p>
+<ol type="1">
+<li><strong>Faire fonctionner le bloc d’installation avec succès.</strong> C’est le seul élément non négociable — faites-le maintenant, pas le matin de l’atelier.</li>
+<li><strong>Relire deux fois les puces sur <code>marginaleffects</code>.</strong> Ces cinq fonctions (<code>predictions</code>, <code>avg_predictions</code>, <code>slopes</code>, <code>avg_slopes</code>, <code>hypotheses</code>) constituent la véritable boîte à outils analytique que nous utiliserons pour interpréter et rapporter les interactions. Tout le reste de ce document existe pour appuyer leur utilisation correcte.</li>
+<li><strong>Ne vous souciez pas de la mécanique de la simulation.</strong> Vous verrez <code>rnorm()</code>, <code>tibble()</code>, <code>ifelse()</code>, etc. faire le travail d’inventer de faux mouflons, fleurs et parcelles fictives — le but de ces lignes est de produire des données avec une interaction connue, pas de vous enseigner la simulation elle-même.</li>
+</ol>
+<p>À bientôt à l’atelier — venez avec des questions sur l’interprétation et le rapport des effets d’interaction, puisque c’est là-dessus que nous passerons la majeure partie de notre temps.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/www\.allenbushbeaupre\.com");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

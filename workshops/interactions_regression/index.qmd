@@ -28,6 +28,7 @@ This workshop is adapted from a two-part tutorial series on interactions in regr
 
 - Part 1: [Categorical × numerical interactions](../../posts/interactions_categorical_numerical/index.qmd)
 - Part 2: [Numerical × numerical interactions](../../posts/interactions_numerical_numerical/index.qmd)
+- Part 3: [Generalized linear models and link functions](../../posts/interactions_link_functions/index.qmd)
 
 **Audience**: graduate students and researchers in ecology who fit GL(M)Ms and want to interpret interaction terms correctly.
 
@@ -45,6 +46,8 @@ By the end of this workshop you should be able to:
 
 4.  Use `marginaleffects` (`predictions()`, `slopes()`, `avg_predictions()`, `avg_slopes()`, `hypotheses()`) to extract and test the quantities you actually care about
 5.  Visualize interaction effects (slope-by-moderator plots, five-number-summary predictions, response surfaces) and know their trade-offs
+6.  Explain why a non-linear link function (logit, log) creates an **implicit interaction** even when the model formula has none, and convert a raw GLM coefficient to a probability-scale or count-scale effect
+7.  Interpret a hurdle/zero-inflated model's two components separately and combined, and recognize that two-way interactions are symmetric
 
 ## Setup {.smaller}
 
@@ -55,6 +58,7 @@ library(glmmTMB)         # Generalized linear (mixed) models
 library(marginaleffects) # Compute marginal/conditional effects
 library(patchwork)       # Combine multiple plots
 library(GGally)          # Pairwise plots
+library(distributional)  # Simulate mixture/gamma/normal distributions (Part 3)
 
 # Set ggplot2 theme
 black_theme <- theme(
@@ -82,6 +86,21 @@ options(marginaleffects_safe = FALSE)
 
 set.seed(4127)
 ```
+
+## Coding style & functions used throughout {.smaller}
+
+A few conventions and workhorse functions you'll see on repeat:
+
+- **Native pipe `|>`**: `data |> mutate(...) |> ggplot(...)` reads left-to-right, "and then"
+- **`tibble()` + `rnorm()`/`rbinom()`/`rpois()`/`runif()`**: how we simulate data with a *known* true effect, so we can check whether our model recovers it
+- **`glmmTMB(y ~ x1 * x2, data = ..., family = ...)`**: our model-fitting workhorse; `*` expands to `x1 + x2 + x1:x2`
+- **`marginaleffects` verbs**:
+  - `predictions()` / `avg_predictions()` — model-implied values of $Y$
+  - `slopes()` / `avg_slopes()` — model-implied *effects* (derivatives) of a predictor on $Y$
+  - `datagrid()` — build a covariate grid to evaluate predictions/slopes at (e.g., `fivenum`, specific values, `mean`)
+  - `by =` — keep results split by a grouping variable instead of averaging over it
+  - `hypotheses()` — test linear combinations of estimates (e.g., "is slope A different from slope B?")
+- **`set.seed()`**: called once per script so simulated data (and thus every number you see) is reproducible
 
 # Part 1 — Categorical × Numerical Interactions
 
@@ -529,12 +548,315 @@ Extend `mod_flower_2` by adding `rain_centered` and a `temp_centered * rain_cent
 4.  Five-number-summary prediction plots are usually more honest than response surfaces (they retain uncertainty)
 5.  Interactions can act on variance, not just the mean, via distributional regression (`dispformula`)
 
+# Part 3 — Link Functions Create Implicit Interactions
+
+## A different kind of interaction
+
+So far, every interaction we've seen was written explicitly into the model formula (`X1 * X2`).
+
+Non-linear **link functions** (logit, log, ...) introduce a *second*, implicit source of interaction: even a model with **no interaction term at all** can show predictors whose response-scale effect depends on the values of other predictors.
+
+This happens because the link function bends a straight line (on the *link* scale) into a curve (on the *response* scale) — and how much a fixed push on the link scale moves the response depends on where you are on that curve.
+
+## Case study: species occurrence
+
+Simulated presence/absence of a species across 200 plots, as a function of tree cover, rain, and temperature — **no interaction terms**, fit with a binomial GLM (logit link):
+
+```{r}
+n_plots <- 200
+tree_cover <- dist_mixture(dist_beta(4, 0.8), dist_beta(0.8, 4), weights = c(0.5, 0.5))
+avg_yearly_rain <- dist_gamma(shape = 3, rate = 0.7)
+avg_yearly_temp <- dist_normal(mu = 20, sd = 10)
+
+occurence_intercept <- plogis(-3)
+occurence_tree_effect <- 0.45
+occurence_rain_effect <- 0.01
+occurence_temp_effect <- 0.01
+
+occ_data <- tibble(
+  tree_cov = generate(tree_cover, n_plots),
+  rain = generate(avg_yearly_rain, n_plots),
+  temp = generate(avg_yearly_temp, n_plots)
+) |>
+  unnest(everything()) |>
+  mutate(occurence = rbinom(n_plots, size = 1,
+    prob = occurence_intercept +
+      occurence_tree_effect * tree_cov +
+      occurence_rain_effect * rain +
+      occurence_temp_effect * temp))
+```
+
+## Fit the model {.smaller}
+
+```{r}
+mod_1 <- glmmTMB(occurence ~ tree_cov + rain + temp, family = binomial(link = "logit"), data = occ_data)
+summary(mod_1)$coefficients$cond
+```
+
+We simulated the effect of tree cover to be **0.45** on the probability scale, but the model reports **~1.87**. Did the model get it wrong?
+
+## No — it's reporting a different scale
+
+The logit-link GLM draws a straight line through the **log-odds** of occurrence, then bends that line into an S-shape to get back to a probability.
+
+```{r}
+#| code-fold: true
+#| fig-cap: "The logit link bends a straight line into an S-shape."
+tibble(log_odds = seq(-6, 6, length.out = 400)) |>
+  mutate(probability = plogis(log_odds)) |>
+  ggplot(aes(x = log_odds, y = probability)) +
+  geom_line(linewidth = 2) +
+  labs(x = "log-odds scale (what the coefficient describes)",
+       y = "probability scale (what we care about)")
+```
+
+Near the middle (p ≈ 0.5) the curve is steep: a small log-odds push moves probability a lot. Near the ends (p ≈ 0 or 1) the curve flattens: the same push barely moves probability.
+
+## From log-odds to probability, by hand
+
+The derivative of the inverse-logit gives the conversion: if $\eta$ is the log-odds and $p = \text{logit}^{-1}(\eta)$,
+
+$$\frac{dp}{dX} = p(1-p) \times \beta$$
+
+```{r}
+beta_tree <- fixef(mod_1)$cond["tree_cov"]
+eta <- predict(mod_1, newdata = datagrid(model = mod_1, temp = mean(occ_data$temp),
+                                          rain = mean(occ_data$rain)), type = "link")
+p <- plogis(eta)
+p * (1 - p) * beta_tree  # matches slopes() below, and is close to our simulated 0.45
+```
+
+## `marginaleffects` does this for us
+
+```{r}
+slopes(mod_1, variables = "tree_cov",
+       newdata = datagrid(temp = mean(occ_data$temp), rain = mean(occ_data$rain)))
+```
+
+`slopes()` asks: "at these covariate values, how much does *predicted probability* change for a small increase in tree cover?" — a probability-scale answer, directly comparable to how we simulated the data.
+
+## The implicit interaction, visualized {.smaller .fig-slide}
+
+```{r}
+#| code-fold: true
+#| fig-cap: "The tree-cover slope on the probability scale changes across rain × temp, though no interaction term exists in the model."
+slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = fivenum)) |>
+  ggplot() +
+  geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1)) +
+  geom_vline(xintercept = occurence_tree_effect, alpha = .8) +
+  facet_grid(rain ~ temp) +
+  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.line.y = element_blank())
+```
+
+Because the amount of "bending" depends on where you are on the S-curve, tree cover's probability-scale effect depends on rain and temp too — even though we never told the model to include that interaction.
+
+## A note on measurement scale (Spake et al. 2023)
+
+Whether an interaction "exists" can depend on which scale you look at: **additive** (probability, or log-odds as a straight difference) vs. **multiplicative** (ratios, or the log scale itself).
+
+`mod_1` has *no* interaction term, yet:
+
+- on the **log-odds** scale: no interaction, by construction
+- on the **probability** scale: an interaction appears, purely from the S-curve's shape
+
+Getting the scale question wrong is one way real interactions get mis-detected or mis-sized (a "Type-D" error in Spake et al.'s terminology).
+
+## 🧪 Exercise 5
+
+Using `mod_1`:
+
+1.  Compute the probability-scale slope of `tree_cov` at the *minimum* and *maximum* observed values of `rain` and `temp` (four combinations total, via `datagrid()`).
+2.  Which combination gives the smallest slope? Which gives the largest? Relate your answer to where those combinations fall on the S-curve.
+3.  In one sentence, explain why reporting only the raw `summary(mod_1)` coefficient for `tree_cov` would be misleading to a reader who cares about probability of occurrence.
+
+*(\~7 minutes)*
+
+## Case study: species abundance
+
+The same phenomenon shows up with **count** data. Abundance (when present) as a function of the same three predictors, fit with a Poisson GLM (log link), again **no interaction terms**:
+
+```{r}
+abundance_intercept <- exp(1)
+abundance_tree_effect <- 4.5
+abundance_rain_effect <- 0.1
+abundance_temp_effect <- 0.1
+
+abund_data <- tibble(
+  tree_cov = generate(tree_cover, n_plots),
+  rain = generate(avg_yearly_rain, n_plots),
+  temp = generate(avg_yearly_temp, n_plots)
+) |>
+  unnest(everything()) |>
+  mutate(abundance = rpois(n_plots, lambda =
+    abundance_intercept +
+    abundance_tree_effect * tree_cov +
+    abundance_rain_effect * rain +
+    abundance_temp_effect * temp))
+
+mod_2 <- glmmTMB(abundance ~ tree_cov + rain + temp, family = poisson(link = "log"), data = abund_data)
+```
+
+## The log link bends a line into an exponential curve
+
+```{r}
+#| code-fold: true
+tibble(log_count = seq(-2, 6, length.out = 400)) |>
+  mutate(count = exp(log_count)) |>
+  ggplot(aes(x = log_count, y = count)) +
+  geom_line(linewidth = 2) +
+  labs(x = "log scale (what the coefficient describes)", y = "count scale (what we care about)")
+```
+
+The log-scale `tree_cov` coefficient is **~0.73**, not 4.5. The local rate of change on the count scale is $$\lambda \cdot \beta$$ (the expected count itself, times the log-scale coefficient) — the count-scale analogue of $$p(1-p)\cdot\beta$$.
+
+## Two ways to report a log-link coefficient
+
+- **Rate ratio** ($$e^\beta$$): a *constant* multiplicative effect, valid everywhere — "each unit increase in tree cover multiplies expected abundance by this factor, regardless of rain or temp"
+- **Local slope** ($$\lambda \cdot \beta$$): an *additive*, count-scale effect ("this many more individuals"), but only valid near the specific covariate values used
+
+```{r}
+exp(fixef(mod_2)$cond["tree_cov"])  # rate ratio: ~2.08, i.e. a ~108% increase per unit tree cover
+```
+
+Both describe the same underlying model — pick the one that matches your audience (percent change vs. a concrete headcount).
+
+## 🧪 Exercise 6
+
+Using `mod_2`:
+
+1.  Compute the rate ratio and the local count-scale slope for `temp`, holding `rain` at its minimum (a "drought" scenario) and `tree_cov` at its mean.
+2.  Repeat holding `tree_cov` at a low vs. a high value (e.g., the 10th and 90th percentiles) — does the rate ratio change? Does the local slope?
+3.  Explain, in your own words, why one of these two summaries stays constant across `tree_cov` and the other doesn't.
+
+*(\~7 minutes)*
+
+## Case study: occurrence *and* abundance together
+
+In reality, a species first has to be **present** before we can measure its abundance. A **hurdle model** combines two sub-models fit jointly:
+
+- A **binomial** (logit-link) component: does a plot clear the "hurdle" of zero? (occurrence)
+- A **truncated count** component: given it's non-zero, how many individuals? (abundance when present)
+
+Two ways to interpret: each part **separately** (what drives occurrence vs. abundance), or **combined** on the population scale (expected abundance across *all* plots = P(occurrence) × E[abundance | present]).
+
+## Simulating with an explicit interaction {.smaller}
+
+Prey and competitors interact in their effect on abundance (when present); tree cover drives occurrence only. Predictors are simulated through the model's own inverse link (`exp()`, `plogis()`) so they stay in a valid range:
+
+```{r}
+more_plots <- 4000
+prey_abun <- dist_poisson(lambda = 6)
+competitor_abun <- dist_poisson(lambda = 3)
+
+pop_data <- tibble(
+  tree_cov = generate(tree_cover, more_plots),
+  prey = generate(prey_abun, more_plots),
+  competitors = generate(competitor_abun, more_plots)
+) |>
+  unnest(everything()) |>
+  mutate(
+    abundance_pres = rpois(more_plots,
+      lambda = exp(1 + 0.12 * prey - 0.15 * competitors - 0.045 * prey * competitors)),
+    occurence = rbinom(more_plots, size = 1, prob = plogis(-2 + 0.45 * tree_cov)),
+    abundance_pop = abundance_pres * occurence
+  ) |>
+  mutate(across(c(tree_cov, prey, competitors), ~ (.x - mean(.x)) / sd(.x), .names = "scl_{.col}"))
+```
+
+## Fitting the hurdle model {.smaller}
+
+```{r}
+mod_hu <- glmmTMB(
+  abundance_pop ~ scl_prey * scl_competitors,
+  zi = ~ scl_tree_cov,
+  family = truncated_poisson,
+  data = pop_data
+)
+summary(mod_hu)$coefficients$cond
+```
+
+`zi = ~ scl_tree_cov`: the zero-inflation (occurrence) part. The conditional formula's `scl_prey * scl_competitors` is an **explicit** interaction, layered on top of the log link's *implicit* one.
+
+## The interaction on the count scale {.smaller .fig-slide}
+
+```{r}
+#| code-fold: true
+#| fig-cap: "Count-scale effect of prey weakens (and reverses) as competitors increase."
+slopes(mod_hu, variables = "scl_prey",
+       newdata = datagrid(scl_competitors = seq(min(pop_data$scl_competitors),
+                                                 max(pop_data$scl_competitors), length.out = 30)),
+       type = "response") |>
+  ggplot(aes(x = scl_competitors, y = estimate)) +
+  geom_hline(yintercept = 0, color = "blue", linetype = 2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.4, fill = "lightgrey") +
+  geom_line(linewidth = 1.5, lineend = "round", color = "white") +
+  labs(y = "Slope of scl_prey (count scale)", x = "Competitors (scaled)")
+```
+
+## Isolating the interaction: rate ratios {.smaller}
+
+A rate ratio ($$e^\beta$$) stays constant regardless of where the moderator is evaluated — the cleanest way to report "the interaction itself":
+
+```{r}
+avg_slopes(mod_hu, variables = "scl_prey", by = "scl_competitors",
+           newdata = datagrid(scl_competitors = c(-1, 0, 1)), type = "link") |>
+  mutate(rate_ratio = exp(estimate)) |>
+  select(scl_competitors, rate_ratio, p.value)
+```
+
+Prey's rate ratio drops from >1 (helps abundance) at low competitor density to \<1 (hurts abundance) at high competitor density.
+
+## Interactions are symmetric
+
+`scl_prey:scl_competitors` is the *same* coefficient as `scl_competitors:scl_prey` — there's no statistical reason to always put one variable on the x-axis and the other as color/facet. Showing only one direction risks reporting half the story (Spake et al. 2023).
+
+**Practical check**: if you always plot "A moderated by B," try the mirror-image plot ("B moderated by A") before deciding which (or both) to report.
+
+## Population-scale predictions {.smaller .fig-slide}
+
+Combine both model parts (`type = "response"`) to get expected abundance across *all* plots, accounting for occurrence probability:
+
+```{r}
+#| code-fold: true
+#| fig-cap: "Population-scale abundance: same prey x competitors shape, shifted by occupancy."
+predictions(mod_hu,
+  newdata = datagrid(
+    scl_prey = seq(min(pop_data$scl_prey), max(pop_data$scl_prey), length.out = 30),
+    scl_competitors = fivenum
+  ),
+  type = "response"
+) |>
+  ggplot(aes(x = scl_prey, y = estimate, color = as.factor(scl_competitors), fill = as.factor(scl_competitors))) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.2) +
+  geom_line(linewidth = 1.5, lineend = "round") +
+  labs(y = "Predicted population abundance", x = "Prey (scaled)", color = "Competitors", fill = "Competitors")
+```
+
+## 🧪 Exercise 7
+
+Using `mod_hu`:
+
+1.  Compute `avg_slopes()` for `scl_tree_cov` (hint: it only appears in the `zi =` part — you'll need `type = "zprob"` or `type = "response"`, not `"conditional"`).
+2.  In one sentence, explain the difference between `type = "conditional"` and `type = "response"` predictions for this model.
+3.  Build the mirror-image plot from the "interactions are symmetric" slide (competitors on the x-axis, one line per prey level) and describe one thing it shows that the original plot doesn't.
+
+*(\~8 minutes)*
+
+## Part 3 takeaways
+
+1.  Non-linear link functions (logit, log) create an **implicit interaction**: every predictor's response-scale effect depends on the values of all other predictors, even with no interaction term in the formula
+2.  Raw GLM coefficients live on the link scale; convert them with the link's derivative ($$p(1-p)\cdot\beta$$ for logit, $$\lambda\cdot\beta$$ for log) or let `marginaleffects::slopes()` do it for you
+3.  Multiplicative summaries ($$e^\beta$$, rate ratios / odds ratios) stay constant across the range of other predictors; additive, response-scale summaries do not
+4.  Whether an interaction "exists" can depend on the scale you're measuring on (Spake et al. 2023) — this applies just as much to *implicit* link-function interactions as to explicit interaction terms
+5.  **Hurdle/zero-inflated models** separate "does it occur" from "how much, given it occurs" — interpret each part separately, or combine them (`type = "response"`) for a population-scale answer
+6.  Interactions are mathematically **symmetric**: report (or at least check) both "A moderated by B" and "B moderated by A"
+
 ## Wrap-up and further reading
 
-- Full write-ups with additional detail and 3D visualizations: [Part 1](../../posts/interactions_categorical_numerical/index.qmd), [Part 2](../../posts/interactions_numerical_numerical/index.qmd)
+- Full write-ups with additional detail and 3D visualizations: [Part 1](../../posts/interactions_categorical_numerical/index.qmd), [Part 2](../../posts/interactions_numerical_numerical/index.qmd), [Part 3](../../posts/interactions_link_functions/index.qmd)
 - `marginaleffects` documentation: <https://marginaleffects.com/>
 - Spake et al. (2023), on interactions in GLMs: <https://onlinelibrary.wiley.com/doi/full/10.1111/brv.12939>
-- A planned Part 3 will extend this material to non-Gaussian GLMs (non-linear link functions) and Part 4 to GAMs
+- A planned Part 4 will extend this material to GAMs
 
 ## Exercise solutions (instructor notes)
 
@@ -560,4 +882,28 @@ Extend `mod_flower_2` by adding `rain_centered` and a `temp_centered * rain_cent
 - Mirror the code from the "slope across the range of the moderator" slide, swapping the roles of `temp_centered` and `rain_centered`
 - Answer depends on the random seed / simulated draw — have students report their own CI crossing point
 - Example framing: "Does the effect of temperature (exposure) on petal length depend on rainfall (moderator)?"
+:::
+
+::: {.callout-note collapse="true"}
+## Exercise 5
+
+- `slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = c(min(occ_data$temp), max(occ_data$temp)), rain = c(min(occ_data$rain), max(occ_data$rain))))`
+- The smallest slope occurs at whichever combination pushes predicted probability closest to 0 or 1 (flat ends of the S-curve); the largest occurs near predicted probability ≈ 0.5 (steepest part of the curve)
+- Reporting only the raw coefficient (~1.87) would mislead a reader into thinking tree cover has one fixed effect on occurrence probability, when in fact that effect shrinks or grows depending on rain and temperature — exactly the implicit interaction discussed above
+:::
+
+::: {.callout-note collapse="true"}
+## Exercise 6
+
+- Rate ratio: `exp(fixef(mod_2)$cond["temp"])` — identical regardless of `rain` or `tree_cov`, since $$e^\beta$$ does not depend on other covariate values
+- Local slope: `lambda * beta_temp` where `lambda <- exp(predict(mod_2, newdata = datagrid(model = mod_2, rain = min(abund_data$rain), tree_cov = mean(abund_data$tree_cov)), type = "link"))` — this **does** change with `tree_cov` (and `rain`), because it's rescaled by the expected count $$\lambda$$ at each point
+- The rate ratio is constant because exponentiating a fixed additive (log-scale) effect always yields the same multiplicative factor; the local slope is not constant because it also depends on the curve's local steepness, i.e., on $$\lambda$$ itself
+:::
+
+::: {.callout-note collapse="true"}
+## Exercise 7
+
+- `avg_slopes(mod_hu, variables = "scl_tree_cov", type = "response")` — `scl_tree_cov` only enters the `zi =` formula, but `type = "response"` still lets you ask how it affects population-scale abundance by way of occupancy
+- `type = "conditional"` gives abundance *given* the plot is occupied (ignores occurrence entirely); `type = "response"` multiplies that by the predicted probability of occurrence, giving abundance across *all* plots
+- The mirror plot (competitors on the x-axis, one line per prey level) makes it easier to see that abundance converges to roughly the same low floor once competitors are abundant, regardless of prey — a pattern that's harder to spot when prey is on the x-axis
 :::

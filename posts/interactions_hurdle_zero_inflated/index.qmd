@@ -1,0 +1,125 @@
+---
+title: "Understanding Interactions in Regression Models: Part 4 - Hurdle and Zero-Inflated Models"
+description: "Fourth in a series on interactions: pushing interactions further in hurdle and zero-inflated models, and recovering interaction effects on the occurence, conditional, and population-level scales"
+author:
+  - name: Allen Bush-Beaupré
+    url: https://abushbeaupre.github.io/
+    orcid: 0000-0001-6989-9278
+date: 12-01-2026
+categories: [tutorial, interactions, marginaleffects, glmm, statistics, R, series, hurdle, zero-inflation]
+draft: true
+editor: source
+format:
+  html:
+    fig-width: 10
+    fig-height: 7
+    out-width: "100%"
+---
+
+# Introduction
+
+::: {.callout-note}
+## Series: Understanding Interactions in Regression Models
+
+This is **Part 4** of a tutorial series on interactions in regression models. This part focuses on **interactions in hurdle and zero-inflated models**. Other parts:
+- [Part 1: Categorical × numerical interactions](../interactions_categorical_numerical/index.qmd)
+- [Part 2: Numerical × numerical interactions](../interactions_numerical_numerical/index.qmd)
+- [Part 3: Generalized linear models and link functions](../interactions_link_functions/index.qmd)
+:::
+
+In [Part 3](../interactions_link_functions/index.qmd), we introduced hurdle models as a way to combine two data-generating processes into one model: whether a species occurs at all (a binary presence/absence process), and how abundant it is *given* that it occurs (a strictly-positive count process). We kept that introduction deliberately simple — a single predictor (`tree_cov`), and only a brief look at a two-way and a three-way interaction spanning both components of the model.
+
+This tutorial picks up where that left off. We'll push further into what happens when hurdle (and, more generally, zero-inflated) models carry genuine interactions — between two predictors, and eventually among three — and how to recover those interaction effects correctly on each of the scales such a model actually offers us:
+
+1. **Occurence** — the probability that the species is present at all (the zero-inflation/hurdle component).
+2. **Abundance when present** — the expected count conditional on occurence (the truncated-count component).
+3. **Population abundance** — the unconditional expected count across *all* sampled plots, combining both components ($$E[\text{abundance}] = P(\text{present}) \times E[\text{abundance} \mid \text{present}]$$).
+
+Along the way we'll also confront a recurring practical issue with these models: the occurence (zero-inflation) component is often fit on much less effective information than the count component, so complex interactions there require substantially larger sample sizes to estimate with any precision — a limitation that's easy to overlook when simulating data with "reasonable-looking" effect sizes.
+
+## Setup
+
+```{r}
+#| output: false
+#| warning: false
+library(tidyverse)       # Data manipulation and plotting
+library(tidylog)         # Print a log of data manipulations done with tidyverse
+library(glmmTMB)         # Generalized linear (mixed) models
+library(marginaleffects) # Compute marginal/conditional effects
+library(patchwork)       # Combine multiple plots
+library(distributional)  # Simulate distributions
+library(ggdist)          # Plot nice distributions
+library(GGally)
+
+# Set ggplot2 theme
+black_theme <- theme(
+  axis.line = element_line(linewidth = 2, lineend = "round", color = "white"),
+  panel.grid = element_blank(),
+  panel.background = element_rect(fill = "black", color = NA),
+  axis.ticks = element_blank(),
+  axis.text = element_text(size = 21, face = "bold", color = "white"),
+  axis.title = element_text(size = 21, face = "bold", color = "white"),
+  plot.title = element_text(size = 25, face = "bold", color = "white"),
+  plot.background = element_rect(fill = "black", color = NA),
+  legend.background = element_rect(fill = "black", color = NA),
+  legend.text = element_text(size = 21, color = "white"),
+  legend.title = element_text(size = 21, face = "bold", color = "white"),
+  legend.position = "bottom"
+)
+
+theme_set(black_theme)
+
+# Set global default for geom_point shape
+update_geom_defaults("point", list(shape = 1, size = 3, alpha = 0.8))
+
+# silence marginaleffects warnings about glmmTMB
+options(marginaleffects_safe = FALSE)
+
+set.seed(4218)
+
+inv_logit <- function(x) 1 / (1 + exp(-x))
+```
+
+## Recreating the simulation setup from Part 3
+
+We reuse the same predictor distributions and baseline effects as [Part 3](../interactions_link_functions/index.qmd)'s Case Study 3, so that the interactions we add below are layered on top of a familiar baseline rather than a new simulation to learn from scratch.
+
+```{r}
+n_plots <- 200
+
+tree_cover <- dist_mixture(dist_beta(4, 0.8), dist_beta(0.8, 4), weights = c(0.5, 0.5))
+avg_yearly_rain <- dist_gamma(shape = 3, rate = 0.7)
+avg_yearly_temp <- dist_normal(mu = 20, sd = 10)
+
+occurence_intercept <- plogis(-3)
+occurence_tree_effect <- 0.45
+occurence_rain_effect <- 0.01
+occurence_temp_effect <- 0.01
+
+abundance_intercept <- exp(1)
+abundance_tree_effect <- 4.5
+abundance_rain_effect <- 0.1
+abundance_temp_effect <- 0.1
+```
+
+## What we'll cover
+
+- A brief recap of hurdle models and why a negative occurence effect (instead of a simple shared positive `tree_cov` effect, as in Part 3) makes for a more interesting — and more realistic — case study: colonization and persistence can easily pull in opposite directions from the predictors that drive local abundance.
+- Simulating and fitting a hurdle model with a genuine two-way interaction (`tree_cov * rain`) on *both* the zero-inflation and conditional-count formulas, and recovering that interaction on the occurence, abundance-when-present, and population-abundance scales using `marginaleffects::slopes()`.
+- Extending to a three-way interaction (`tree_cov * rain * temp`) on both components, and confronting the asymmetric statistical power between the occurence and count components head-on — including what that implies for how much data you'd actually need to detect a triple interaction reliably in a zero-inflation formula.
+- Revisiting the "implicit interaction" theme from Part 3: even the *simple*, no-interaction hurdle model implicitly creates an interaction on the population-abundance scale, since that scale is a product of two nonlinearly-transformed components. We'll make that concrete before adding any explicit interaction terms.
+- A closing discussion of practical guidance: when is it worth fitting interactions in *both* components of a hurdle model versus just one, and how to communicate a "doesn't clear significance in the zero-inflation part, but is visible in the count part" result honestly, rather than as a null finding.
+
+<!--
+DRAFT NOTE: this post is a placeholder scaffold. The material that used to live in
+Part 3 (interactions_link_functions/index.qmd) under "Interacting effects on occurence
+and abundance" — the double- and triple-interaction hurdle models, their `marginaleffects`
+extraction on all three scales, and the associated plots and discussion — has been removed
+from Part 3 and should be adapted into this post, expanded with:
+  - the simpler single-predictor hurdle case study with a *negative* occurence effect
+    (currently sketched, unfinished, in Part 3 as `mod_hu_simple_2` / `simple_pop_data_2`)
+  - more explicit connective tissue back to Parts 1-3 rather than assuming the reader has
+    just finished Part 3
+  - a standalone explanation of hurdle/zero-inflated models (Part 3 only gestured at this
+    with "EXPLAIN BRIEFLY" as a placeholder)
+-->
