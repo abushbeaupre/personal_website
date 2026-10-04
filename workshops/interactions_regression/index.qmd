@@ -32,7 +32,7 @@ This workshop is adapted from a two-part tutorial series on interactions in regr
 
 **Audience**: graduate students and researchers in ecology who fit GL(M)Ms and want to interpret interaction terms correctly.
 
-**Format**: short lecture blocks, live-coded examples, and practice exercises (look for the 🧪 slides).
+**Format**: short lecture blocks, and practice exercises.
 
 ## Learning objectives
 
@@ -40,14 +40,17 @@ By the end of this workshop you should be able to:
 
 1.  Explain what an interaction term means for a categorical × numerical model and for a numerical × numerical model
 2.  Distinguish **conditional** effects from **marginal** effects, and choose the right one for a research question
-3.  Recognize Simpson's Paradox and sampling bias as threats to naive interpretation
+3.  Use `marginaleffects` (`predictions()`, `slopes()`, `avg_predictions()`, `avg_slopes()`, `hypotheses()`) to extract and test the quantities you actually care about
 
 ## Learning objectives (continued)
 
-4.  Use `marginaleffects` (`predictions()`, `slopes()`, `avg_predictions()`, `avg_slopes()`, `hypotheses()`) to extract and test the quantities you actually care about
-5.  Visualize interaction effects (slope-by-moderator plots, five-number-summary predictions, response surfaces) and know their trade-offs
-6.  Explain why a non-linear link function (logit, log) creates an **implicit interaction** even when the model formula has none, and convert a raw GLM coefficient to a probability-scale or count-scale effect
-7.  Interpret a hurdle/zero-inflated model's two components separately and combined, and recognize that two-way interactions are symmetric
+4.  Visualize interaction effects (slope-by-moderator plots, five-number-summary predictions, response surfaces) and know their trade-offs
+5.  Recognize that a non-linear link function (logit, log) creates an **implicit interaction** even when the model formula has none, and convert a raw GLM coefficient to a probability-scale or count-scale effect
+6.  Interpret a hurdle/zero-inflated model's two components separately and combined, and recognize that two-way interactions are symmetric
+
+## Actual learning objective
+
+Model summary outputs rarely answer a research question and definitely do not communicate the results in a comprehensible way.
 
 ## Setup {.smaller}
 
@@ -185,7 +188,7 @@ ggplot(bighorn_population) +
   geom_smooth(aes(x = snow_depth, y = weight, color = sex), method = "lm", se = FALSE)
 ```
 
-## 🧪 Exercise 1
+## Exercise 1
 
 Using `bighorn_population`:
 
@@ -213,6 +216,12 @@ mod_mass_1 <- glmmTMB(weight ~ sex * snow_depth,
                        data = bighorn_mass_1, family = gaussian())
 ```
 
+## Model coefficients {.table-slide}
+
+```{r}
+summary(mod_mass_1)$coefficients$cond
+```
+
 ## Reading the coefficients
 
 - **Intercept**: female weight at snow_depth = 0
@@ -221,12 +230,6 @@ mod_mass_1 <- glmmTMB(weight ~ sex * snow_depth,
 - **sexmale:snow_depth**: male − female slope difference
 
 Useful for hypothesis tests, not directly interpretable for "what's the effect for males?" — that's what `marginaleffects` is for.
-
-## Model coefficients {.table-slide}
-
-```{r}
-summary(mod_mass_1)$coefficients$cond
-```
 
 ## Q1: Do sexes differ in spring mass? {.table-slide}
 
@@ -307,6 +310,7 @@ bighorn_mass_2 <- bind_rows(
   bighorn_population |> filter(sex == "female") |> slice_sample(n = 20)
 )
 mod_mass_2 <- glmmTMB(weight ~ sex * snow_depth, data = bighorn_mass_2, family = gaussian())
+summary(mod_mass_2)
 avg_slopes(mod_mass_2, variables = "snow_depth", vcov = TRUE)
 ```
 
@@ -318,21 +322,36 @@ Conditional (by-sex) slopes stay close to truth. But the **marginal** slope is b
 
 If we *know* the true population sex ratio (50:50), we can average over a **balanced** `newdata` grid instead of our biased sample.
 
-**Key principle**: model coefficients capture conditional relationships from your sample; marginal effects can target *any* population composition via `newdata`.
-
-## Balanced-`newdata` correction {.smaller}
-
 ```{r}
 newdata_balanced <- bighorn_mass_2 |>
   group_by(sex) |>
   reframe(snow_depth = seq(min(snow_depth), max(snow_depth), length.out = 50)) |>
   ungroup()
-
-avg_predictions(mod_mass_2, variables = "snow_depth", newdata = newdata_balanced) |>
-  as_tibble() |> select(estimate, conf.low, conf.high) |> head(3)
 ```
 
-## 🧪 Exercise 2
+## Comparing biased and unbiased prediction grids
+
+```{r}
+mod_mass_true <- glmmTMB(weight ~ sex * snow_depth,
+                          data = bighorn_population, family = gaussian())
+
+avg_pred_mass_2 <- avg_predictions(mod_mass_2, variables = "snow_depth")
+avg_pred_mass_3 <- avg_predictions(mod_mass_2, variables = "snow_depth", newdata = newdata_balanced)
+avg_pred_mass_true <- avg_predictions(mod_mass_true, variables = "snow_depth")
+
+bind_rows(
+  avg_pred_mass_2 |> mutate(type = "biased"),
+  avg_pred_mass_3 |> mutate(type = "corrected"),
+  avg_pred_mass_true |> mutate(type = "true")
+) |>
+  ggplot() +
+  geom_line(aes(x = snow_depth, y = estimate, color = type), linewidth = 2) +
+  labs(y = "Predicted weight (kg)",
+       x = "Snow depth (cm)",
+       color = "Prediction type")
+```
+
+## Exercise 2
 
 Using `mod_mass_2` (the biased sample model):
 

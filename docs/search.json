@@ -487,21 +487,21 @@
     "href": "workshops/interactions_regression/index.html#welcome",
     "title": "Understanding Interactions in Regression Models",
     "section": "Welcome",
-    "text": "Welcome\nThis workshop is adapted from a two-part tutorial series on interactions in regression models:\n\nPart 1: Categorical × numerical interactions\nPart 2: Numerical × numerical interactions\nPart 3: Generalized linear models and link functions\n\nAudience: graduate students and researchers in ecology who fit GL(M)Ms and want to interpret interaction terms correctly.\nFormat: short lecture blocks, live-coded examples, and practice exercises (look for the 🧪 slides)."
+    "text": "Welcome\nThis workshop is adapted from a two-part tutorial series on interactions in regression models:\n\nPart 1: Categorical × numerical interactions\nPart 2: Numerical × numerical interactions\nPart 3: Generalized linear models and link functions\n\nAudience: graduate students and researchers in ecology who fit GL(M)Ms and want to interpret interaction terms correctly.\nFormat: short lecture blocks, and practice exercises."
   },
   {
     "objectID": "workshops/interactions_regression/index.html#learning-objectives",
     "href": "workshops/interactions_regression/index.html#learning-objectives",
     "title": "Understanding Interactions in Regression Models",
     "section": "Learning objectives",
-    "text": "Learning objectives\nBy the end of this workshop you should be able to:\n\nExplain what an interaction term means for a categorical × numerical model and for a numerical × numerical model\nDistinguish conditional effects from marginal effects, and choose the right one for a research question\nRecognize Simpson’s Paradox and sampling bias as threats to naive interpretation"
+    "text": "Learning objectives\nBy the end of this workshop you should be able to:\n\nExplain what an interaction term means for a categorical × numerical model and for a numerical × numerical model\nDistinguish conditional effects from marginal effects, and choose the right one for a research question\nUse marginaleffects (predictions(), slopes(), avg_predictions(), avg_slopes(), hypotheses()) to extract and test the quantities you actually care about"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#learning-objectives-continued",
     "href": "workshops/interactions_regression/index.html#learning-objectives-continued",
     "title": "Understanding Interactions in Regression Models",
     "section": "Learning objectives (continued)",
-    "text": "Learning objectives (continued)\n\nUse marginaleffects (predictions(), slopes(), avg_predictions(), avg_slopes(), hypotheses()) to extract and test the quantities you actually care about\nVisualize interaction effects (slope-by-moderator plots, five-number-summary predictions, response surfaces) and know their trade-offs\nExplain why a non-linear link function (logit, log) creates an implicit interaction even when the model formula has none, and convert a raw GLM coefficient to a probability-scale or count-scale effect\nInterpret a hurdle/zero-inflated model’s two components separately and combined, and recognize that two-way interactions are symmetric"
+    "text": "Learning objectives (continued)\n\nVisualize interaction effects (slope-by-moderator plots, five-number-summary predictions, response surfaces) and know their trade-offs\nRecognize that a non-linear link function (logit, log) creates an implicit interaction even when the model formula has none, and convert a raw GLM coefficient to a probability-scale or count-scale effect\nInterpret a hurdle/zero-inflated model’s two components separately and combined, and recognize that two-way interactions are symmetric"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#setup",
@@ -563,8 +563,8 @@
     "objectID": "workshops/interactions_regression/index.html#exercise-1",
     "href": "workshops/interactions_regression/index.html#exercise-1",
     "title": "Understanding Interactions in Regression Models",
-    "section": "🧪 Exercise 1",
-    "text": "🧪 Exercise 1\nUsing bighorn_population:\n\nFit weight ~ sex * snow_depth with glmmTMB(). Call it mod_mass_true.\nFrom the summary, identify which coefficient represents the male slope of snow depth. (Hint: it’s not printed directly — you have to add two rows together.)\nIn one sentence, explain why a naive weight ~ snow_depth model (ignoring sex) would mislead a manager trying to understand the effect of a harsh winter.\n\n(~5 minutes — discuss with a neighbor)"
+    "section": "Exercise 1",
+    "text": "Exercise 1\nUsing bighorn_population:\n\nFit weight ~ sex * snow_depth with glmmTMB(). Call it mod_mass_true.\nFrom the summary, identify which coefficient represents the male slope of snow depth. (Hint: it’s not printed directly — you have to add two rows together.)\nIn one sentence, explain why a naive weight ~ snow_depth model (ignoring sex) would mislead a manager trying to understand the effect of a harsh winter.\n\n(~5 minutes — discuss with a neighbor)"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#sampling-from-the-population",
@@ -627,14 +627,14 @@
     "href": "workshops/interactions_regression/index.html#scenario-2-biased-sampling-80-male",
     "title": "Understanding Interactions in Regression Models",
     "section": "Scenario 2: biased sampling (80% male)",
-    "text": "Scenario 2: biased sampling (80% male)\n\nbighorn_mass_2 &lt;- bind_rows(\n  bighorn_population |&gt; filter(sex == \"male\") |&gt; slice_sample(n = 80),\n  bighorn_population |&gt; filter(sex == \"female\") |&gt; slice_sample(n = 20)\n)\nmod_mass_2 &lt;- glmmTMB(weight ~ sex * snow_depth, data = bighorn_mass_2, family = gaussian())\navg_slopes(mod_mass_2, variables = \"snow_depth\", vcov = TRUE)\n\n\n Estimate Std. Error     z Pr(&gt;|z|)    S 2.5 % 97.5 %\n    -1.12       0.17 -6.62   &lt;0.001 34.7 -1.46 -0.792\n\nTerm: snow_depth\nType: response\nComparison: dY/dX"
+    "text": "Scenario 2: biased sampling (80% male)\n\nbighorn_mass_2 &lt;- bind_rows(\n  bighorn_population |&gt; filter(sex == \"male\") |&gt; slice_sample(n = 80),\n  bighorn_population |&gt; filter(sex == \"female\") |&gt; slice_sample(n = 20)\n)\nmod_mass_2 &lt;- glmmTMB(weight ~ sex * snow_depth, data = bighorn_mass_2, family = gaussian())\nsummary(mod_mass_2)\n\n Family: gaussian  ( identity )\nFormula:          weight ~ sex * snow_depth\nData: bighorn_mass_2\n\n      AIC       BIC    logLik -2*log(L)  df.resid \n    845.8     858.9    -417.9     835.8        95 \n\n\nDispersion estimate for gaussian family (sigma^2):  250 \n\nConditional model:\n                   Estimate Std. Error z value Pr(&gt;|z|)    \n(Intercept)        182.7351     7.5600  24.171  &lt; 2e-16 ***\nsexmale             35.8867    12.7414   2.817  0.00485 ** \nsnow_depth          -2.5263     0.3534  -7.149 8.76e-13 ***\nsexmale:snow_depth   1.7521     0.4027   4.351 1.36e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\navg_slopes(mod_mass_2, variables = \"snow_depth\", vcov = TRUE)\n\n\n Estimate Std. Error     z Pr(&gt;|z|)    S 2.5 % 97.5 %\n    -1.12       0.17 -6.62   &lt;0.001 34.7 -1.46 -0.792\n\nTerm: snow_depth\nType: response\nComparison: dY/dX"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#correcting-for-known-sampling-bias",
     "href": "workshops/interactions_regression/index.html#correcting-for-known-sampling-bias",
     "title": "Understanding Interactions in Regression Models",
     "section": "Correcting for known sampling bias",
-    "text": "Correcting for known sampling bias\nIf we know the true population sex ratio (50:50), we can average over a balanced newdata grid instead of our biased sample.\nKey principle: model coefficients capture conditional relationships from your sample; marginal effects can target any population composition via newdata."
+    "text": "Correcting for known sampling bias\nIf we know the true population sex ratio (50:50), we can average over a balanced newdata grid instead of our biased sample.\n\nnewdata_balanced &lt;- bighorn_mass_2 |&gt;\n  group_by(sex) |&gt;\n  reframe(snow_depth = seq(min(snow_depth), max(snow_depth), length.out = 50)) |&gt;\n  ungroup()"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#balanced-newdata-correction",
@@ -647,8 +647,8 @@
     "objectID": "workshops/interactions_regression/index.html#exercise-2",
     "href": "workshops/interactions_regression/index.html#exercise-2",
     "title": "Understanding Interactions in Regression Models",
-    "section": "🧪 Exercise 2",
-    "text": "🧪 Exercise 2\nUsing mod_mass_2 (the biased sample model):\n\nCompute avg_slopes() without correcting for sampling bias, and again with the balanced newdata_balanced grid.\nWhich one is closer to the true average slope, mean(c(male_loss, female_loss))?\nSuppose instead you didn’t know the true sex ratio in the population — what additional data would you need to collect to justify a correction like this?\n\n(~7 minutes — try it in your own script, then we’ll compare answers)"
+    "section": "Exercise 2",
+    "text": "Exercise 2\nUsing mod_mass_2 (the biased sample model):\n\nCompute avg_slopes() without correcting for sampling bias, and again with the balanced newdata_balanced grid.\nWhich one is closer to the true average slope, mean(c(male_loss, female_loss))?\nSuppose instead you didn’t know the true sex ratio in the population — what additional data would you need to collect to justify a correction like this?\n\n(~7 minutes — try it in your own script, then we’ll compare answers)"
   },
   {
     "objectID": "workshops/interactions_regression/index.html#part-1-takeaways",
@@ -1832,5 +1832,19 @@
     "title": "Understanding Interactions in Regression Models",
     "section": "",
     "text": "This workshop is adapted from a two-part tutorial series on interactions in regression models:\n\nPart 1: Categorical × numerical interactions\nPart 2: Numerical × numerical interactions\nPart 3: Generalized linear models and link functions\n\nAudience: graduate students and researchers in ecology who fit GL(M)Ms and want to interpret interaction terms correctly.\nFormat: short lecture blocks, live-coded examples, and practice exercises (look for the 🧪 slides)."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#actual-learning-objective",
+    "href": "workshops/interactions_regression/index.html#actual-learning-objective",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Actual learning objective",
+    "text": "Actual learning objective\nModel summary outputs rarely answer a research question and definitely do not communicate the results in a comprehensible way."
+  },
+  {
+    "objectID": "workshops/interactions_regression/index.html#comparing-biased-and-unbiased-prediction-grids",
+    "href": "workshops/interactions_regression/index.html#comparing-biased-and-unbiased-prediction-grids",
+    "title": "Understanding Interactions in Regression Models",
+    "section": "Comparing biased and unbiased prediction grids",
+    "text": "Comparing biased and unbiased prediction grids\n\nmod_mass_true &lt;- glmmTMB(weight ~ sex * snow_depth,\n                          data = bighorn_population, family = gaussian())\n\navg_pred_mass_2 &lt;- avg_predictions(mod_mass_2, variables = \"snow_depth\")\navg_pred_mass_3 &lt;- avg_predictions(mod_mass_2, variables = \"snow_depth\", newdata = newdata_balanced)\navg_pred_mass_true &lt;- avg_predictions(mod_mass_true, variables = \"snow_depth\")\n\nbind_rows(\n  avg_pred_mass_2 |&gt; mutate(type = \"biased\"),\n  avg_pred_mass_3 |&gt; mutate(type = \"corrected\"),\n  avg_pred_mass_true |&gt; mutate(type = \"true\")\n) |&gt;\n  ggplot() +\n  geom_line(aes(x = snow_depth, y = estimate, color = type), linewidth = 2) +\n  labs(y = \"Predicted weight (kg)\",\n       x = \"Snow depth (cm)\",\n       color = \"Prediction type\")"
   }
 ]

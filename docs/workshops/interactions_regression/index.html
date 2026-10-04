@@ -233,7 +233,7 @@ Allen Bush-Beaupré
 <li>Part 3: <a href="../../posts/interactions_link_functions/index.html">Generalized linear models and link functions</a></li>
 </ul>
 <p><strong>Audience</strong>: graduate students and researchers in ecology who fit GL(M)Ms and want to interpret interaction terms correctly.</p>
-<p><strong>Format</strong>: short lecture blocks, live-coded examples, and practice exercises (look for the 🧪 slides).</p>
+<p><strong>Format</strong>: short lecture blocks, and practice exercises.</p>
 </section>
 <section id="learning-objectives" class="slide level2 scrollable">
 <h2>Learning objectives</h2>
@@ -241,17 +241,20 @@ Allen Bush-Beaupré
 <ol type="1">
 <li>Explain what an interaction term means for a categorical × numerical model and for a numerical × numerical model</li>
 <li>Distinguish <strong>conditional</strong> effects from <strong>marginal</strong> effects, and choose the right one for a research question</li>
-<li>Recognize Simpson’s Paradox and sampling bias as threats to naive interpretation</li>
+<li>Use <code>marginaleffects</code> (<code>predictions()</code>, <code>slopes()</code>, <code>avg_predictions()</code>, <code>avg_slopes()</code>, <code>hypotheses()</code>) to extract and test the quantities you actually care about</li>
 </ol>
 </section>
 <section id="learning-objectives-continued" class="slide level2 scrollable">
 <h2>Learning objectives (continued)</h2>
 <ol start="4" type="1">
-<li>Use <code>marginaleffects</code> (<code>predictions()</code>, <code>slopes()</code>, <code>avg_predictions()</code>, <code>avg_slopes()</code>, <code>hypotheses()</code>) to extract and test the quantities you actually care about</li>
 <li>Visualize interaction effects (slope-by-moderator plots, five-number-summary predictions, response surfaces) and know their trade-offs</li>
-<li>Explain why a non-linear link function (logit, log) creates an <strong>implicit interaction</strong> even when the model formula has none, and convert a raw GLM coefficient to a probability-scale or count-scale effect</li>
+<li>Recognize that a non-linear link function (logit, log) creates an <strong>implicit interaction</strong> even when the model formula has none, and convert a raw GLM coefficient to a probability-scale or count-scale effect</li>
 <li>Interpret a hurdle/zero-inflated model’s two components separately and combined, and recognize that two-way interactions are symmetric</li>
 </ol>
+</section>
+<section id="actual-learning-objective" class="slide level2">
+<h2>Actual learning objective</h2>
+<p>Model summary outputs rarely answer a research question and definitely do not communicate the results in a comprehensible way.</p>
 </section>
 <section id="setup" class="slide level2 smaller">
 <h2>Setup</h2>
@@ -399,7 +402,7 @@ Allen Bush-Beaupré
 </div>
 <img data-src="index_files/figure-revealjs/unnamed-chunk-4-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Within-sex trends are negative, as expected.</p></section>
 <section id="exercise-1" class="slide level2 scrollable">
-<h2>🧪 Exercise 1</h2>
+<h2>Exercise 1</h2>
 <p>Using <code>bighorn_population</code>:</p>
 <ol type="1">
 <li>Fit <code>weight ~ sex * snow_depth</code> with <code>glmmTMB()</code>. Call it <code>mod_mass_true</code>.</li>
@@ -426,16 +429,6 @@ Allen Bush-Beaupré
 <span id="cb5-8"><a aria-label="8"></a>                       <span class="at">data =</span> bighorn_mass_1, <span class="at">family =</span> <span class="fu">gaussian</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="reading-the-coefficients" class="slide level2">
-<h2>Reading the coefficients</h2>
-<ul>
-<li><strong>Intercept</strong>: female weight at snow_depth = 0</li>
-<li><strong>sexmale</strong>: male − female intercept difference</li>
-<li><strong>snow_depth</strong>: female slope</li>
-<li><strong>sexmale:snow_depth</strong>: male − female slope difference</li>
-</ul>
-<p>Useful for hypothesis tests, not directly interpretable for “what’s the effect for males?” — that’s what <code>marginaleffects</code> is for.</p>
-</section>
 <section id="model-coefficients" class="slide level2 table-slide">
 <h2>Model coefficients</h2>
 <div class="cell">
@@ -450,6 +443,16 @@ attr(,"ddf")
 [1] "asymptotic"</code></pre>
 </div>
 </div>
+</section>
+<section id="reading-the-coefficients" class="slide level2">
+<h2>Reading the coefficients</h2>
+<ul>
+<li><strong>Intercept</strong>: female weight at snow_depth = 0</li>
+<li><strong>sexmale</strong>: male − female intercept difference</li>
+<li><strong>snow_depth</strong>: female slope</li>
+<li><strong>sexmale:snow_depth</strong>: male − female slope difference</li>
+</ul>
+<p>Useful for hypothesis tests, not directly interpretable for “what’s the effect for males?” — that’s what <code>marginaleffects</code> is for.</p>
 </section>
 <section id="q1-do-sexes-differ-in-spring-mass" class="slide level2 table-slide">
 <h2>Q1: Do sexes differ in spring mass?</h2>
@@ -562,7 +565,28 @@ Comparison: dY/dX</code></pre>
 <span id="cb20-3"><a aria-label="3"></a>  bighorn_population <span class="sc">|&gt;</span> <span class="fu">filter</span>(sex <span class="sc">==</span> <span class="st">"female"</span>) <span class="sc">|&gt;</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">20</span>)</span>
 <span id="cb20-4"><a aria-label="4"></a>)</span>
 <span id="cb20-5"><a aria-label="5"></a>mod_mass_2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(weight <span class="sc">~</span> sex <span class="sc">*</span> snow_depth, <span class="at">data =</span> bighorn_mass_2, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
-<span id="cb20-6"><a aria-label="6"></a><span class="fu">avg_slopes</span>(mod_mass_2, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb20-6"><a aria-label="6"></a><span class="fu">summary</span>(mod_mass_2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: gaussian  ( identity )
+Formula:          weight ~ sex * snow_depth
+Data: bighorn_mass_2
+
+      AIC       BIC    logLik -2*log(L)  df.resid 
+    845.8     858.9    -417.9     835.8        95 
+
+
+Dispersion estimate for gaussian family (sigma^2):  250 
+
+Conditional model:
+                   Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)        182.7351     7.5600  24.171  &lt; 2e-16 ***
+sexmale             35.8867    12.7414   2.817  0.00485 ** 
+snow_depth          -2.5263     0.3534  -7.149 8.76e-13 ***
+sexmale:snow_depth   1.7521     0.4027   4.351 1.36e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a aria-label="1"></a><span class="fu">avg_slopes</span>(mod_mass_2, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Estimate Std. Error     z Pr(&gt;|z|)    S 2.5 % 97.5 %
@@ -581,30 +605,38 @@ Comparison: dY/dX</code></pre>
 <section id="correcting-for-known-sampling-bias" class="slide level2">
 <h2>Correcting for known sampling bias</h2>
 <p>If we <em>know</em> the true population sex ratio (50:50), we can average over a <strong>balanced</strong> <code>newdata</code> grid instead of our biased sample.</p>
-<p><strong>Key principle</strong>: model coefficients capture conditional relationships from your sample; marginal effects can target <em>any</em> population composition via <code>newdata</code>.</p>
-</section>
-<section id="balanced-newdata-correction" class="slide level2 smaller">
-<h2>Balanced-<code>newdata</code> correction</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a aria-label="1"></a>newdata_balanced <span class="ot">&lt;-</span> bighorn_mass_2 <span class="sc">|&gt;</span></span>
-<span id="cb22-2"><a aria-label="2"></a>  <span class="fu">group_by</span>(sex) <span class="sc">|&gt;</span></span>
-<span id="cb22-3"><a aria-label="3"></a>  <span class="fu">reframe</span>(<span class="at">snow_depth =</span> <span class="fu">seq</span>(<span class="fu">min</span>(snow_depth), <span class="fu">max</span>(snow_depth), <span class="at">length.out =</span> <span class="dv">50</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb22-4"><a aria-label="4"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb22-5"><a aria-label="5"></a></span>
-<span id="cb22-6"><a aria-label="6"></a><span class="fu">avg_predictions</span>(mod_mass_2, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">newdata =</span> newdata_balanced) <span class="sc">|&gt;</span></span>
-<span id="cb22-7"><a aria-label="7"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span> <span class="fu">select</span>(estimate, conf.low, conf.high) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  estimate conf.low conf.high
-     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-1     197.     185.      209.
-2     138.     130.      146.
-3     120.     109.      131.</code></pre>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a aria-label="1"></a>newdata_balanced <span class="ot">&lt;-</span> bighorn_mass_2 <span class="sc">|&gt;</span></span>
+<span id="cb24-2"><a aria-label="2"></a>  <span class="fu">group_by</span>(sex) <span class="sc">|&gt;</span></span>
+<span id="cb24-3"><a aria-label="3"></a>  <span class="fu">reframe</span>(<span class="at">snow_depth =</span> <span class="fu">seq</span>(<span class="fu">min</span>(snow_depth), <span class="fu">max</span>(snow_depth), <span class="at">length.out =</span> <span class="dv">50</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb24-4"><a aria-label="4"></a>  <span class="fu">ungroup</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
+<section id="comparing-biased-and-unbiased-prediction-grids" class="slide level2">
+<h2>Comparing biased and unbiased prediction grids</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a aria-label="1"></a>mod_mass_true <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(weight <span class="sc">~</span> sex <span class="sc">*</span> snow_depth,</span>
+<span id="cb25-2"><a aria-label="2"></a>                          <span class="at">data =</span> bighorn_population, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
+<span id="cb25-3"><a aria-label="3"></a></span>
+<span id="cb25-4"><a aria-label="4"></a>avg_pred_mass_2 <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_mass_2, <span class="at">variables =</span> <span class="st">"snow_depth"</span>)</span>
+<span id="cb25-5"><a aria-label="5"></a>avg_pred_mass_3 <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_mass_2, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">newdata =</span> newdata_balanced)</span>
+<span id="cb25-6"><a aria-label="6"></a>avg_pred_mass_true <span class="ot">&lt;-</span> <span class="fu">avg_predictions</span>(mod_mass_true, <span class="at">variables =</span> <span class="st">"snow_depth"</span>)</span>
+<span id="cb25-7"><a aria-label="7"></a></span>
+<span id="cb25-8"><a aria-label="8"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb25-9"><a aria-label="9"></a>  avg_pred_mass_2 <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">"biased"</span>),</span>
+<span id="cb25-10"><a aria-label="10"></a>  avg_pred_mass_3 <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">"corrected"</span>),</span>
+<span id="cb25-11"><a aria-label="11"></a>  avg_pred_mass_true <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">"true"</span>)</span>
+<span id="cb25-12"><a aria-label="12"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb25-13"><a aria-label="13"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb25-14"><a aria-label="14"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> snow_depth, <span class="at">y =</span> estimate, <span class="at">color =</span> type), <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb25-15"><a aria-label="15"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted weight (kg)"</span>,</span>
+<span id="cb25-16"><a aria-label="16"></a>       <span class="at">x =</span> <span class="st">"Snow depth (cm)"</span>,</span>
+<span id="cb25-17"><a aria-label="17"></a>       <span class="at">color =</span> <span class="st">"Prediction type"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+
+</div>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-16-1.png" width="768" class="r-stretch"></section>
 <section id="exercise-2" class="slide level2 scrollable">
-<h2>🧪 Exercise 2</h2>
+<h2>Exercise 2</h2>
 <p>Using <code>mod_mass_2</code> (the biased sample model):</p>
 <ol type="1">
 <li>Compute <code>avg_slopes()</code> <strong>without</strong> correcting for sampling bias, and again <strong>with</strong> the balanced <code>newdata_balanced</code> grid.</li>
@@ -641,30 +673,30 @@ Comparison: dY/dX</code></pre>
 <section id="simulating-the-data" class="slide level2 smaller">
 <h2>Simulating the data</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a aria-label="1"></a>n_flowers <span class="ot">&lt;-</span> <span class="dv">200</span></span>
-<span id="cb24-2"><a aria-label="2"></a>temperature <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_flowers, <span class="at">mean =</span> <span class="dv">10</span>, <span class="at">sd =</span> <span class="dv">15</span>)</span>
-<span id="cb24-3"><a aria-label="3"></a>rain <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(n_flowers, <span class="at">shape =</span> <span class="dv">2</span>)</span>
-<span id="cb24-4"><a aria-label="4"></a>avg_petal_length <span class="ot">&lt;-</span> <span class="fl">25.6</span>; sd_petal_length <span class="ot">&lt;-</span> <span class="fl">4.5</span></span>
-<span id="cb24-5"><a aria-label="5"></a>temperature_effect <span class="ot">&lt;-</span> <span class="fl">0.4</span>; rain_effect <span class="ot">&lt;-</span> <span class="fl">0.9</span>; interaction_effect <span class="ot">&lt;-</span> <span class="fl">0.2</span></span>
-<span id="cb24-6"><a aria-label="6"></a></span>
-<span id="cb24-7"><a aria-label="7"></a>flower_measurements_1 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb24-8"><a aria-label="8"></a>  <span class="at">temp_centered =</span> temperature <span class="sc">-</span> <span class="fu">mean</span>(temperature),</span>
-<span id="cb24-9"><a aria-label="9"></a>  <span class="at">rain_centered =</span> rain <span class="sc">-</span> <span class="fu">mean</span>(rain),</span>
-<span id="cb24-10"><a aria-label="10"></a>  <span class="at">petal_length =</span> <span class="fu">rnorm</span>(n_flowers,</span>
-<span id="cb24-11"><a aria-label="11"></a>    <span class="at">mean =</span> avg_petal_length <span class="sc">+</span></span>
-<span id="cb24-12"><a aria-label="12"></a>      temperature_effect <span class="sc">*</span> temp_centered <span class="sc">+</span></span>
-<span id="cb24-13"><a aria-label="13"></a>      rain_effect <span class="sc">*</span> rain_centered <span class="sc">+</span></span>
-<span id="cb24-14"><a aria-label="14"></a>      interaction_effect <span class="sc">*</span> temp_centered <span class="sc">*</span> rain_centered,</span>
-<span id="cb24-15"><a aria-label="15"></a>    <span class="at">sd =</span> sd_petal_length)</span>
-<span id="cb24-16"><a aria-label="16"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a aria-label="1"></a>n_flowers <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb26-2"><a aria-label="2"></a>temperature <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_flowers, <span class="at">mean =</span> <span class="dv">10</span>, <span class="at">sd =</span> <span class="dv">15</span>)</span>
+<span id="cb26-3"><a aria-label="3"></a>rain <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(n_flowers, <span class="at">shape =</span> <span class="dv">2</span>)</span>
+<span id="cb26-4"><a aria-label="4"></a>avg_petal_length <span class="ot">&lt;-</span> <span class="fl">25.6</span>; sd_petal_length <span class="ot">&lt;-</span> <span class="fl">4.5</span></span>
+<span id="cb26-5"><a aria-label="5"></a>temperature_effect <span class="ot">&lt;-</span> <span class="fl">0.4</span>; rain_effect <span class="ot">&lt;-</span> <span class="fl">0.9</span>; interaction_effect <span class="ot">&lt;-</span> <span class="fl">0.2</span></span>
+<span id="cb26-6"><a aria-label="6"></a></span>
+<span id="cb26-7"><a aria-label="7"></a>flower_measurements_1 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb26-8"><a aria-label="8"></a>  <span class="at">temp_centered =</span> temperature <span class="sc">-</span> <span class="fu">mean</span>(temperature),</span>
+<span id="cb26-9"><a aria-label="9"></a>  <span class="at">rain_centered =</span> rain <span class="sc">-</span> <span class="fu">mean</span>(rain),</span>
+<span id="cb26-10"><a aria-label="10"></a>  <span class="at">petal_length =</span> <span class="fu">rnorm</span>(n_flowers,</span>
+<span id="cb26-11"><a aria-label="11"></a>    <span class="at">mean =</span> avg_petal_length <span class="sc">+</span></span>
+<span id="cb26-12"><a aria-label="12"></a>      temperature_effect <span class="sc">*</span> temp_centered <span class="sc">+</span></span>
+<span id="cb26-13"><a aria-label="13"></a>      rain_effect <span class="sc">*</span> rain_centered <span class="sc">+</span></span>
+<span id="cb26-14"><a aria-label="14"></a>      interaction_effect <span class="sc">*</span> temp_centered <span class="sc">*</span> rain_centered,</span>
+<span id="cb26-15"><a aria-label="15"></a>    <span class="at">sd =</span> sd_petal_length)</span>
+<span id="cb26-16"><a aria-label="16"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="fit-the-model" class="slide level2 table-slide">
 <h2>Fit the model</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a aria-label="1"></a>mod_flower_1 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(petal_length <span class="sc">~</span> temp_centered <span class="sc">*</span> rain_centered,</span>
-<span id="cb25-2"><a aria-label="2"></a>                         <span class="at">data =</span> flower_measurements_1)</span>
-<span id="cb25-3"><a aria-label="3"></a><span class="fu">summary</span>(mod_flower_1)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a aria-label="1"></a>mod_flower_1 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(petal_length <span class="sc">~</span> temp_centered <span class="sc">*</span> rain_centered,</span>
+<span id="cb27-2"><a aria-label="2"></a>                         <span class="at">data =</span> flower_measurements_1)</span>
+<span id="cb27-3"><a aria-label="3"></a><span class="fu">summary</span>(mod_flower_1)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                              Estimate Std. Error   z value     Pr(&gt;|z|)
 (Intercept)                 24.7315526 0.34191019 72.333477 0.000000e+00
@@ -680,9 +712,9 @@ attr(,"ddf")
 <section id="slope-of-one-predictor-at-a-single-value-of-the-other" class="slide level2 table-slide">
 <h2>Slope of one predictor at a single value of the other</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a aria-label="1"></a><span class="co"># Effect of temperature when rain_centered = 0 (i.e., average rain)</span></span>
-<span id="cb27-2"><a aria-label="2"></a><span class="fu">slopes</span>(mod_flower_1, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">rain_centered =</span> <span class="dv">0</span>),</span>
-<span id="cb27-3"><a aria-label="3"></a>       <span class="at">variables =</span> <span class="st">"temp_centered"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a aria-label="1"></a><span class="co"># Effect of temperature when rain_centered = 0 (i.e., average rain)</span></span>
+<span id="cb29-2"><a aria-label="2"></a><span class="fu">slopes</span>(mod_flower_1, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">rain_centered =</span> <span class="dv">0</span>),</span>
+<span id="cb29-3"><a aria-label="3"></a>       <span class="at">variables =</span> <span class="st">"temp_centered"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  rain_centered Estimate Std. Error    z Pr(&gt;|z|)     S 2.5 % 97.5 %
@@ -700,29 +732,29 @@ Comparison: dY/dX</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a aria-label="1"></a>slopes_by_temp <span class="ot">&lt;-</span> <span class="fu">slopes</span>(mod_flower_1,</span>
-<span id="cb29-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
-<span id="cb29-3"><a aria-label="3"></a>                                          <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered), <span class="at">length.out =</span> <span class="dv">30</span>)),</span>
-<span id="cb29-4"><a aria-label="4"></a>  <span class="at">variables =</span> <span class="st">"rain_centered"</span>, <span class="at">by =</span> <span class="st">"temp_centered"</span>)</span>
-<span id="cb29-5"><a aria-label="5"></a></span>
-<span id="cb29-6"><a aria-label="6"></a>trend_slope_temp <span class="ot">&lt;-</span> <span class="fu">coef</span>(<span class="fu">lm</span>(estimate <span class="sc">~</span> temp_centered, <span class="at">data =</span> slopes_by_temp))[[<span class="st">"temp_centered"</span>]]</span>
-<span id="cb29-7"><a aria-label="7"></a></span>
-<span id="cb29-8"><a aria-label="8"></a>slopes_by_temp <span class="sc">|&gt;</span></span>
-<span id="cb29-9"><a aria-label="9"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb29-10"><a aria-label="10"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb29-11"><a aria-label="11"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high),</span>
-<span id="cb29-12"><a aria-label="12"></a>    <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">fill =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
-<span id="cb29-13"><a aria-label="13"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">y =</span> estimate),</span>
-<span id="cb29-14"><a aria-label="14"></a>    <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb29-15"><a aria-label="15"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.2</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>,</span>
-<span id="cb29-16"><a aria-label="16"></a>    <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"slope = "</span>, <span class="fu">round</span>(trend_slope_temp, <span class="dv">3</span>)),</span>
-<span id="cb29-17"><a aria-label="17"></a>    <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>) <span class="sc">+</span></span>
-<span id="cb29-18"><a aria-label="18"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">25</span>, <span class="dv">50</span>, <span class="at">by =</span> <span class="dv">5</span>)) <span class="sc">+</span></span>
-<span id="cb29-19"><a aria-label="19"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Effect of rain on petal length"</span>, <span class="at">x =</span> <span class="st">"Temperature values"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a aria-label="1"></a>slopes_by_temp <span class="ot">&lt;-</span> <span class="fu">slopes</span>(mod_flower_1,</span>
+<span id="cb31-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
+<span id="cb31-3"><a aria-label="3"></a>                                          <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered), <span class="at">length.out =</span> <span class="dv">30</span>)),</span>
+<span id="cb31-4"><a aria-label="4"></a>  <span class="at">variables =</span> <span class="st">"rain_centered"</span>, <span class="at">by =</span> <span class="st">"temp_centered"</span>)</span>
+<span id="cb31-5"><a aria-label="5"></a></span>
+<span id="cb31-6"><a aria-label="6"></a>trend_slope_temp <span class="ot">&lt;-</span> <span class="fu">coef</span>(<span class="fu">lm</span>(estimate <span class="sc">~</span> temp_centered, <span class="at">data =</span> slopes_by_temp))[[<span class="st">"temp_centered"</span>]]</span>
+<span id="cb31-7"><a aria-label="7"></a></span>
+<span id="cb31-8"><a aria-label="8"></a>slopes_by_temp <span class="sc">|&gt;</span></span>
+<span id="cb31-9"><a aria-label="9"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb31-10"><a aria-label="10"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb31-11"><a aria-label="11"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high),</span>
+<span id="cb31-12"><a aria-label="12"></a>    <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">fill =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
+<span id="cb31-13"><a aria-label="13"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">y =</span> estimate),</span>
+<span id="cb31-14"><a aria-label="14"></a>    <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb31-15"><a aria-label="15"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.2</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>,</span>
+<span id="cb31-16"><a aria-label="16"></a>    <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"slope = "</span>, <span class="fu">round</span>(trend_slope_temp, <span class="dv">3</span>)),</span>
+<span id="cb31-17"><a aria-label="17"></a>    <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>) <span class="sc">+</span></span>
+<span id="cb31-18"><a aria-label="18"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">25</span>, <span class="dv">50</span>, <span class="at">by =</span> <span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb31-19"><a aria-label="19"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Effect of rain on petal length"</span>, <span class="at">x =</span> <span class="st">"Temperature values"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-19-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Effect of rain on petal length, across observed temperatures.</p></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-20-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Effect of rain on petal length, across observed temperatures.</p></section>
 <section id="reading-the-slope-by-moderator-plot" class="slide level2">
 <h2>Reading the slope-by-moderator plot</h2>
 <p>The interaction coefficient is exactly the slope of this line — how much the effect of rain <em>changes</em> per unit of temperature.</p>
@@ -733,46 +765,46 @@ Comparison: dY/dX</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_flower_1,</span>
-<span id="cb30-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
-<span id="cb30-3"><a aria-label="3"></a>    <span class="at">temp_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
-<span id="cb30-4"><a aria-label="4"></a>                         <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
-<span id="cb30-5"><a aria-label="5"></a>    <span class="at">rain_centered =</span> fivenum</span>
-<span id="cb30-6"><a aria-label="6"></a>  )) <span class="sc">|&gt;</span></span>
-<span id="cb30-7"><a aria-label="7"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
-<span id="cb30-8"><a aria-label="8"></a>  <span class="fu">mutate</span>(<span class="at">rain =</span> <span class="fu">round</span>(rain_centered <span class="sc">+</span> <span class="fu">mean</span>(rain), <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb30-9"><a aria-label="9"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb30-10"><a aria-label="10"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> estimate, <span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">color =</span> <span class="fu">as.factor</span>(rain)),</span>
-<span id="cb30-11"><a aria-label="11"></a>            <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
-<span id="cb30-12"><a aria-label="12"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high,</span>
-<span id="cb30-13"><a aria-label="13"></a>                  <span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">fill =</span> <span class="fu">as.factor</span>(rain)), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb30-14"><a aria-label="14"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted petal length"</span>, <span class="at">x =</span> <span class="st">"Temperature"</span>, <span class="at">color =</span> <span class="st">"Rain"</span>, <span class="at">fill =</span> <span class="st">"Rain"</span>) <span class="sc">+</span></span>
-<span id="cb30-15"><a aria-label="15"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">50</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_flower_1,</span>
+<span id="cb32-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
+<span id="cb32-3"><a aria-label="3"></a>    <span class="at">temp_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
+<span id="cb32-4"><a aria-label="4"></a>                         <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb32-5"><a aria-label="5"></a>    <span class="at">rain_centered =</span> fivenum</span>
+<span id="cb32-6"><a aria-label="6"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb32-7"><a aria-label="7"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
+<span id="cb32-8"><a aria-label="8"></a>  <span class="fu">mutate</span>(<span class="at">rain =</span> <span class="fu">round</span>(rain_centered <span class="sc">+</span> <span class="fu">mean</span>(rain), <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb32-9"><a aria-label="9"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb32-10"><a aria-label="10"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> estimate, <span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">color =</span> <span class="fu">as.factor</span>(rain)),</span>
+<span id="cb32-11"><a aria-label="11"></a>            <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb32-12"><a aria-label="12"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high,</span>
+<span id="cb32-13"><a aria-label="13"></a>                  <span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">fill =</span> <span class="fu">as.factor</span>(rain)), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb32-14"><a aria-label="14"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted petal length"</span>, <span class="at">x =</span> <span class="st">"Temperature"</span>, <span class="at">color =</span> <span class="st">"Rain"</span>, <span class="at">fill =</span> <span class="st">"Rain"</span>) <span class="sc">+</span></span>
+<span id="cb32-15"><a aria-label="15"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">50</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-20-1.png" width="768" class="r-stretch"></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-21-1.png" width="768" class="r-stretch"></section>
 <section id="response-surfaces-use-with-caution" class="slide level2 fig-slide">
 <h2>Response surfaces — use with caution</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_flower_1,</span>
-<span id="cb31-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
-<span id="cb31-3"><a aria-label="3"></a>    <span class="at">temp_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
-<span id="cb31-4"><a aria-label="4"></a>                         <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
-<span id="cb31-5"><a aria-label="5"></a>    <span class="at">rain_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>rain_centered),</span>
-<span id="cb31-6"><a aria-label="6"></a>                         <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>rain_centered), <span class="at">length.out =</span> <span class="dv">30</span>)</span>
-<span id="cb31-7"><a aria-label="7"></a>  )) <span class="sc">|&gt;</span></span>
-<span id="cb31-8"><a aria-label="8"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
-<span id="cb31-9"><a aria-label="9"></a>  <span class="fu">mutate</span>(<span class="at">rain =</span> rain_centered <span class="sc">+</span> <span class="fu">mean</span>(rain), <span class="at">temp =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature)) <span class="sc">|&gt;</span></span>
-<span id="cb31-10"><a aria-label="10"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> rain, <span class="at">y =</span> temp, <span class="at">z =</span> estimate)) <span class="sc">+</span></span>
-<span id="cb31-11"><a aria-label="11"></a>  <span class="fu">stat_contour_filled</span>() <span class="sc">+</span></span>
-<span id="cb31-12"><a aria-label="12"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Rain"</span>, <span class="at">y =</span> <span class="st">"Temperature"</span>, <span class="at">fill =</span> <span class="st">"Predicted petal length"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_flower_1,</span>
+<span id="cb33-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
+<span id="cb33-3"><a aria-label="3"></a>    <span class="at">temp_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>temp_centered),</span>
+<span id="cb33-4"><a aria-label="4"></a>                         <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>temp_centered), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb33-5"><a aria-label="5"></a>    <span class="at">rain_centered =</span> <span class="fu">seq</span>(<span class="fu">min</span>(flower_measurements_1<span class="sc">$</span>rain_centered),</span>
+<span id="cb33-6"><a aria-label="6"></a>                         <span class="fu">max</span>(flower_measurements_1<span class="sc">$</span>rain_centered), <span class="at">length.out =</span> <span class="dv">30</span>)</span>
+<span id="cb33-7"><a aria-label="7"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb33-8"><a aria-label="8"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
+<span id="cb33-9"><a aria-label="9"></a>  <span class="fu">mutate</span>(<span class="at">rain =</span> rain_centered <span class="sc">+</span> <span class="fu">mean</span>(rain), <span class="at">temp =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature)) <span class="sc">|&gt;</span></span>
+<span id="cb33-10"><a aria-label="10"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> rain, <span class="at">y =</span> temp, <span class="at">z =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb33-11"><a aria-label="11"></a>  <span class="fu">stat_contour_filled</span>() <span class="sc">+</span></span>
+<span id="cb33-12"><a aria-label="12"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Rain"</span>, <span class="at">y =</span> <span class="st">"Temperature"</span>, <span class="at">fill =</span> <span class="st">"Predicted petal length"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-21-1.png" width="768" class="r-stretch"></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-22-1.png" width="768" class="r-stretch"></section>
 <section id="response-surfaces-a-caution" class="slide level2">
 <h2>Response surfaces: a caution</h2>
 <p>Contour bins are arbitrary and hide uncertainty — good for exploration, risky for publication-quality inference. Prefer line-and-ribbon plots when you can.</p>
@@ -794,20 +826,20 @@ Comparison: dY/dX</code></pre>
 <section id="simulating-heteroscedastic-data" class="slide level2 smaller">
 <h2>Simulating heteroscedastic data</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a aria-label="1"></a>log_sd_intercept <span class="ot">&lt;-</span> <span class="fu">log</span>(sd_petal_length)</span>
-<span id="cb32-2"><a aria-label="2"></a>log_sd_temp_slope <span class="ot">&lt;-</span> <span class="fl">0.03</span></span>
-<span id="cb32-3"><a aria-label="3"></a></span>
-<span id="cb32-4"><a aria-label="4"></a>flower_measurements_2 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb32-5"><a aria-label="5"></a>  <span class="at">temp_centered =</span> temperature <span class="sc">-</span> <span class="fu">mean</span>(temperature),</span>
-<span id="cb32-6"><a aria-label="6"></a>  <span class="at">rain_centered =</span> rain <span class="sc">-</span> <span class="fu">mean</span>(rain),</span>
-<span id="cb32-7"><a aria-label="7"></a>  <span class="at">petal_length =</span> <span class="fu">rnorm</span>(n_flowers,</span>
-<span id="cb32-8"><a aria-label="8"></a>    <span class="at">mean =</span> avg_petal_length <span class="sc">+</span> temperature_effect <span class="sc">*</span> temp_centered,</span>
-<span id="cb32-9"><a aria-label="9"></a>    <span class="at">sd =</span> <span class="fu">exp</span>(log_sd_intercept <span class="sc">+</span> log_sd_temp_slope <span class="sc">*</span> temp_centered))</span>
-<span id="cb32-10"><a aria-label="10"></a>)</span>
-<span id="cb32-11"><a aria-label="11"></a></span>
-<span id="cb32-12"><a aria-label="12"></a>mod_flower_2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(petal_length <span class="sc">~</span> temp_centered,</span>
-<span id="cb32-13"><a aria-label="13"></a>                         <span class="at">dispformula =</span> <span class="sc">~</span> temp_centered,</span>
-<span id="cb32-14"><a aria-label="14"></a>                         <span class="at">data =</span> flower_measurements_2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a aria-label="1"></a>log_sd_intercept <span class="ot">&lt;-</span> <span class="fu">log</span>(sd_petal_length)</span>
+<span id="cb34-2"><a aria-label="2"></a>log_sd_temp_slope <span class="ot">&lt;-</span> <span class="fl">0.03</span></span>
+<span id="cb34-3"><a aria-label="3"></a></span>
+<span id="cb34-4"><a aria-label="4"></a>flower_measurements_2 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb34-5"><a aria-label="5"></a>  <span class="at">temp_centered =</span> temperature <span class="sc">-</span> <span class="fu">mean</span>(temperature),</span>
+<span id="cb34-6"><a aria-label="6"></a>  <span class="at">rain_centered =</span> rain <span class="sc">-</span> <span class="fu">mean</span>(rain),</span>
+<span id="cb34-7"><a aria-label="7"></a>  <span class="at">petal_length =</span> <span class="fu">rnorm</span>(n_flowers,</span>
+<span id="cb34-8"><a aria-label="8"></a>    <span class="at">mean =</span> avg_petal_length <span class="sc">+</span> temperature_effect <span class="sc">*</span> temp_centered,</span>
+<span id="cb34-9"><a aria-label="9"></a>    <span class="at">sd =</span> <span class="fu">exp</span>(log_sd_intercept <span class="sc">+</span> log_sd_temp_slope <span class="sc">*</span> temp_centered))</span>
+<span id="cb34-10"><a aria-label="10"></a>)</span>
+<span id="cb34-11"><a aria-label="11"></a></span>
+<span id="cb34-12"><a aria-label="12"></a>mod_flower_2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(petal_length <span class="sc">~</span> temp_centered,</span>
+<span id="cb34-13"><a aria-label="13"></a>                         <span class="at">dispformula =</span> <span class="sc">~</span> temp_centered,</span>
+<span id="cb34-14"><a aria-label="14"></a>                         <span class="at">data =</span> flower_measurements_2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="checking-the-dispersion-model" class="slide level2 fig-slide">
@@ -815,28 +847,28 @@ Comparison: dY/dX</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_flower_2, <span class="at">newdata =</span> flower_measurements_2, <span class="at">type =</span> <span class="st">"disp"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb33-2"><a aria-label="2"></a>  <span class="fu">as_tibble</span>() <span class="ot">-&gt;</span> pred_sd_temp</span>
-<span id="cb33-3"><a aria-label="3"></a></span>
-<span id="cb33-4"><a aria-label="4"></a>true_sd_temp <span class="ot">&lt;-</span> flower_measurements_2 <span class="sc">|&gt;</span></span>
-<span id="cb33-5"><a aria-label="5"></a>  <span class="fu">mutate</span>(<span class="at">true_sd =</span> <span class="fu">exp</span>(log_sd_intercept <span class="sc">+</span> log_sd_temp_slope <span class="sc">*</span> temp_centered))</span>
-<span id="cb33-6"><a aria-label="6"></a></span>
-<span id="cb33-7"><a aria-label="7"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb33-8"><a aria-label="8"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> true_sd_temp,</span>
-<span id="cb33-9"><a aria-label="9"></a>            <span class="fu">aes</span>(<span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">y =</span> true_sd, <span class="at">color =</span> <span class="st">"Simulated"</span>),</span>
-<span id="cb33-10"><a aria-label="10"></a>            <span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb33-11"><a aria-label="11"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> pred_sd_temp,</span>
-<span id="cb33-12"><a aria-label="12"></a>              <span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high, <span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature)),</span>
-<span id="cb33-13"><a aria-label="13"></a>              <span class="at">fill =</span> <span class="st">"red"</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
-<span id="cb33-14"><a aria-label="14"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> pred_sd_temp,</span>
-<span id="cb33-15"><a aria-label="15"></a>            <span class="fu">aes</span>(<span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">y =</span> estimate, <span class="at">color =</span> <span class="st">"Estimated"</span>),</span>
-<span id="cb33-16"><a aria-label="16"></a>            <span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
-<span id="cb33-17"><a aria-label="17"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Simulated"</span> <span class="ot">=</span> <span class="st">"green"</span>, <span class="st">"Estimated"</span> <span class="ot">=</span> <span class="st">"red"</span>), <span class="at">name =</span> <span class="st">"Standard deviation"</span>) <span class="sc">+</span></span>
-<span id="cb33-18"><a aria-label="18"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Temperature"</span>, <span class="at">y =</span> <span class="st">"Standard deviation"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_flower_2, <span class="at">newdata =</span> flower_measurements_2, <span class="at">type =</span> <span class="st">"disp"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb35-2"><a aria-label="2"></a>  <span class="fu">as_tibble</span>() <span class="ot">-&gt;</span> pred_sd_temp</span>
+<span id="cb35-3"><a aria-label="3"></a></span>
+<span id="cb35-4"><a aria-label="4"></a>true_sd_temp <span class="ot">&lt;-</span> flower_measurements_2 <span class="sc">|&gt;</span></span>
+<span id="cb35-5"><a aria-label="5"></a>  <span class="fu">mutate</span>(<span class="at">true_sd =</span> <span class="fu">exp</span>(log_sd_intercept <span class="sc">+</span> log_sd_temp_slope <span class="sc">*</span> temp_centered))</span>
+<span id="cb35-6"><a aria-label="6"></a></span>
+<span id="cb35-7"><a aria-label="7"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb35-8"><a aria-label="8"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> true_sd_temp,</span>
+<span id="cb35-9"><a aria-label="9"></a>            <span class="fu">aes</span>(<span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">y =</span> true_sd, <span class="at">color =</span> <span class="st">"Simulated"</span>),</span>
+<span id="cb35-10"><a aria-label="10"></a>            <span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb35-11"><a aria-label="11"></a>  <span class="fu">geom_ribbon</span>(<span class="at">data =</span> pred_sd_temp,</span>
+<span id="cb35-12"><a aria-label="12"></a>              <span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high, <span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature)),</span>
+<span id="cb35-13"><a aria-label="13"></a>              <span class="at">fill =</span> <span class="st">"red"</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb35-14"><a aria-label="14"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> pred_sd_temp,</span>
+<span id="cb35-15"><a aria-label="15"></a>            <span class="fu">aes</span>(<span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">y =</span> estimate, <span class="at">color =</span> <span class="st">"Estimated"</span>),</span>
+<span id="cb35-16"><a aria-label="16"></a>            <span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb35-17"><a aria-label="17"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Simulated"</span> <span class="ot">=</span> <span class="st">"green"</span>, <span class="st">"Estimated"</span> <span class="ot">=</span> <span class="st">"red"</span>), <span class="at">name =</span> <span class="st">"Standard deviation"</span>) <span class="sc">+</span></span>
+<span id="cb35-18"><a aria-label="18"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Temperature"</span>, <span class="at">y =</span> <span class="st">"Standard deviation"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-23-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Recovered vs.&nbsp;simulated standard deviation of petal length.</p></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-24-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Recovered vs.&nbsp;simulated standard deviation of petal length.</p></section>
 <section id="reading-the-dispersion-model-plot" class="slide level2">
 <h2>Reading the dispersion-model plot</h2>
 <p><code>type = "disp"</code> retrieves predictions/slopes for the dispersion sub-model, exactly as <code>type = "conditional"</code> does for the mean.</p>
@@ -876,34 +908,34 @@ Comparison: dY/dX</code></pre>
 <h2>Case study: species occurrence</h2>
 <p>Simulated presence/absence of a species across 200 plots, as a function of tree cover, rain, and temperature — <strong>no interaction terms</strong>, fit with a binomial GLM (logit link):</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a aria-label="1"></a>n_plots <span class="ot">&lt;-</span> <span class="dv">200</span></span>
-<span id="cb34-2"><a aria-label="2"></a>tree_cover <span class="ot">&lt;-</span> <span class="fu">dist_mixture</span>(<span class="fu">dist_beta</span>(<span class="dv">4</span>, <span class="fl">0.8</span>), <span class="fu">dist_beta</span>(<span class="fl">0.8</span>, <span class="dv">4</span>), <span class="at">weights =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>))</span>
-<span id="cb34-3"><a aria-label="3"></a>avg_yearly_rain <span class="ot">&lt;-</span> <span class="fu">dist_gamma</span>(<span class="at">shape =</span> <span class="dv">3</span>, <span class="at">rate =</span> <span class="fl">0.7</span>)</span>
-<span id="cb34-4"><a aria-label="4"></a>avg_yearly_temp <span class="ot">&lt;-</span> <span class="fu">dist_normal</span>(<span class="at">mu =</span> <span class="dv">20</span>, <span class="at">sd =</span> <span class="dv">10</span>)</span>
-<span id="cb34-5"><a aria-label="5"></a></span>
-<span id="cb34-6"><a aria-label="6"></a>occurence_intercept <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">3</span>)</span>
-<span id="cb34-7"><a aria-label="7"></a>occurence_tree_effect <span class="ot">&lt;-</span> <span class="fl">0.45</span></span>
-<span id="cb34-8"><a aria-label="8"></a>occurence_rain_effect <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
-<span id="cb34-9"><a aria-label="9"></a>occurence_temp_effect <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
-<span id="cb34-10"><a aria-label="10"></a></span>
-<span id="cb34-11"><a aria-label="11"></a>occ_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb34-12"><a aria-label="12"></a>  <span class="at">tree_cov =</span> <span class="fu">generate</span>(tree_cover, n_plots),</span>
-<span id="cb34-13"><a aria-label="13"></a>  <span class="at">rain =</span> <span class="fu">generate</span>(avg_yearly_rain, n_plots),</span>
-<span id="cb34-14"><a aria-label="14"></a>  <span class="at">temp =</span> <span class="fu">generate</span>(avg_yearly_temp, n_plots)</span>
-<span id="cb34-15"><a aria-label="15"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb34-16"><a aria-label="16"></a>  <span class="fu">unnest</span>(<span class="fu">everything</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb34-17"><a aria-label="17"></a>  <span class="fu">mutate</span>(<span class="at">occurence =</span> <span class="fu">rbinom</span>(n_plots, <span class="at">size =</span> <span class="dv">1</span>,</span>
-<span id="cb34-18"><a aria-label="18"></a>    <span class="at">prob =</span> occurence_intercept <span class="sc">+</span></span>
-<span id="cb34-19"><a aria-label="19"></a>      occurence_tree_effect <span class="sc">*</span> tree_cov <span class="sc">+</span></span>
-<span id="cb34-20"><a aria-label="20"></a>      occurence_rain_effect <span class="sc">*</span> rain <span class="sc">+</span></span>
-<span id="cb34-21"><a aria-label="21"></a>      occurence_temp_effect <span class="sc">*</span> temp))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a aria-label="1"></a>n_plots <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb36-2"><a aria-label="2"></a>tree_cover <span class="ot">&lt;-</span> <span class="fu">dist_mixture</span>(<span class="fu">dist_beta</span>(<span class="dv">4</span>, <span class="fl">0.8</span>), <span class="fu">dist_beta</span>(<span class="fl">0.8</span>, <span class="dv">4</span>), <span class="at">weights =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>))</span>
+<span id="cb36-3"><a aria-label="3"></a>avg_yearly_rain <span class="ot">&lt;-</span> <span class="fu">dist_gamma</span>(<span class="at">shape =</span> <span class="dv">3</span>, <span class="at">rate =</span> <span class="fl">0.7</span>)</span>
+<span id="cb36-4"><a aria-label="4"></a>avg_yearly_temp <span class="ot">&lt;-</span> <span class="fu">dist_normal</span>(<span class="at">mu =</span> <span class="dv">20</span>, <span class="at">sd =</span> <span class="dv">10</span>)</span>
+<span id="cb36-5"><a aria-label="5"></a></span>
+<span id="cb36-6"><a aria-label="6"></a>occurence_intercept <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">3</span>)</span>
+<span id="cb36-7"><a aria-label="7"></a>occurence_tree_effect <span class="ot">&lt;-</span> <span class="fl">0.45</span></span>
+<span id="cb36-8"><a aria-label="8"></a>occurence_rain_effect <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb36-9"><a aria-label="9"></a>occurence_temp_effect <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb36-10"><a aria-label="10"></a></span>
+<span id="cb36-11"><a aria-label="11"></a>occ_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb36-12"><a aria-label="12"></a>  <span class="at">tree_cov =</span> <span class="fu">generate</span>(tree_cover, n_plots),</span>
+<span id="cb36-13"><a aria-label="13"></a>  <span class="at">rain =</span> <span class="fu">generate</span>(avg_yearly_rain, n_plots),</span>
+<span id="cb36-14"><a aria-label="14"></a>  <span class="at">temp =</span> <span class="fu">generate</span>(avg_yearly_temp, n_plots)</span>
+<span id="cb36-15"><a aria-label="15"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb36-16"><a aria-label="16"></a>  <span class="fu">unnest</span>(<span class="fu">everything</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb36-17"><a aria-label="17"></a>  <span class="fu">mutate</span>(<span class="at">occurence =</span> <span class="fu">rbinom</span>(n_plots, <span class="at">size =</span> <span class="dv">1</span>,</span>
+<span id="cb36-18"><a aria-label="18"></a>    <span class="at">prob =</span> occurence_intercept <span class="sc">+</span></span>
+<span id="cb36-19"><a aria-label="19"></a>      occurence_tree_effect <span class="sc">*</span> tree_cov <span class="sc">+</span></span>
+<span id="cb36-20"><a aria-label="20"></a>      occurence_rain_effect <span class="sc">*</span> rain <span class="sc">+</span></span>
+<span id="cb36-21"><a aria-label="21"></a>      occurence_temp_effect <span class="sc">*</span> temp))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="fit-the-model-1" class="slide level2 table-slide">
 <h2>Fit the model</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a aria-label="1"></a>mod_1 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(occurence <span class="sc">~</span> tree_cov <span class="sc">+</span> rain <span class="sc">+</span> temp, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>), <span class="at">data =</span> occ_data)</span>
-<span id="cb35-2"><a aria-label="2"></a><span class="fu">summary</span>(mod_1)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a aria-label="1"></a>mod_1 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(occurence <span class="sc">~</span> tree_cov <span class="sc">+</span> rain <span class="sc">+</span> temp, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>), <span class="at">data =</span> occ_data)</span>
+<span id="cb37-2"><a aria-label="2"></a><span class="fu">summary</span>(mod_1)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>               Estimate Std. Error    z value     Pr(&gt;|z|)
 (Intercept) -2.91472721 0.60152587 -4.8455558 1.262577e-06
@@ -925,40 +957,40 @@ attr(,"ddf")
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a aria-label="1"></a><span class="fu">tibble</span>(<span class="at">log_odds =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>, <span class="at">length.out =</span> <span class="dv">400</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb37-2"><a aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">probability =</span> <span class="fu">plogis</span>(log_odds)) <span class="ot">-&gt;</span> logistic_curve</span>
-<span id="cb37-3"><a aria-label="3"></a></span>
-<span id="cb37-4"><a aria-label="4"></a><span class="fu">tibble</span>(</span>
-<span id="cb37-5"><a aria-label="5"></a>  <span class="at">log_odds =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="sc">-</span><span class="fl">4.2</span>, <span class="fl">4.2</span>),</span>
-<span id="cb37-6"><a aria-label="6"></a>  <span class="at">probability =</span> <span class="fu">plogis</span>(log_odds),</span>
-<span id="cb37-7"><a aria-label="7"></a>  <span class="at">label =</span> <span class="fu">c</span>(<span class="st">"steep middle:</span><span class="sc">\n</span><span class="st">a small push here</span><span class="sc">\n</span><span class="st">moves probability a lot"</span>,</span>
-<span id="cb37-8"><a aria-label="8"></a>            <span class="st">"flat end:</span><span class="sc">\n</span><span class="st">a push here barely</span><span class="sc">\n</span><span class="st">moves probability"</span>,</span>
-<span id="cb37-9"><a aria-label="9"></a>            <span class="st">"flat end:</span><span class="sc">\n</span><span class="st">a push here barely</span><span class="sc">\n</span><span class="st">moves probability"</span>)</span>
-<span id="cb37-10"><a aria-label="10"></a>) <span class="ot">-&gt;</span> annot</span>
-<span id="cb37-11"><a aria-label="11"></a></span>
-<span id="cb37-12"><a aria-label="12"></a><span class="fu">ggplot</span>(logistic_curve, <span class="fu">aes</span>(<span class="at">x =</span> log_odds, <span class="at">y =</span> probability)) <span class="sc">+</span></span>
-<span id="cb37-13"><a aria-label="13"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
-<span id="cb37-14"><a aria-label="14"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> annot, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb37-15"><a aria-label="15"></a>  <span class="fu">geom_text</span>(</span>
-<span id="cb37-16"><a aria-label="16"></a>    <span class="at">data =</span> annot,</span>
-<span id="cb37-17"><a aria-label="17"></a>    <span class="fu">aes</span>(<span class="at">label =</span> label),</span>
-<span id="cb37-18"><a aria-label="18"></a>    <span class="at">color =</span> <span class="st">"white"</span>,</span>
-<span id="cb37-19"><a aria-label="19"></a>    <span class="at">size =</span> <span class="fl">4.5</span>,</span>
-<span id="cb37-20"><a aria-label="20"></a>    <span class="at">fontface =</span> <span class="st">"bold"</span>,</span>
-<span id="cb37-21"><a aria-label="21"></a>    <span class="at">lineheight =</span> <span class="fl">0.9</span>,</span>
-<span id="cb37-22"><a aria-label="22"></a>    <span class="at">vjust =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.4</span>, <span class="sc">-</span><span class="fl">0.6</span>, <span class="fl">1.6</span>),</span>
-<span id="cb37-23"><a aria-label="23"></a>    <span class="at">hjust =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>)</span>
-<span id="cb37-24"><a aria-label="24"></a>  ) <span class="sc">+</span></span>
-<span id="cb37-25"><a aria-label="25"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.1</span>, <span class="fl">1.05</span>)) <span class="sc">+</span></span>
-<span id="cb37-26"><a aria-label="26"></a>  <span class="fu">labs</span>(</span>
-<span id="cb37-27"><a aria-label="27"></a>    <span class="at">x =</span> <span class="st">"log-odds scale (what the model's coefficient describes)"</span>,</span>
-<span id="cb37-28"><a aria-label="28"></a>    <span class="at">y =</span> <span class="st">"probability scale"</span>,</span>
-<span id="cb37-29"><a aria-label="29"></a>    <span class="at">title =</span> <span class="st">"The logit link bends a straight line into an S-shape"</span></span>
-<span id="cb37-30"><a aria-label="30"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a aria-label="1"></a><span class="fu">tibble</span>(<span class="at">log_odds =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>, <span class="at">length.out =</span> <span class="dv">400</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb39-2"><a aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">probability =</span> <span class="fu">plogis</span>(log_odds)) <span class="ot">-&gt;</span> logistic_curve</span>
+<span id="cb39-3"><a aria-label="3"></a></span>
+<span id="cb39-4"><a aria-label="4"></a><span class="fu">tibble</span>(</span>
+<span id="cb39-5"><a aria-label="5"></a>  <span class="at">log_odds =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="sc">-</span><span class="fl">4.2</span>, <span class="fl">4.2</span>),</span>
+<span id="cb39-6"><a aria-label="6"></a>  <span class="at">probability =</span> <span class="fu">plogis</span>(log_odds),</span>
+<span id="cb39-7"><a aria-label="7"></a>  <span class="at">label =</span> <span class="fu">c</span>(<span class="st">"steep middle:</span><span class="sc">\n</span><span class="st">a small push here</span><span class="sc">\n</span><span class="st">moves probability a lot"</span>,</span>
+<span id="cb39-8"><a aria-label="8"></a>            <span class="st">"flat end:</span><span class="sc">\n</span><span class="st">a push here barely</span><span class="sc">\n</span><span class="st">moves probability"</span>,</span>
+<span id="cb39-9"><a aria-label="9"></a>            <span class="st">"flat end:</span><span class="sc">\n</span><span class="st">a push here barely</span><span class="sc">\n</span><span class="st">moves probability"</span>)</span>
+<span id="cb39-10"><a aria-label="10"></a>) <span class="ot">-&gt;</span> annot</span>
+<span id="cb39-11"><a aria-label="11"></a></span>
+<span id="cb39-12"><a aria-label="12"></a><span class="fu">ggplot</span>(logistic_curve, <span class="fu">aes</span>(<span class="at">x =</span> log_odds, <span class="at">y =</span> probability)) <span class="sc">+</span></span>
+<span id="cb39-13"><a aria-label="13"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb39-14"><a aria-label="14"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> annot, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb39-15"><a aria-label="15"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb39-16"><a aria-label="16"></a>    <span class="at">data =</span> annot,</span>
+<span id="cb39-17"><a aria-label="17"></a>    <span class="fu">aes</span>(<span class="at">label =</span> label),</span>
+<span id="cb39-18"><a aria-label="18"></a>    <span class="at">color =</span> <span class="st">"white"</span>,</span>
+<span id="cb39-19"><a aria-label="19"></a>    <span class="at">size =</span> <span class="fl">4.5</span>,</span>
+<span id="cb39-20"><a aria-label="20"></a>    <span class="at">fontface =</span> <span class="st">"bold"</span>,</span>
+<span id="cb39-21"><a aria-label="21"></a>    <span class="at">lineheight =</span> <span class="fl">0.9</span>,</span>
+<span id="cb39-22"><a aria-label="22"></a>    <span class="at">vjust =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.4</span>, <span class="sc">-</span><span class="fl">0.6</span>, <span class="fl">1.6</span>),</span>
+<span id="cb39-23"><a aria-label="23"></a>    <span class="at">hjust =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>)</span>
+<span id="cb39-24"><a aria-label="24"></a>  ) <span class="sc">+</span></span>
+<span id="cb39-25"><a aria-label="25"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.1</span>, <span class="fl">1.05</span>)) <span class="sc">+</span></span>
+<span id="cb39-26"><a aria-label="26"></a>  <span class="fu">labs</span>(</span>
+<span id="cb39-27"><a aria-label="27"></a>    <span class="at">x =</span> <span class="st">"log-odds scale (what the model's coefficient describes)"</span>,</span>
+<span id="cb39-28"><a aria-label="28"></a>    <span class="at">y =</span> <span class="st">"probability scale"</span>,</span>
+<span id="cb39-29"><a aria-label="29"></a>    <span class="at">title =</span> <span class="st">"The logit link bends a straight line into an S-shape"</span></span>
+<span id="cb39-30"><a aria-label="30"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-26-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">The logit link bends a straight line into an S-shape.</p></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-27-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">The logit link bends a straight line into an S-shape.</p></section>
 <section id="reading-the-s-curve" class="slide level2">
 <h2>Reading the S-curve</h2>
 <p>Near the middle (p ≈ 0.5) the curve is steep: a small log-odds push moves probability a lot. Near the ends (p ≈ 0 or 1) the curve flattens: the same push barely moves probability.</p>
@@ -967,8 +999,8 @@ attr(,"ddf")
 <section id="marginaleffects-does-this-for-us" class="slide level2 table-slide">
 <h2><code>marginaleffects</code> does this for us</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a aria-label="1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree_cov"</span>,</span>
-<span id="cb38-2"><a aria-label="2"></a>       <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>temp), <span class="at">rain =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>rain)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a aria-label="1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree_cov"</span>,</span>
+<span id="cb40-2"><a aria-label="2"></a>       <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>temp), <span class="at">rain =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>rain)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  temp rain Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
@@ -986,16 +1018,16 @@ Comparison: dY/dX</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a aria-label="1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree_cov"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> fivenum, <span class="at">rain =</span> fivenum)) <span class="sc">|&gt;</span></span>
-<span id="cb40-2"><a aria-label="2"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb40-3"><a aria-label="3"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">xmin =</span> conf.low, <span class="at">xmax =</span> conf.high, <span class="at">y =</span> <span class="dv">1</span>), <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb40-4"><a aria-label="4"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> occurence_tree_effect, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> .<span class="dv">8</span>) <span class="sc">+</span></span>
-<span id="cb40-5"><a aria-label="5"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp) <span class="sc">+</span></span>
-<span id="cb40-6"><a aria-label="6"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.line.y =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a aria-label="1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree_cov"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> fivenum, <span class="at">rain =</span> fivenum)) <span class="sc">|&gt;</span></span>
+<span id="cb42-2"><a aria-label="2"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb42-3"><a aria-label="3"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">xmin =</span> conf.low, <span class="at">xmax =</span> conf.high, <span class="at">y =</span> <span class="dv">1</span>), <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb42-4"><a aria-label="4"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> occurence_tree_effect, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> .<span class="dv">8</span>) <span class="sc">+</span></span>
+<span id="cb42-5"><a aria-label="5"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp) <span class="sc">+</span></span>
+<span id="cb42-6"><a aria-label="6"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.line.y =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-28-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">The tree-cover slope on the probability scale changes across rain × temp, though no interaction term exists in the model.</p></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-29-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">The tree-cover slope on the probability scale changes across rain × temp, though no interaction term exists in the model.</p></section>
 <section id="why-the-slope-moves-around" class="slide level2">
 <h2>Why the slope moves around</h2>
 <p>Because the amount of “bending” depends on where you are on the S-curve, tree cover’s probability-scale effect depends on rain and temp too — even though we never told the model to include that interaction.</p>
@@ -1024,24 +1056,24 @@ Comparison: dY/dX</code></pre>
 <h2>Case study: species abundance</h2>
 <p>The same phenomenon shows up with <strong>count</strong> data. Abundance (when present) as a function of the same three predictors, fit with a Poisson GLM (log link), again <strong>no interaction terms</strong>:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a aria-label="1"></a>abundance_intercept <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="dv">1</span>)</span>
-<span id="cb41-2"><a aria-label="2"></a>abundance_tree_effect <span class="ot">&lt;-</span> <span class="fl">4.5</span></span>
-<span id="cb41-3"><a aria-label="3"></a>abundance_rain_effect <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
-<span id="cb41-4"><a aria-label="4"></a>abundance_temp_effect <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
-<span id="cb41-5"><a aria-label="5"></a></span>
-<span id="cb41-6"><a aria-label="6"></a>abund_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb41-7"><a aria-label="7"></a>  <span class="at">tree_cov =</span> <span class="fu">generate</span>(tree_cover, n_plots),</span>
-<span id="cb41-8"><a aria-label="8"></a>  <span class="at">rain =</span> <span class="fu">generate</span>(avg_yearly_rain, n_plots),</span>
-<span id="cb41-9"><a aria-label="9"></a>  <span class="at">temp =</span> <span class="fu">generate</span>(avg_yearly_temp, n_plots)</span>
-<span id="cb41-10"><a aria-label="10"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb41-11"><a aria-label="11"></a>  <span class="fu">unnest</span>(<span class="fu">everything</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb41-12"><a aria-label="12"></a>  <span class="fu">mutate</span>(<span class="at">abundance =</span> <span class="fu">rpois</span>(n_plots, <span class="at">lambda =</span></span>
-<span id="cb41-13"><a aria-label="13"></a>    abundance_intercept <span class="sc">+</span></span>
-<span id="cb41-14"><a aria-label="14"></a>    abundance_tree_effect <span class="sc">*</span> tree_cov <span class="sc">+</span></span>
-<span id="cb41-15"><a aria-label="15"></a>    abundance_rain_effect <span class="sc">*</span> rain <span class="sc">+</span></span>
-<span id="cb41-16"><a aria-label="16"></a>    abundance_temp_effect <span class="sc">*</span> temp))</span>
-<span id="cb41-17"><a aria-label="17"></a></span>
-<span id="cb41-18"><a aria-label="18"></a>mod_2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(abundance <span class="sc">~</span> tree_cov <span class="sc">+</span> rain <span class="sc">+</span> temp, <span class="at">family =</span> <span class="fu">poisson</span>(<span class="at">link =</span> <span class="st">"log"</span>), <span class="at">data =</span> abund_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a aria-label="1"></a>abundance_intercept <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="dv">1</span>)</span>
+<span id="cb43-2"><a aria-label="2"></a>abundance_tree_effect <span class="ot">&lt;-</span> <span class="fl">4.5</span></span>
+<span id="cb43-3"><a aria-label="3"></a>abundance_rain_effect <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
+<span id="cb43-4"><a aria-label="4"></a>abundance_temp_effect <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
+<span id="cb43-5"><a aria-label="5"></a></span>
+<span id="cb43-6"><a aria-label="6"></a>abund_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb43-7"><a aria-label="7"></a>  <span class="at">tree_cov =</span> <span class="fu">generate</span>(tree_cover, n_plots),</span>
+<span id="cb43-8"><a aria-label="8"></a>  <span class="at">rain =</span> <span class="fu">generate</span>(avg_yearly_rain, n_plots),</span>
+<span id="cb43-9"><a aria-label="9"></a>  <span class="at">temp =</span> <span class="fu">generate</span>(avg_yearly_temp, n_plots)</span>
+<span id="cb43-10"><a aria-label="10"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb43-11"><a aria-label="11"></a>  <span class="fu">unnest</span>(<span class="fu">everything</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb43-12"><a aria-label="12"></a>  <span class="fu">mutate</span>(<span class="at">abundance =</span> <span class="fu">rpois</span>(n_plots, <span class="at">lambda =</span></span>
+<span id="cb43-13"><a aria-label="13"></a>    abundance_intercept <span class="sc">+</span></span>
+<span id="cb43-14"><a aria-label="14"></a>    abundance_tree_effect <span class="sc">*</span> tree_cov <span class="sc">+</span></span>
+<span id="cb43-15"><a aria-label="15"></a>    abundance_rain_effect <span class="sc">*</span> rain <span class="sc">+</span></span>
+<span id="cb43-16"><a aria-label="16"></a>    abundance_temp_effect <span class="sc">*</span> temp))</span>
+<span id="cb43-17"><a aria-label="17"></a></span>
+<span id="cb43-18"><a aria-label="18"></a>mod_2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(abundance <span class="sc">~</span> tree_cov <span class="sc">+</span> rain <span class="sc">+</span> temp, <span class="at">family =</span> <span class="fu">poisson</span>(<span class="at">link =</span> <span class="st">"log"</span>), <span class="at">data =</span> abund_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="the-log-link-bends-a-line-into-a-curve" class="slide level2 fig-slide">
@@ -1049,39 +1081,39 @@ Comparison: dY/dX</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a aria-label="1"></a><span class="fu">tibble</span>(<span class="at">log_count =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">6</span>, <span class="at">length.out =</span> <span class="dv">400</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb42-2"><a aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">count =</span> <span class="fu">exp</span>(log_count)) <span class="ot">-&gt;</span> exp_curve</span>
-<span id="cb42-3"><a aria-label="3"></a></span>
-<span id="cb42-4"><a aria-label="4"></a><span class="fu">tibble</span>(</span>
-<span id="cb42-5"><a aria-label="5"></a>  <span class="at">log_count =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.5</span>, <span class="dv">2</span>, <span class="fl">4.5</span>),</span>
-<span id="cb42-6"><a aria-label="6"></a>  <span class="at">count =</span> <span class="fu">exp</span>(log_count),</span>
-<span id="cb42-7"><a aria-label="7"></a>  <span class="at">label =</span> <span class="fu">c</span>(<span class="st">"flat end:</span><span class="sc">\n</span><span class="st">a push here barely</span><span class="sc">\n</span><span class="st">moves the expected count"</span>,</span>
-<span id="cb42-8"><a aria-label="8"></a>            <span class="st">"moderate slope:</span><span class="sc">\n</span><span class="st">a push here moves</span><span class="sc">\n</span><span class="st">the expected count some"</span>,</span>
-<span id="cb42-9"><a aria-label="9"></a>            <span class="st">"steep end:</span><span class="sc">\n</span><span class="st">a push here moves</span><span class="sc">\n</span><span class="st">the expected count a lot"</span>)</span>
-<span id="cb42-10"><a aria-label="10"></a>) <span class="ot">-&gt;</span> annot_exp</span>
-<span id="cb42-11"><a aria-label="11"></a></span>
-<span id="cb42-12"><a aria-label="12"></a><span class="fu">ggplot</span>(exp_curve, <span class="fu">aes</span>(<span class="at">x =</span> log_count, <span class="at">y =</span> count)) <span class="sc">+</span></span>
-<span id="cb42-13"><a aria-label="13"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
-<span id="cb42-14"><a aria-label="14"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> annot_exp, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb42-15"><a aria-label="15"></a>  <span class="fu">geom_text</span>(</span>
-<span id="cb42-16"><a aria-label="16"></a>    <span class="at">data =</span> annot_exp,</span>
-<span id="cb42-17"><a aria-label="17"></a>    <span class="fu">aes</span>(<span class="at">label =</span> label),</span>
-<span id="cb42-18"><a aria-label="18"></a>    <span class="at">color =</span> <span class="st">"white"</span>,</span>
-<span id="cb42-19"><a aria-label="19"></a>    <span class="at">size =</span> <span class="fl">4.5</span>,</span>
-<span id="cb42-20"><a aria-label="20"></a>    <span class="at">fontface =</span> <span class="st">"bold"</span>,</span>
-<span id="cb42-21"><a aria-label="21"></a>    <span class="at">lineheight =</span> <span class="fl">0.9</span>,</span>
-<span id="cb42-22"><a aria-label="22"></a>    <span class="at">vjust =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.4</span>, <span class="sc">-</span><span class="fl">0.6</span>, <span class="fl">1.6</span>),</span>
-<span id="cb42-23"><a aria-label="23"></a>    <span class="at">hjust =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>)</span>
-<span id="cb42-24"><a aria-label="24"></a>  ) <span class="sc">+</span></span>
-<span id="cb42-25"><a aria-label="25"></a>  <span class="fu">labs</span>(</span>
-<span id="cb42-26"><a aria-label="26"></a>    <span class="at">x =</span> <span class="st">"log scale (what the model's coefficient describes)"</span>,</span>
-<span id="cb42-27"><a aria-label="27"></a>    <span class="at">y =</span> <span class="st">"count scale"</span>,</span>
-<span id="cb42-28"><a aria-label="28"></a>    <span class="at">title =</span> <span class="st">"The log link bends a straight line into an exponential curve"</span></span>
-<span id="cb42-29"><a aria-label="29"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a aria-label="1"></a><span class="fu">tibble</span>(<span class="at">log_count =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">6</span>, <span class="at">length.out =</span> <span class="dv">400</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb44-2"><a aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">count =</span> <span class="fu">exp</span>(log_count)) <span class="ot">-&gt;</span> exp_curve</span>
+<span id="cb44-3"><a aria-label="3"></a></span>
+<span id="cb44-4"><a aria-label="4"></a><span class="fu">tibble</span>(</span>
+<span id="cb44-5"><a aria-label="5"></a>  <span class="at">log_count =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.5</span>, <span class="dv">2</span>, <span class="fl">4.5</span>),</span>
+<span id="cb44-6"><a aria-label="6"></a>  <span class="at">count =</span> <span class="fu">exp</span>(log_count),</span>
+<span id="cb44-7"><a aria-label="7"></a>  <span class="at">label =</span> <span class="fu">c</span>(<span class="st">"flat end:</span><span class="sc">\n</span><span class="st">a push here barely</span><span class="sc">\n</span><span class="st">moves the expected count"</span>,</span>
+<span id="cb44-8"><a aria-label="8"></a>            <span class="st">"moderate slope:</span><span class="sc">\n</span><span class="st">a push here moves</span><span class="sc">\n</span><span class="st">the expected count some"</span>,</span>
+<span id="cb44-9"><a aria-label="9"></a>            <span class="st">"steep end:</span><span class="sc">\n</span><span class="st">a push here moves</span><span class="sc">\n</span><span class="st">the expected count a lot"</span>)</span>
+<span id="cb44-10"><a aria-label="10"></a>) <span class="ot">-&gt;</span> annot_exp</span>
+<span id="cb44-11"><a aria-label="11"></a></span>
+<span id="cb44-12"><a aria-label="12"></a><span class="fu">ggplot</span>(exp_curve, <span class="fu">aes</span>(<span class="at">x =</span> log_count, <span class="at">y =</span> count)) <span class="sc">+</span></span>
+<span id="cb44-13"><a aria-label="13"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb44-14"><a aria-label="14"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> annot_exp, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb44-15"><a aria-label="15"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb44-16"><a aria-label="16"></a>    <span class="at">data =</span> annot_exp,</span>
+<span id="cb44-17"><a aria-label="17"></a>    <span class="fu">aes</span>(<span class="at">label =</span> label),</span>
+<span id="cb44-18"><a aria-label="18"></a>    <span class="at">color =</span> <span class="st">"white"</span>,</span>
+<span id="cb44-19"><a aria-label="19"></a>    <span class="at">size =</span> <span class="fl">4.5</span>,</span>
+<span id="cb44-20"><a aria-label="20"></a>    <span class="at">fontface =</span> <span class="st">"bold"</span>,</span>
+<span id="cb44-21"><a aria-label="21"></a>    <span class="at">lineheight =</span> <span class="fl">0.9</span>,</span>
+<span id="cb44-22"><a aria-label="22"></a>    <span class="at">vjust =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.4</span>, <span class="sc">-</span><span class="fl">0.6</span>, <span class="fl">1.6</span>),</span>
+<span id="cb44-23"><a aria-label="23"></a>    <span class="at">hjust =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>)</span>
+<span id="cb44-24"><a aria-label="24"></a>  ) <span class="sc">+</span></span>
+<span id="cb44-25"><a aria-label="25"></a>  <span class="fu">labs</span>(</span>
+<span id="cb44-26"><a aria-label="26"></a>    <span class="at">x =</span> <span class="st">"log scale (what the model's coefficient describes)"</span>,</span>
+<span id="cb44-27"><a aria-label="27"></a>    <span class="at">y =</span> <span class="st">"count scale"</span>,</span>
+<span id="cb44-28"><a aria-label="28"></a>    <span class="at">title =</span> <span class="st">"The log link bends a straight line into an exponential curve"</span></span>
+<span id="cb44-29"><a aria-label="29"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-30-1.png" width="768" class="r-stretch"></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-31-1.png" width="768" class="r-stretch"></section>
 <section id="from-log-scale-to-counts" class="slide level2">
 <h2>From log scale to counts</h2>
 <p>The log-scale <code>tree_cov</code> coefficient is <strong>~0.73</strong>, not 4.5 — the same phenomenon as the logit link, just a different curve.</p>
@@ -1096,7 +1128,7 @@ Comparison: dY/dX</code></pre>
 <section id="computing-the-rate-ratio" class="slide level2 table-slide">
 <h2>Computing the rate ratio</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a aria-label="1"></a><span class="fu">exp</span>(<span class="fu">fixef</span>(mod_2)<span class="sc">$</span>cond[<span class="st">"tree_cov"</span>])  <span class="co"># rate ratio: ~2.08, i.e. a ~108% increase per unit tree cover</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a aria-label="1"></a><span class="fu">exp</span>(<span class="fu">fixef</span>(mod_2)<span class="sc">$</span>cond[<span class="st">"tree_cov"</span>])  <span class="co"># rate ratio: ~2.08, i.e. a ~108% increase per unit tree cover</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tree_cov 
 1.658646 </code></pre>
@@ -1127,35 +1159,35 @@ Comparison: dY/dX</code></pre>
 <h2>Simulating with an explicit interaction</h2>
 <p>Prey and competitors interact in their effect on abundance (when present); tree cover drives occurrence only. Predictors are simulated through the model’s own inverse link (<code>exp()</code>, <code>plogis()</code>) so they stay in a valid range:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a aria-label="1"></a>more_plots <span class="ot">&lt;-</span> <span class="dv">4000</span></span>
-<span id="cb45-2"><a aria-label="2"></a>prey_abun <span class="ot">&lt;-</span> <span class="fu">dist_poisson</span>(<span class="at">lambda =</span> <span class="dv">6</span>)</span>
-<span id="cb45-3"><a aria-label="3"></a>competitor_abun <span class="ot">&lt;-</span> <span class="fu">dist_poisson</span>(<span class="at">lambda =</span> <span class="dv">3</span>)</span>
-<span id="cb45-4"><a aria-label="4"></a></span>
-<span id="cb45-5"><a aria-label="5"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb45-6"><a aria-label="6"></a>  <span class="at">tree_cov =</span> <span class="fu">generate</span>(tree_cover, more_plots),</span>
-<span id="cb45-7"><a aria-label="7"></a>  <span class="at">prey =</span> <span class="fu">generate</span>(prey_abun, more_plots),</span>
-<span id="cb45-8"><a aria-label="8"></a>  <span class="at">competitors =</span> <span class="fu">generate</span>(competitor_abun, more_plots)</span>
-<span id="cb45-9"><a aria-label="9"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb45-10"><a aria-label="10"></a>  <span class="fu">unnest</span>(<span class="fu">everything</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb45-11"><a aria-label="11"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb45-12"><a aria-label="12"></a>    <span class="at">abundance_pres =</span> <span class="fu">rpois</span>(more_plots,</span>
-<span id="cb45-13"><a aria-label="13"></a>      <span class="at">lambda =</span> <span class="fu">exp</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.12</span> <span class="sc">*</span> prey <span class="sc">-</span> <span class="fl">0.15</span> <span class="sc">*</span> competitors <span class="sc">-</span> <span class="fl">0.045</span> <span class="sc">*</span> prey <span class="sc">*</span> competitors)),</span>
-<span id="cb45-14"><a aria-label="14"></a>    <span class="at">occurence =</span> <span class="fu">rbinom</span>(more_plots, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.45</span> <span class="sc">*</span> tree_cov)),</span>
-<span id="cb45-15"><a aria-label="15"></a>    <span class="at">abundance_pop =</span> abundance_pres <span class="sc">*</span> occurence</span>
-<span id="cb45-16"><a aria-label="16"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb45-17"><a aria-label="17"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(tree_cov, prey, competitors), <span class="sc">~</span> (.x <span class="sc">-</span> <span class="fu">mean</span>(.x)) <span class="sc">/</span> <span class="fu">sd</span>(.x), <span class="at">.names =</span> <span class="st">"scl_{.col}"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a aria-label="1"></a>more_plots <span class="ot">&lt;-</span> <span class="dv">4000</span></span>
+<span id="cb47-2"><a aria-label="2"></a>prey_abun <span class="ot">&lt;-</span> <span class="fu">dist_poisson</span>(<span class="at">lambda =</span> <span class="dv">6</span>)</span>
+<span id="cb47-3"><a aria-label="3"></a>competitor_abun <span class="ot">&lt;-</span> <span class="fu">dist_poisson</span>(<span class="at">lambda =</span> <span class="dv">3</span>)</span>
+<span id="cb47-4"><a aria-label="4"></a></span>
+<span id="cb47-5"><a aria-label="5"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb47-6"><a aria-label="6"></a>  <span class="at">tree_cov =</span> <span class="fu">generate</span>(tree_cover, more_plots),</span>
+<span id="cb47-7"><a aria-label="7"></a>  <span class="at">prey =</span> <span class="fu">generate</span>(prey_abun, more_plots),</span>
+<span id="cb47-8"><a aria-label="8"></a>  <span class="at">competitors =</span> <span class="fu">generate</span>(competitor_abun, more_plots)</span>
+<span id="cb47-9"><a aria-label="9"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb47-10"><a aria-label="10"></a>  <span class="fu">unnest</span>(<span class="fu">everything</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb47-11"><a aria-label="11"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb47-12"><a aria-label="12"></a>    <span class="at">abundance_pres =</span> <span class="fu">rpois</span>(more_plots,</span>
+<span id="cb47-13"><a aria-label="13"></a>      <span class="at">lambda =</span> <span class="fu">exp</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.12</span> <span class="sc">*</span> prey <span class="sc">-</span> <span class="fl">0.15</span> <span class="sc">*</span> competitors <span class="sc">-</span> <span class="fl">0.045</span> <span class="sc">*</span> prey <span class="sc">*</span> competitors)),</span>
+<span id="cb47-14"><a aria-label="14"></a>    <span class="at">occurence =</span> <span class="fu">rbinom</span>(more_plots, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.45</span> <span class="sc">*</span> tree_cov)),</span>
+<span id="cb47-15"><a aria-label="15"></a>    <span class="at">abundance_pop =</span> abundance_pres <span class="sc">*</span> occurence</span>
+<span id="cb47-16"><a aria-label="16"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb47-17"><a aria-label="17"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(tree_cov, prey, competitors), <span class="sc">~</span> (.x <span class="sc">-</span> <span class="fu">mean</span>(.x)) <span class="sc">/</span> <span class="fu">sd</span>(.x), <span class="at">.names =</span> <span class="st">"scl_{.col}"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="fitting-the-hurdle-model" class="slide level2 table-slide">
 <h2>Fitting the hurdle model</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a aria-label="1"></a>mod_hu <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(</span>
-<span id="cb46-2"><a aria-label="2"></a>  abundance_pop <span class="sc">~</span> scl_prey <span class="sc">*</span> scl_competitors,</span>
-<span id="cb46-3"><a aria-label="3"></a>  <span class="at">zi =</span> <span class="sc">~</span> scl_tree_cov,</span>
-<span id="cb46-4"><a aria-label="4"></a>  <span class="at">family =</span> truncated_poisson,</span>
-<span id="cb46-5"><a aria-label="5"></a>  <span class="at">data =</span> pop_data</span>
-<span id="cb46-6"><a aria-label="6"></a>)</span>
-<span id="cb46-7"><a aria-label="7"></a><span class="fu">summary</span>(mod_hu)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a aria-label="1"></a>mod_hu <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(</span>
+<span id="cb48-2"><a aria-label="2"></a>  abundance_pop <span class="sc">~</span> scl_prey <span class="sc">*</span> scl_competitors,</span>
+<span id="cb48-3"><a aria-label="3"></a>  <span class="at">zi =</span> <span class="sc">~</span> scl_tree_cov,</span>
+<span id="cb48-4"><a aria-label="4"></a>  <span class="at">family =</span> truncated_poisson,</span>
+<span id="cb48-5"><a aria-label="5"></a>  <span class="at">data =</span> pop_data</span>
+<span id="cb48-6"><a aria-label="6"></a>)</span>
+<span id="cb48-7"><a aria-label="7"></a><span class="fu">summary</span>(mod_hu)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                            Estimate Std. Error    z value     Pr(&gt;|z|)
 (Intercept)               0.51213906 0.05130134   9.982957 1.809903e-23
@@ -1173,28 +1205,28 @@ attr(,"ddf")
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a aria-label="1"></a><span class="fu">slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_prey"</span>,</span>
-<span id="cb48-2"><a aria-label="2"></a>       <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_competitors =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_competitors),</span>
-<span id="cb48-3"><a aria-label="3"></a>                                                 <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_competitors), <span class="at">length.out =</span> <span class="dv">30</span>)),</span>
-<span id="cb48-4"><a aria-label="4"></a>       <span class="at">type =</span> <span class="st">"response"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb48-5"><a aria-label="5"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> scl_competitors, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
-<span id="cb48-6"><a aria-label="6"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb48-7"><a aria-label="7"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">fill =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
-<span id="cb48-8"><a aria-label="8"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb48-9"><a aria-label="9"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Slope of scl_prey</span><span class="sc">\n</span><span class="st">(count scale, individuals present)"</span>, <span class="at">x =</span> <span class="st">"Competitors (scaled)"</span>,</span>
-<span id="cb48-10"><a aria-label="10"></a>       <span class="at">title =</span> <span class="st">"Count-scale effect of prey availability weakens as competitors increase"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a aria-label="1"></a><span class="fu">slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_prey"</span>,</span>
+<span id="cb50-2"><a aria-label="2"></a>       <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_competitors =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_competitors),</span>
+<span id="cb50-3"><a aria-label="3"></a>                                                 <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_competitors), <span class="at">length.out =</span> <span class="dv">30</span>)),</span>
+<span id="cb50-4"><a aria-label="4"></a>       <span class="at">type =</span> <span class="st">"response"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb50-5"><a aria-label="5"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> scl_competitors, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb50-6"><a aria-label="6"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb50-7"><a aria-label="7"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">fill =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
+<span id="cb50-8"><a aria-label="8"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb50-9"><a aria-label="9"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Slope of scl_prey</span><span class="sc">\n</span><span class="st">(count scale, individuals present)"</span>, <span class="at">x =</span> <span class="st">"Competitors (scaled)"</span>,</span>
+<span id="cb50-10"><a aria-label="10"></a>       <span class="at">title =</span> <span class="st">"Count-scale effect of prey availability weakens as competitors increase"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-34-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Count-scale effect of prey weakens (and reverses) as competitors increase.</p></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-35-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Count-scale effect of prey weakens (and reverses) as competitors increase.</p></section>
 <section id="isolating-the-interaction-rate-ratios" class="slide level2 table-slide">
 <h2>Isolating the interaction: rate ratios</h2>
 <p>A rate ratio stays constant regardless of where the moderator is evaluated — the cleanest way to report “the interaction itself”:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a aria-label="1"></a><span class="fu">avg_slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_prey"</span>, <span class="at">by =</span> <span class="st">"scl_competitors"</span>,</span>
-<span id="cb49-2"><a aria-label="2"></a>           <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_competitors =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)), <span class="at">type =</span> <span class="st">"link"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb49-3"><a aria-label="3"></a>  <span class="fu">mutate</span>(<span class="at">rate_ratio =</span> <span class="fu">exp</span>(estimate)) <span class="sc">|&gt;</span></span>
-<span id="cb49-4"><a aria-label="4"></a>  <span class="fu">select</span>(scl_competitors, rate_ratio, p.value)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a aria-label="1"></a><span class="fu">avg_slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_prey"</span>, <span class="at">by =</span> <span class="st">"scl_competitors"</span>,</span>
+<span id="cb51-2"><a aria-label="2"></a>           <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_competitors =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)), <span class="at">type =</span> <span class="st">"link"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb51-3"><a aria-label="3"></a>  <span class="fu">mutate</span>(<span class="at">rate_ratio =</span> <span class="fu">exp</span>(estimate)) <span class="sc">|&gt;</span></span>
+<span id="cb51-4"><a aria-label="4"></a>  <span class="fu">select</span>(scl_competitors, rate_ratio, p.value)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Pr(&gt;|z|)
@@ -1216,21 +1248,21 @@ attr(,"ddf")
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_hu,</span>
-<span id="cb51-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
-<span id="cb51-3"><a aria-label="3"></a>    <span class="at">scl_prey =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_prey), <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_prey), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
-<span id="cb51-4"><a aria-label="4"></a>    <span class="at">scl_competitors =</span> fivenum</span>
-<span id="cb51-5"><a aria-label="5"></a>  ),</span>
-<span id="cb51-6"><a aria-label="6"></a>  <span class="at">type =</span> <span class="st">"response"</span></span>
-<span id="cb51-7"><a aria-label="7"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb51-8"><a aria-label="8"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> scl_prey, <span class="at">y =</span> estimate, <span class="at">color =</span> <span class="fu">as.factor</span>(scl_competitors), <span class="at">fill =</span> <span class="fu">as.factor</span>(scl_competitors))) <span class="sc">+</span></span>
-<span id="cb51-9"><a aria-label="9"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb51-10"><a aria-label="10"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
-<span id="cb51-11"><a aria-label="11"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted population abundance"</span>, <span class="at">x =</span> <span class="st">"Prey (scaled)"</span>, <span class="at">color =</span> <span class="st">"Competitors"</span>, <span class="at">fill =</span> <span class="st">"Competitors"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_hu,</span>
+<span id="cb53-2"><a aria-label="2"></a>  <span class="at">newdata =</span> <span class="fu">datagrid</span>(</span>
+<span id="cb53-3"><a aria-label="3"></a>    <span class="at">scl_prey =</span> <span class="fu">seq</span>(<span class="fu">min</span>(pop_data<span class="sc">$</span>scl_prey), <span class="fu">max</span>(pop_data<span class="sc">$</span>scl_prey), <span class="at">length.out =</span> <span class="dv">30</span>),</span>
+<span id="cb53-4"><a aria-label="4"></a>    <span class="at">scl_competitors =</span> fivenum</span>
+<span id="cb53-5"><a aria-label="5"></a>  ),</span>
+<span id="cb53-6"><a aria-label="6"></a>  <span class="at">type =</span> <span class="st">"response"</span></span>
+<span id="cb53-7"><a aria-label="7"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb53-8"><a aria-label="8"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> scl_prey, <span class="at">y =</span> estimate, <span class="at">color =</span> <span class="fu">as.factor</span>(scl_competitors), <span class="at">fill =</span> <span class="fu">as.factor</span>(scl_competitors))) <span class="sc">+</span></span>
+<span id="cb53-9"><a aria-label="9"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb53-10"><a aria-label="10"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb53-11"><a aria-label="11"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted population abundance"</span>, <span class="at">x =</span> <span class="st">"Prey (scaled)"</span>, <span class="at">color =</span> <span class="st">"Competitors"</span>, <span class="at">fill =</span> <span class="st">"Competitors"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-36-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Population-scale abundance: same prey x competitors shape, shifted by occupancy.</p></section>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-37-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Population-scale abundance: same prey x competitors shape, shifted by occupancy.</p></section>
 <section id="exercise-7" class="slide level2 scrollable">
 <h2>🧪 Exercise 7</h2>
 <p>Using <code>mod_hu</code>:</p>
