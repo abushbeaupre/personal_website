@@ -63,6 +63,8 @@ library(patchwork)       # Combine multiple plots
 library(GGally)          # Pairwise plots
 library(distributional)  # Simulate mixture/gamma/normal distributions (Part 3)
 library(ggdist)          # stat_slab() for predicted-distribution plots (Part 3)
+library(tinytable)       # tt(): simple, nice-looking results tables
+library(performance)     # r2(), r2_tjur(): model R-squared measures
 
 # Set ggplot2 theme
 black_theme <- theme(
@@ -830,7 +832,7 @@ plot_slope <- function(data, x, y_lab, scale_title) {
 
 ## Reading these panels
 
-- **Link (log-odds) scale**: the slope of `tree_cov` is flat (~1.87) across both moderators — exactly as it should be, since `mod_1`'s formula has no interaction term at all.
+- **Link (log-odds) scale**: the slope of `tree_cov` is flat (\~1.87) across both moderators — exactly as it should be, since `mod_1`'s formula has no interaction term at all.
 - **Response (probability) scale**: the slope visibly curves with temp (and more weakly with rain) — the implicit interaction made concrete, purely from the logit link's curvature.
 - With three predictors, a focal variable's slope can no longer be shown across "the" moderator in one 2D plot — each panel above holds the *other* remaining predictor fixed at its mean. Alternatives: facet by the third variable, use small multiples at representative (e.g. five-number-summary) values, or report a single `avg_slopes()` that integrates over the observed distribution instead of fixing it.
 
@@ -852,11 +854,67 @@ avg_predictions(mod_1, variables = "tree_cov", vcov = TRUE) |>
 
 Using `mod_1`:
 
-1.  Compute the probability-scale slope of `tree_cov` at the *minimum* and *maximum* observed values of `rain` and `temp` (four combinations total, via `datagrid()`).
-2.  Which combination gives the smallest slope? Which gives the largest? Relate your answer to where those combinations fall on the S-curve.
-3.  In one sentence, explain why reporting only the raw `summary(mod_1)` coefficient for `tree_cov` would be misleading to a reader who cares about probability of occurrence.
+1.  Plot the predicted trend of occurence as a function of tree cover for the unique combinations of the five number summary of rain and temperature. Hint: use the predictions() function.
+2.  Plot the prediction for the average effect of temperature.
 
-*(\~7 minutes)*
+*(\~20 minutes)*
+
+## Exercise 5: answer (task 1) {.fig-slide}
+
+```{r}
+#| code-fold: true
+#| fig-cap: "Predicted probability of occurrence across tree_cov, at each combination of the five-number summary of rain and temp."
+predictions(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = fivenum)) |>
+  ggplot() +
+  geom_ribbon(aes(x = tree_cov, ymin = conf.low, ymax = conf.high), fill = "white", alpha = 0.2) +
+  geom_line(aes(x = tree_cov, y = estimate), color = "white", linewidth = 1.5, lineend = "round") +
+  facet_grid(rain ~ temp) +
+  labs(y = "Predicted occurence")
+```
+
+## Exercise 5: answer (task 2) {.fig-slide}
+
+```{r}
+#| code-fold: true
+#| fig-cap: "Average predicted probability of occurrence across temp, integrating over the observed distribution of rain and tree_cov."
+avg_predictions(mod_1, variables = "temp", vcov = TRUE) |>
+  ggplot() +
+  geom_ribbon(aes(x = temp, ymin = conf.low, ymax = conf.high), fill = "white", alpha = 0.2) +
+  geom_line(aes(x = temp, y = estimate), color = "white", linewidth = 1.5, lineend = "round") +
+  labs(y = "Predicted occurence")
+```
+
+## Reviewer 2 wants a table {.table-slide}
+
+```{r}
+# Average slopes on the probability scale for all three predictors
+slopes_tbl_mod1 <- avg_slopes(mod_1, variables = c("tree_cov", "rain", "temp"), type = "response") |>
+  as_tibble() |>
+  select(term, estimate, conf.low, conf.high, p.value) |>
+  mutate(
+    across(c(estimate, conf.low, conf.high), ~ round(.x, 3)),
+    p.value = if_else(p.value < 0.001, "<0.001", as.character(round(p.value, 3)))
+  ) |>
+  mutate(CI_95 = glue::glue("[{conf.low}, {conf.high}]")) |>
+  select(Predictor = term, Slope = estimate, `95% CI` = CI_95, `p-value` = p.value)
+
+# Tjur's R2 as an extra row in the same 4-column layout
+r2_row <- tibble(
+  Predictor = "Tjur's R\u00b2",
+  Slope = as.character(round(r2_tjur(mod_1), 3)),
+  `95% CI` = "",
+  `p-value` = ""
+)
+
+mod1_tbl <- bind_rows(
+  slopes_tbl_mod1 |> mutate(across(everything(), as.character)),
+  r2_row
+)
+
+mod1_tbl |>
+  tt(caption = "Average slopes of occurrence on the probability scale, and Tjur's R2 for mod_1") |>
+  style_tt(i = nrow(slopes_tbl_mod1) + 1, bold = TRUE, line = "t", line_color = "black", line_width = 0.1)
+```
 
 ## Case study: species abundance
 
@@ -945,6 +1003,94 @@ Using `mod_2`:
 
 *(\~7 minutes)*
 
+## Exercise 6: answer (task 1) {.table-slide}
+
+```{r}
+# Count-scale (additive) slope of temp under drought (rain = min), tree_cov at its mean
+temp_count_drought <- avg_slopes(
+  mod_2,
+  variables = "temp",
+  newdata = datagrid(rain = min(abund_data$rain), tree_cov = mean(abund_data$tree_cov)),
+  type = "response"
+) |> as_tibble()
+
+# Rate ratio (exponentiated log-scale) slope of temp at the same point
+temp_link_drought <- avg_slopes(
+  mod_2,
+  variables = "temp",
+  newdata = datagrid(rain = min(abund_data$rain), tree_cov = mean(abund_data$tree_cov)),
+  type = "link"
+) |> as_tibble()
+
+temp_drought_tbl_ex6 <- temp_count_drought |>
+  select(count_est = estimate, count_low = conf.low, count_high = conf.high) |>
+  bind_cols(
+    temp_link_drought |>
+      mutate(rr = exp(estimate), rr_low = exp(conf.low), rr_high = exp(conf.high)) |>
+      select(rr, rr_low, rr_high, p.value)
+  ) |>
+  mutate(
+    across(c(count_est, count_low, count_high, rr, rr_low, rr_high), ~ round(.x, 3)),
+    p.value = if_else(p.value < 0.001, "<0.001", as.character(round(p.value, 3))),
+    count_CI = glue::glue("[{count_low}, {count_high}]"),
+    rr_CI = glue::glue("[{rr_low}, {rr_high}]")
+  ) |>
+  select(`Count-scale slope` = count_est, `(95% CI)` = count_CI,
+         `Rate ratio` = rr, `(95% CI) ` = rr_CI, `p-value` = p.value)
+
+temp_drought_tbl_ex6 |>
+  tt(caption = "Effect of temperature on abundance under drought (rain at its minimum), at mean tree cover")
+```
+
+## Exercise 6: answer (task 2) {.table-slide}
+
+```{r}
+# Low vs. high tree cover: 10th and 90th percentiles
+low_tree_q <- quantile(abund_data$tree_cov, 0.1)
+high_tree_q <- quantile(abund_data$tree_cov, 0.9)
+
+# Count-scale slope of temp at each tree_cov percentile, under drought (rain = min)
+temp_count_scale_ex6 <- avg_slopes(
+  mod_2,
+  variables = "temp",
+  by = "tree_cov",
+  newdata = datagrid(tree_cov = c(low_tree_q, high_tree_q), rain = min(abund_data$rain)),
+  type = "response"
+) |> as_tibble()
+
+# Rate ratio (exponentiated log-scale) slope of temp at the same two points
+temp_link_scale_ex6 <- avg_slopes(
+  mod_2,
+  variables = "temp",
+  by = "tree_cov",
+  newdata = datagrid(tree_cov = c(low_tree_q, high_tree_q), rain = min(abund_data$rain)),
+  type = "link"
+) |> as_tibble()
+
+temp_tree_tbl_ex6 <- temp_count_scale_ex6 |>
+  select(tree_cov, count_est = estimate, count_low = conf.low, count_high = conf.high) |>
+  left_join(
+    temp_link_scale_ex6 |>
+      mutate(rr = exp(estimate), rr_low = exp(conf.low), rr_high = exp(conf.high)) |>
+      select(tree_cov, rr, rr_low, rr_high, p.value),
+    by = "tree_cov"
+  ) |>
+  mutate(
+    tree_cov_label = if_else(tree_cov == low_tree_q, "Low tree cover (p10)", "High tree cover (p90)"),
+    across(c(count_est, count_low, count_high, rr, rr_low, rr_high), ~ round(.x, 3)),
+    p.value = if_else(p.value < 0.001, "<0.001", as.character(round(p.value, 3))),
+    count_CI = glue::glue("[{count_low}, {count_high}]"),
+    rr_CI = glue::glue("[{rr_low}, {rr_high}]")
+  ) |>
+  select(`Tree cover` = tree_cov_label, `Count-scale slope` = count_est, `(95% CI)` = count_CI,
+         `Rate ratio` = rr, `(95% CI) ` = rr_CI, `p-value` = p.value)
+
+temp_tree_tbl_ex6 |>
+  tt(caption = "Effect of temperature on abundance under drought (rain at its minimum), at low vs. high tree cover")
+```
+
+The rate ratio stays essentially constant across tree cover (it's a fixed multiplicative effect, $$e^\beta$$, independent of covariate values), while the count-scale slope grows substantially from low to high tree cover, since it's rescaled by the much larger expected count $$\lambda$$ there.
+
 ## Case study: occurrence *and* abundance together
 
 In reality, a species first has to be **present** before we can measure its abundance. A **hurdle model** combines two sub-models fit jointly:
@@ -953,6 +1099,64 @@ In reality, a species first has to be **present** before we can measure its abun
 - A **truncated count** component: given it's non-zero, how many individuals? (abundance when present)
 
 Two ways to interpret: each part **separately** (what drives occurrence vs. abundance), or **combined** on the population scale (expected abundance across *all* plots = P(occurrence) × E\[abundance \| present\]).
+
+## A simple hurdle example {.smaller}
+
+```{r}
+# Simple hurdle simulation: abundance_pres = counts if present; occurence = presence;
+# abundance_pop = observed count in every plot (zero wherever the species is absent)
+tibble(
+  tree_cov = generate(tree_cover, n_plots)
+) |>
+  unnest(everything()) |>
+  mutate(abundance_pres = rpois(n_plots, lambda =
+                     abundance_intercept +
+                     abundance_tree_effect * tree_cov
+                     ),
+         occurence = rbinom(n_plots, size = 1,
+                     prob = occurence_intercept +
+                            occurence_tree_effect * tree_cov),
+         abundance_pop = abundance_pres * occurence) -> simple_pop_data
+
+# Hurdle model: main formula is the (zero-truncated Poisson) abundance-when-present part;
+# zi = ~ tree_cov models the probability of a structural zero (absence) with a logit link
+mod_hu_simple <- glmmTMB(abundance_pop ~ tree_cov,
+                         zi = ~ tree_cov,
+                         family = truncated_poisson,
+                         data = simple_pop_data)
+```
+
+## Population vs. present-only predictions {.fig-slide}
+
+```{r}
+#| code-fold: true
+#| fig-cap: "Top: predicted abundance, population-scale (response) vs. when present (conditional). Bottom: predicted occurrence probability (1 - zprob)."
+# type = "response": population-scale expected abundance across ALL plots (P(present) x count)
+predictions(mod_hu_simple, type = "response") |> mutate(type = "response") -> pred_resp_simple
+
+# type = "zprob": predicted probability of a structural zero (i.e. NOT occurring)
+predictions(mod_hu_simple, type = "zprob") -> pred_prob_simple
+
+# type = "conditional": expected abundance given the species is present
+predictions(mod_hu_simple, type = "conditional") |> mutate(type = "conditional") -> pred_cond_simple
+
+bind_rows(pred_resp_simple, pred_cond_simple) -> pred_abun_simple
+
+plot_pred_abun_simple <- ggplot(pred_abun_simple) +
+  geom_ribbon(aes(x = tree_cov, ymin = conf.low, ymax = conf.high, fill = type), alpha = 0.2) +
+  geom_line(aes(x = tree_cov, y = estimate, color = type), linewidth = 1.5, lineend = "round") +
+  labs(x = "Tree cover", y = "Abundance", color = "Prediction type", fill = "Prediction type")
+
+# zprob is P(structural zero), so 1 - zprob is the occurrence probability
+plot_pred_prob_simple <- ggplot(pred_prob_simple) +
+  geom_ribbon(aes(x = tree_cov, ymin = 1 - conf.high, ymax = 1 - conf.low), fill = "white", alpha = 0.2) +
+  geom_line(aes(x = tree_cov, y = 1 - estimate), color = "white", linewidth = 1.5, lineend = "round") +
+  labs(x = "Tree cover", y = "Occurence probability")
+
+plot_pred_abun_simple / plot_pred_prob_simple
+```
+
+Predicted abundance when present (conditional) is always higher than population-scale abundance (response), since occurrence probability is below 100%. This is an implicit interaction **between the model's two parts**: tree cover's effect on population-scale abundance depends on its effect on both occurrence and abundance-when-present.
 
 ## Simulating with an explicit interaction {.smaller}
 
@@ -987,7 +1191,6 @@ mod_hu <- glmmTMB(
   family = truncated_poisson,
   data = pop_data
 )
-summary(mod_hu)$coefficients$cond
 ```
 
 `zi = ~ scl_tree_cov`: the zero-inflation (occurrence) part. The conditional formula's `scl_prey * scl_competitors` is an **explicit** interaction, layered on top of the log link's *implicit* one.
@@ -1001,13 +1204,36 @@ slopes(mod_hu, variables = "scl_prey",
        newdata = datagrid(scl_competitors = seq(min(pop_data$scl_competitors),
                                                  max(pop_data$scl_competitors), length.out = 30)),
        type = "response") |>
-  ggplot(aes(x = scl_competitors, y = estimate)) +
+  # unscale back to raw competitor counts for an interpretable x-axis
+  mutate(competitors = scl_competitors * sd(pop_data$competitors) + mean(pop_data$competitors)) |>
+  ggplot(aes(x = competitors, y = estimate)) +
   geom_hline(yintercept = 0, color = "blue", linewidth = 1, linetype = 2) +
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.4, fill = "lightgrey") +
   geom_line(linewidth = 1.5, lineend = "round", color = "white") +
-  labs(y = "Slope of scl_prey\n(count scale, individuals present)", x = "Competitors (scaled)",
+  labs(y = "Slope of scl_prey\n(count scale, individuals present)", x = "Competitors",
        title = "Count-scale effect of prey availability weakens as competitors increase")
 ```
+
+## The interaction on the link scale {.fig-slide}
+
+```{r}
+#| code-fold: true
+#| fig-cap: "Link-scale effect of prey is a straight, non-zero-crossing line in competitors — the explicit interaction, undistorted by the log link."
+slopes(mod_hu, variables = "scl_prey",
+       newdata = datagrid(scl_competitors = seq(min(pop_data$scl_competitors),
+                                                 max(pop_data$scl_competitors), length.out = 30)),
+       type = "link") |>
+  # unscale back to raw competitor counts for an interpretable x-axis
+  mutate(competitors = scl_competitors * sd(pop_data$competitors) + mean(pop_data$competitors)) |>
+  ggplot(aes(x = competitors, y = estimate)) +
+  geom_hline(yintercept = 0, color = "blue", linewidth = 1, linetype = 2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.4, fill = "lightgrey") +
+  geom_line(linewidth = 1.5, lineend = "round", color = "white") +
+  labs(y = "Slope of scl_prey\n(log scale)", x = "Competitors",
+       title = "Link-scale effect of prey declines linearly with competitors")
+```
+
+Unlike the count-scale slide, this one is linear in competitors by construction — the model's formula (`scl_prey * scl_competitors`) is fit additively on the log scale, so the **explicit** interaction shows up here as a straight line, with no additional curvature from the log link itself.
 
 ## Isolating the interaction: rate ratios {.table-slide}
 
