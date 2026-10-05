@@ -220,7 +220,7 @@ ggplot(logistic_curve, aes(x = log_odds, y = probability)) +
   labs(
     x = "log-odds scale (what the model's coefficient describes)",
     y = "probability scale",
-    title = "The logit link bends a straight line into an S-shape"
+    title = "The logit link bends a straight line\ninto an S-shape"
   )
 ```
 
@@ -500,7 +500,7 @@ ggplot(exp_curve, aes(x = log_count, y = count)) +
   labs(
     x = "log scale (what the model's coefficient describes)",
     y = "count scale",
-    title = "The log link bends a straight line into an exponential curve"
+    title = "The log link bends a straight line\ninto an exponential curve"
   )
 ```
 

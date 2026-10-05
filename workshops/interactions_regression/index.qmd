@@ -715,7 +715,7 @@ mod_1 <- glmmTMB(occurence ~ tree_cov + rain + temp, family = binomial(link = "l
 summary(mod_1)$coefficients$cond
 ```
 
-We simulated the effect of tree cover to be **0.45** on the probability scale, but the model reports **\~1.98**. Did the model get it wrong?
+We simulated the effect of tree cover to be **0.45** on the probability scale, but the model reports **\~3.76**. Did the model get it wrong?
 
 ## No — it's reporting a different scale
 
@@ -837,9 +837,9 @@ plot_slope <- function(data, x, y_lab, scale_title) {
 }
 
 (plot_slope(slopes_by_temp_response, "temp", "Slope of tree_cov", "Response scale") +
- plot_slope(slopes_by_temp_link, "temp", "Slope of tree_cov", "Link scale")) /
+ plot_slope(slopes_by_temp_link, "temp", NULL, "Link scale")) /
 (plot_slope(slopes_by_rain_response, "rain", "Slope of tree_cov", "Response scale") +
- plot_slope(slopes_by_rain_link, "rain", "Slope of tree_cov", "Link scale"))
+ plot_slope(slopes_by_rain_link, "rain", NULL, "Link scale"))
 ```
 
 ## Reading these panels
@@ -882,7 +882,8 @@ predictions(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, ra
   geom_ribbon(aes(x = tree_cov, ymin = conf.low, ymax = conf.high), fill = "white", alpha = 0.2) +
   geom_line(aes(x = tree_cov, y = estimate), color = "white", linewidth = 1.5, lineend = "round") +
   facet_grid(rain ~ temp) +
-  labs(y = "Predicted occurence")
+  labs(y = "Predicted occurence") +
+  theme(axis.text = element_text(size = 5))
 ```
 
 ## Exercise 4: answer (task 2) {.fig-slide}
@@ -1168,7 +1169,8 @@ plot_pred_abun_simple <- ggplot(pred_abun_simple) +
 plot_pred_prob_simple <- ggplot(pred_prob_simple) +
   geom_ribbon(aes(x = tree_cov, ymin = 1 - conf.high, ymax = 1 - conf.low), fill = "white", alpha = 0.2) +
   geom_line(aes(x = tree_cov, y = 1 - estimate), color = "white", linewidth = 1.5, lineend = "round") +
-  labs(x = "Tree cover", y = "Occurence probability")
+  labs(x = "Tree cover", y = "Occurence") +
+  theme(axis.title.y = element_text(size = 9))
 
 plot_pred_abun_simple / plot_pred_prob_simple
 ```

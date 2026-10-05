@@ -1064,7 +1064,7 @@ attr(,"ddf")
 [1] "asymptotic"</code></pre>
 </div>
 </div>
-<p>We simulated the effect of tree cover to be <strong>0.45</strong> on the probability scale, but the model reports <strong>~1.98</strong>. Did the model get it wrong?</p>
+<p>We simulated the effect of tree cover to be <strong>0.45</strong> on the probability scale, but the model reports <strong>~3.76</strong>. Did the model get it wrong?</p>
 </section>
 <section id="no-its-reporting-a-different-scale" class="slide level2">
 <h2>No — it’s reporting a different scale</h2>
@@ -1198,9 +1198,9 @@ Comparison: dY/dX</code></pre>
 <span id="cb47-27"><a aria-label="27"></a>}</span>
 <span id="cb47-28"><a aria-label="28"></a></span>
 <span id="cb47-29"><a aria-label="29"></a>(<span class="fu">plot_slope</span>(slopes_by_temp_response, <span class="st">"temp"</span>, <span class="st">"Slope of tree_cov"</span>, <span class="st">"Response scale"</span>) <span class="sc">+</span></span>
-<span id="cb47-30"><a aria-label="30"></a> <span class="fu">plot_slope</span>(slopes_by_temp_link, <span class="st">"temp"</span>, <span class="st">"Slope of tree_cov"</span>, <span class="st">"Link scale"</span>)) <span class="sc">/</span></span>
+<span id="cb47-30"><a aria-label="30"></a> <span class="fu">plot_slope</span>(slopes_by_temp_link, <span class="st">"temp"</span>, <span class="cn">NULL</span>, <span class="st">"Link scale"</span>)) <span class="sc">/</span></span>
 <span id="cb47-31"><a aria-label="31"></a>(<span class="fu">plot_slope</span>(slopes_by_rain_response, <span class="st">"rain"</span>, <span class="st">"Slope of tree_cov"</span>, <span class="st">"Response scale"</span>) <span class="sc">+</span></span>
-<span id="cb47-32"><a aria-label="32"></a> <span class="fu">plot_slope</span>(slopes_by_rain_link, <span class="st">"rain"</span>, <span class="st">"Slope of tree_cov"</span>, <span class="st">"Link scale"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb47-32"><a aria-label="32"></a> <span class="fu">plot_slope</span>(slopes_by_rain_link, <span class="st">"rain"</span>, <span class="cn">NULL</span>, <span class="st">"Link scale"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
@@ -1248,7 +1248,8 @@ Comparison: dY/dX</code></pre>
 <span id="cb49-4"><a aria-label="4"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree_cov, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">fill =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
 <span id="cb49-5"><a aria-label="5"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree_cov, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
 <span id="cb49-6"><a aria-label="6"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp) <span class="sc">+</span></span>
-<span id="cb49-7"><a aria-label="7"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted occurence"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb49-7"><a aria-label="7"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted occurence"</span>) <span class="sc">+</span></span>
+<span id="cb49-8"><a aria-label="8"></a>  <span class="fu">theme</span>(<span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
@@ -1749,9 +1750,10 @@ Comparison: dY/dX</code></pre>
 <span id="cb59-18"><a aria-label="18"></a>plot_pred_prob_simple <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(pred_prob_simple) <span class="sc">+</span></span>
 <span id="cb59-19"><a aria-label="19"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree_cov, <span class="at">ymin =</span> <span class="dv">1</span> <span class="sc">-</span> conf.high, <span class="at">ymax =</span> <span class="dv">1</span> <span class="sc">-</span> conf.low), <span class="at">fill =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
 <span id="cb59-20"><a aria-label="20"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree_cov, <span class="at">y =</span> <span class="dv">1</span> <span class="sc">-</span> estimate), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
-<span id="cb59-21"><a aria-label="21"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Tree cover"</span>, <span class="at">y =</span> <span class="st">"Occurence probability"</span>)</span>
-<span id="cb59-22"><a aria-label="22"></a></span>
-<span id="cb59-23"><a aria-label="23"></a>plot_pred_abun_simple <span class="sc">/</span> plot_pred_prob_simple</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb59-21"><a aria-label="21"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Tree cover"</span>, <span class="at">y =</span> <span class="st">"Occurence"</span>) <span class="sc">+</span></span>
+<span id="cb59-22"><a aria-label="22"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">9</span>))</span>
+<span id="cb59-23"><a aria-label="23"></a></span>
+<span id="cb59-24"><a aria-label="24"></a>plot_pred_abun_simple <span class="sc">/</span> plot_pred_prob_simple</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
