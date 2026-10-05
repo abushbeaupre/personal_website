@@ -1169,8 +1169,7 @@ plot_pred_abun_simple <- ggplot(pred_abun_simple) +
 plot_pred_prob_simple <- ggplot(pred_prob_simple) +
   geom_ribbon(aes(x = tree_cov, ymin = 1 - conf.high, ymax = 1 - conf.low), fill = "white", alpha = 0.2) +
   geom_line(aes(x = tree_cov, y = 1 - estimate), color = "white", linewidth = 1.5, lineend = "round") +
-  labs(x = "Tree cover", y = "Occurence") +
-  theme(axis.title.y = element_text(size = 9))
+  labs(x = "Tree cover", y = "Occurence") 
 
 plot_pred_abun_simple / plot_pred_prob_simple
 ```
@@ -1497,7 +1496,8 @@ hu_rr_tbl <- bind_rows(
 hu_rr_tbl |>
   tt(caption = "Standardized rate ratios (conditional model) and odds ratio (zero-inflation model) for mod_hu") |>
   style_tt(i = which(hu_rr_tbl$Component != dplyr::lag(hu_rr_tbl$Component, default = "")) - 1,
-           j = 1:5, line = "b", line_color = "black", line_width = 0.05)
+           j = 1:5, line = "b", line_color = "black", line_width = 0.05) |>
+  style_tt(fontsize = 0.6)
 ```
 
 Prey's rate ratio crosses 1 somewhere around average competitor density (why its raw `summary()` estimate looked like noise); competitors suppress abundance more as prey increases; the interaction row (\~0.81) is the single number behind both patterns, and it's the *same* number whichever predictor you treat as the moderator — the symmetry point from a few slides back, visible directly in the table. Tree cover's odds ratio in the zero-inflation part tells a simpler, interaction-free story about occupancy alone.
