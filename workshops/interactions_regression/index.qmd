@@ -222,6 +222,7 @@ mod_mass_1 <- glmmTMB(weight ~ sex * snow_depth,
 ## Model coefficients {.table-slide}
 
 ```{r}
+#| code-fold: true
 summary(mod_mass_1)$coefficients$cond
 ```
 
@@ -237,6 +238,7 @@ Useful for hypothesis tests, not directly interpretable for "what's the effect f
 ## Q1: Do sexes differ in spring mass? {.table-slide}
 
 ```{r}
+#| code-fold: true
 predictions(mod_mass_1, by = "sex")
 ```
 
@@ -245,6 +247,7 @@ This is a **marginal prediction**: the model-implied mean for each sex, averaged
 ## Testing the sex difference {.table-slide}
 
 ```{r}
+#| code-fold: true
 predictions(mod_mass_1, by = "sex") |>
   hypotheses(hypothesis = "b1 - b2 = 0")
 ```
@@ -265,6 +268,7 @@ slopes(mod_mass_1, variables = "snow_depth", by = "sex", vcov = TRUE) |>
 ## Testing the slope difference {.table-slide}
 
 ```{r}
+#| code-fold: true
 slopes(mod_mass_1, variables = "snow_depth", by = "sex", vcov = TRUE) |>
   hypotheses(hypothesis = "b1 - b2 = 0")
 ```
@@ -274,6 +278,7 @@ slopes(mod_mass_1, variables = "snow_depth", by = "sex", vcov = TRUE) |>
 `avg_slopes()` computes the slope for every observation, then averages:
 
 ```{r}
+#| code-fold: true
 avg_slopes(mod_mass_1, variables = "snow_depth", vcov = TRUE)
 ```
 
@@ -301,13 +306,14 @@ ggplot() +
             lineend = "round", linewidth = 2) +
   geom_point(data = bighorn_mass_1, aes(y = weight, x = snow_depth, color = sex)) +
   guides(alpha = "none", fill = "none") +
-  labs(title = "Green = marginal; red/blue = conditional (by sex)") +
+  labs(y = "Predicted weight (kg)") +
   coord_cartesian(ylim = c(50, 220))
 ```
 
 ## Scenario 2: biased sampling (80% male) {.table-slide}
 
 ```{r}
+#| code-fold: true
 bighorn_mass_2 <- bind_rows(
   bighorn_population |> filter(sex == "male") |> slice_sample(n = 80),
   bighorn_population |> filter(sex == "female") |> slice_sample(n = 20)
@@ -407,6 +413,7 @@ flower_measurements_1 <- tibble(
 ## Fit the model {.table-slide}
 
 ```{r}
+#| code-fold: true
 mod_flower_1 <- glmmTMB(petal_length ~ temp_centered * rain_centered,
                          data = flower_measurements_1)
 summary(mod_flower_1)$coefficients$cond
@@ -417,6 +424,7 @@ Every term has a small p-value — but what do these numbers *mean* for our rese
 ## Slope of one predictor at a single value of the other {.table-slide}
 
 ```{r}
+#| code-fold: true
 # Effect of temperature when rain_centered = 0 (i.e., average rain)
 slopes(mod_flower_1, newdata = datagrid(rain_centered = 0),
        variables = "temp_centered")
@@ -702,11 +710,12 @@ occ_data <- tibble(
 ## Fit the model {.table-slide}
 
 ```{r}
+#| code-fold: true
 mod_1 <- glmmTMB(occurence ~ tree_cov + rain + temp, family = binomial(link = "logit"), data = occ_data)
 summary(mod_1)$coefficients$cond
 ```
 
-We simulated the effect of tree cover to be **0.45** on the probability scale, but the model reports **\~1.87**. Did the model get it wrong?
+We simulated the effect of tree cover to be **0.45** on the probability scale, but the model reports **\~1.98**. Did the model get it wrong?
 
 ## No — it's reporting a different scale
 
@@ -753,11 +762,12 @@ ggplot(logistic_curve, aes(x = log_odds, y = probability)) +
 
 Near the middle (p ≈ 0.5) the curve is steep: a small log-odds push moves probability a lot. Near the ends (p ≈ 0 or 1) the curve flattens: the same push barely moves probability.
 
-No manual derivative needed — `marginaleffects` converts automatically to the scale we actually care about.
+No manual derivative needed — `marginaleffects` converts to the scale we want.
 
 ## `marginaleffects` does this for us {.table-slide}
 
 ```{r}
+#| code-fold: true
 slopes(mod_1, variables = "tree_cov",
        newdata = datagrid(temp = mean(occ_data$temp), rain = mean(occ_data$rain)))
 ```
@@ -774,7 +784,7 @@ slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = 
   geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1), color = "white") +
   geom_vline(xintercept = occurence_tree_effect, color = "white", alpha = .8) +
   facet_grid(rain ~ temp) +
-  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.line.y = element_blank(), axis.text.x = element_text(size = 4))
+  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.line.y = element_blank(), axis.text.x = element_text(size = 10))
 ```
 
 ## Why the slope moves around
@@ -825,15 +835,15 @@ plot_slope <- function(data, x, y_lab, scale_title) {
     labs(y = y_lab, x = x, title = scale_title)
 }
 
-(plot_slope(slopes_by_temp_response, "temp", "Slope of tree_cov\n(probability scale)", "Response scale") +
- plot_slope(slopes_by_temp_link, "temp", "Slope of tree_cov\n(log-odds scale)", "Link scale")) /
-(plot_slope(slopes_by_rain_response, "rain", "Slope of tree_cov\n(probability scale)", "Response scale") +
- plot_slope(slopes_by_rain_link, "rain", "Slope of tree_cov\n(log-odds scale)", "Link scale"))
+(plot_slope(slopes_by_temp_response, "temp", "Slope of tree_cov", "Response scale") +
+ plot_slope(slopes_by_temp_link, "temp", "Slope of tree_cov", "Link scale")) /
+(plot_slope(slopes_by_rain_response, "rain", "Slope of tree_cov", "Response scale") +
+ plot_slope(slopes_by_rain_link, "rain", "Slope of tree_cov", "Link scale"))
 ```
 
 ## Reading these panels
 
-- **Link (log-odds) scale**: the slope of `tree_cov` is flat (\~1.87) across both moderators — exactly as it should be, since `mod_1`'s formula has no interaction term at all.
+- **Link (log-odds) scale**: the slope of `tree_cov` is flat (\~1.98) across both moderators — exactly as it should be, since `mod_1`'s formula has no interaction term at all.
 - **Response (probability) scale**: the slope visibly curves with temp (and more weakly with rain) — the implicit interaction made concrete, purely from the logit link's curvature.
 - With three predictors, a focal variable's slope can no longer be shown across "the" moderator in one 2D plot — each panel above holds the *other* remaining predictor fixed at its mean. Alternatives: facet by the third variable, use small multiples at representative (e.g. five-number-summary) values, or report a single `avg_slopes()` that integrates over the observed distribution instead of fixing it.
 
@@ -851,7 +861,7 @@ avg_predictions(mod_1, variables = "tree_cov", vcov = TRUE) |>
 
 `avg_predictions()`/`avg_slopes()` give one number (or curve) per focal value, integrating over rain and temp as observed in the sample — a marginal, "average effect" alternative to picking a single moderator value to condition on.
 
-## Exercise 5
+## Exercise 4
 
 Using `mod_1`:
 
@@ -860,7 +870,7 @@ Using `mod_1`:
 
 *(\~20 minutes)*
 
-## Exercise 5: answer (task 1) {.fig-slide}
+## Exercise 4: answer (task 1) {.fig-slide}
 
 ```{r}
 #| code-fold: true
@@ -873,7 +883,7 @@ predictions(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, ra
   labs(y = "Predicted occurence")
 ```
 
-## Exercise 5: answer (task 2) {.fig-slide}
+## Exercise 4: answer (task 2) {.fig-slide}
 
 ```{r}
 #| code-fold: true
@@ -888,6 +898,7 @@ avg_predictions(mod_1, variables = "temp", vcov = TRUE) |>
 ## Reviewer 2 wants a table {.table-slide}
 
 ```{r}
+#| code-fold: true
 # Average slopes on the probability scale for all three predictors
 slopes_tbl_mod1 <- avg_slopes(mod_1, variables = c("tree_cov", "rain", "temp"), type = "response") |>
   as_tibble() |>
@@ -989,12 +1000,13 @@ The log-scale `tree_cov` coefficient is **\~0.73**, not 4.5 — the same phenome
 ## Computing the rate ratio {.table-slide}
 
 ```{r}
+#| code-fold: true
 exp(fixef(mod_2)$cond["tree_cov"])  # rate ratio: ~2.08, i.e. a ~108% increase per unit tree cover
 ```
 
 Both describe the same underlying model — pick the one that matches your audience (percent change vs. a concrete headcount).
 
-## 🧪 Exercise 6
+## Exercise 5
 
 Using `mod_2`:
 
@@ -1004,9 +1016,10 @@ Using `mod_2`:
 
 *(\~7 minutes)*
 
-## Exercise 6: answer (task 1) {.table-slide}
+## Exercise 5: answer (task 1) {.table-slide}
 
 ```{r}
+#| code-fold: true
 # Count-scale (additive) slope of temp under drought (rain = min), tree_cov at its mean
 temp_count_drought <- avg_slopes(
   mod_2,
@@ -1043,9 +1056,10 @@ temp_drought_tbl_ex6 |>
   tt(caption = "Effect of temperature on abundance under drought (rain at its minimum), at mean tree cover")
 ```
 
-## Exercise 6: answer (task 2) {.table-slide}
+## Exercise 5: answer (task 2) {.table-slide}
 
 ```{r}
+#| code-fold: true
 # Low vs. high tree cover: 10th and 90th percentiles
 low_tree_q <- quantile(abund_data$tree_cov, 0.1)
 high_tree_q <- quantile(abund_data$tree_cov, 0.9)
@@ -1186,6 +1200,7 @@ pop_data <- tibble(
 ## Fitting the hurdle model {.table-slide}
 
 ```{r}
+#| code-fold: true
 mod_hu <- glmmTMB(
   abundance_pop ~ scl_prey * scl_competitors,
   zi = ~ scl_tree_cov,
@@ -1211,8 +1226,8 @@ slopes(mod_hu, variables = "scl_prey",
   geom_hline(yintercept = 0, color = "blue", linewidth = 1, linetype = 2) +
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.4, fill = "lightgrey") +
   geom_line(linewidth = 1.5, lineend = "round", color = "white") +
-  labs(y = "Slope of scl_prey\n(count scale, individuals present)", x = "Competitors",
-       title = "Count-scale effect of prey availability weakens as competitors increase")
+  labs(y = "Slope of scl_prey", x = "Competitors",
+       title = "Count-scale effect of prey availability")
 ```
 
 ## The interaction on the link scale {.fig-slide}
@@ -1230,8 +1245,8 @@ slopes(mod_hu, variables = "scl_prey",
   geom_hline(yintercept = 0, color = "blue", linewidth = 1, linetype = 2) +
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.4, fill = "lightgrey") +
   geom_line(linewidth = 1.5, lineend = "round", color = "white") +
-  labs(y = "Slope of scl_prey\n(log scale)", x = "Competitors",
-       title = "Link-scale effect of prey declines linearly with competitors")
+  labs(y = "Slope of scl_prey", x = "Competitors",
+       title = "Link-scale effect of prey")
 ```
 
 Unlike the count-scale slide, this one is linear in competitors by construction — the model's formula (`scl_prey * scl_competitors`) is fit additively on the log scale, so the **explicit** interaction shows up here as a straight line, with no additional curvature from the log link itself.
@@ -1241,6 +1256,7 @@ Unlike the count-scale slide, this one is linear in competitors by construction 
 To isolate something closer to “the interaction itself,” we move to the rate-ratio scale: for each one-SD increase in competitors, by what *factor* does the effect of one extra SD of prey get multiplied? That’s `exp()` of the interaction coefficient, and because it lives on the model’s own additive (log) scale, it doesn’t depend on where competitors are evaluated — unlike the count-scale slope.
 
 ```{r}
+#| code-fold: true
 rate_ratio_interaction_tbl <- avg_slopes(mod_hu, variables = "scl_prey",
                                           by = "scl_competitors",
                                           newdata = datagrid(scl_competitors = c(-1, 0, 1)),
@@ -1374,7 +1390,7 @@ p_avg_comp_cond <- avg_pred_comp_cond |>
 p_avg_prey_cond + p_avg_comp_cond
 ```
 
-`datagrid(..., grid_type = "counterfactual")` pairs each focal value with every observed row, then averages — a true average over the sample rather than a slope evaluated at the other predictors' means. Averaged over all observed competitor density, prey still shows a positive effect; averaged over all observed prey, competitors show a diminishing-harm shape.
+`datagrid(..., grid_type = "counterfactual")` pairs each focal value with every observed row, then averages — a true average over the sample rather than a slope evaluated at the other predictors' means. Averaged over all observed competitor density, prey still shows a positive effect; averaged over all observed prey, competitors show a diminishing shape.
 
 ## Population-scale average, by tree cover {.fig-slide}
 
@@ -1421,6 +1437,7 @@ The shapes barely change between tree-cover panels — the prey × competitors i
 ## A full rate-ratio table, by model component {.table-slide}
 
 ```{r}
+#| code-fold: true
 # Conditional-model rate ratio for scl_prey, at three levels of scl_competitors
 prey_rr_tbl <- avg_slopes(mod_hu, variables = "scl_prey", by = "scl_competitors",
                            newdata = datagrid(scl_competitors = c(-1, 0, 1)),
@@ -1481,10 +1498,6 @@ hu_rr_tbl |>
 
 Prey's rate ratio crosses 1 somewhere around average competitor density (why its raw `summary()` estimate looked like noise); competitors suppress abundance more as prey increases; the interaction row (\~0.81) is the single number behind both patterns, and it's the *same* number whichever predictor you treat as the moderator — the symmetry point from a few slides back, visible directly in the table. Tree cover's odds ratio in the zero-inflation part tells a simpler, interaction-free story about occupancy alone.
 
-## Exercise 7 / Homework
-
-Now apply what we learned today to your data!
-
 ## Part 3 takeaways
 
 1.  Non-linear link functions (logit, log) create an **implicit interaction**: every predictor's response-scale effect depends on the values of all other predictors, even with no interaction term in the formula
@@ -1493,6 +1506,10 @@ Now apply what we learned today to your data!
 4.  Whether an interaction "exists" can depend on the scale you're measuring on (Spake et al. 2023) — this applies just as much to *implicit* link-function interactions as to explicit interaction terms
 5.  **Hurdle/zero-inflated models** separate "does it occur" from "how much, given it occurs" — interpret each part separately, or combine them (`type = "response"`) for a population-scale answer
 6.  Interactions are mathematically **symmetric**: report (or at least check) both "A moderated by B" and "B moderated by A"
+
+## Exercise 6 / Homework
+
+Now apply what we learned today to your data!
 
 ## Wrap-up and further reading
 

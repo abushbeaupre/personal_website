@@ -435,7 +435,10 @@ Allen Bush-Beaupré
 <section id="model-coefficients" class="slide level2 table-slide">
 <h2>Model coefficients</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a aria-label="1"></a><span class="fu">summary</span>(mod_mass_1)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>                     Estimate Std. Error    z value     Pr(&gt;|z|)
 (Intercept)        179.711531  3.4913367  51.473560 0.000000e+00
@@ -460,7 +463,10 @@ attr(,"ddf")
 <section id="q1-do-sexes-differ-in-spring-mass" class="slide level2 table-slide">
 <h2>Q1: Do sexes differ in spring mass?</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_mass_1, <span class="at">by =</span> <span class="st">"sex"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     sex Estimate Std. Error    z Pr(&gt;|z|)   S 2.5 % 97.5 %
@@ -475,8 +481,11 @@ Type: response</code></pre>
 <section id="testing-the-sex-difference" class="slide level2 table-slide">
 <h2>Testing the sex difference</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_mass_1, <span class="at">by =</span> <span class="st">"sex"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb10-2"><a aria-label="2"></a>  <span class="fu">hypotheses</span>(<span class="at">hypothesis =</span> <span class="st">"b1 - b2 = 0"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Hypothesis Estimate Std. Error     z Pr(&gt;|z|)     S 2.5 % 97.5 %
@@ -502,8 +511,11 @@ Type: response</code></pre>
 <section id="testing-the-slope-difference" class="slide level2 table-slide">
 <h2>Testing the slope difference</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a aria-label="1"></a><span class="fu">slopes</span>(mod_mass_1, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">by =</span> <span class="st">"sex"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
 <span id="cb13-2"><a aria-label="2"></a>  <span class="fu">hypotheses</span>(<span class="at">hypothesis =</span> <span class="st">"b1 - b2 = 0"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Hypothesis Estimate Std. Error     z Pr(&gt;|z|)    S 2.5 % 97.5 %
@@ -515,7 +527,10 @@ Type: response</code></pre>
 <h2>Q3: What’s the population-average slope?</h2>
 <p><code>avg_slopes()</code> computes the slope for every observation, then averages:</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a aria-label="1"></a><span class="fu">avg_slopes</span>(mod_mass_1, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Estimate Std. Error     z Pr(&gt;|z|)     S 2.5 % 97.5 %
@@ -554,7 +569,7 @@ Comparison: dY/dX</code></pre>
 <span id="cb19-14"><a aria-label="14"></a>            <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
 <span id="cb19-15"><a aria-label="15"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> bighorn_mass_1, <span class="fu">aes</span>(<span class="at">y =</span> weight, <span class="at">x =</span> snow_depth, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
 <span id="cb19-16"><a aria-label="16"></a>  <span class="fu">guides</span>(<span class="at">alpha =</span> <span class="st">"none"</span>, <span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb19-17"><a aria-label="17"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Green = marginal; red/blue = conditional (by sex)"</span>) <span class="sc">+</span></span>
+<span id="cb19-17"><a aria-label="17"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted weight (kg)"</span>) <span class="sc">+</span></span>
 <span id="cb19-18"><a aria-label="18"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">220</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
@@ -563,12 +578,15 @@ Comparison: dY/dX</code></pre>
 <section id="scenario-2-biased-sampling-80-male" class="slide level2 table-slide">
 <h2>Scenario 2: biased sampling (80% male)</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a aria-label="1"></a>bighorn_mass_2 <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
 <span id="cb20-2"><a aria-label="2"></a>  bighorn_population <span class="sc">|&gt;</span> <span class="fu">filter</span>(sex <span class="sc">==</span> <span class="st">"male"</span>) <span class="sc">|&gt;</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">80</span>),</span>
 <span id="cb20-3"><a aria-label="3"></a>  bighorn_population <span class="sc">|&gt;</span> <span class="fu">filter</span>(sex <span class="sc">==</span> <span class="st">"female"</span>) <span class="sc">|&gt;</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">20</span>)</span>
 <span id="cb20-4"><a aria-label="4"></a>)</span>
 <span id="cb20-5"><a aria-label="5"></a>mod_mass_2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(weight <span class="sc">~</span> sex <span class="sc">*</span> snow_depth, <span class="at">data =</span> bighorn_mass_2, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
 <span id="cb20-6"><a aria-label="6"></a><span class="fu">summary</span>(mod_mass_2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code> Family: gaussian  ( identity )
 Formula:          weight ~ sex * snow_depth
@@ -589,7 +607,10 @@ sexmale:snow_depth   1.7521     0.4027   4.351 1.36e-05 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a aria-label="1"></a><span class="fu">avg_slopes</span>(mod_mass_2, <span class="at">variables =</span> <span class="st">"snow_depth"</span>, <span class="at">vcov =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  Estimate Std. Error     z Pr(&gt;|z|)    S 2.5 % 97.5 %
@@ -695,9 +716,12 @@ Comparison: dY/dX</code></pre>
 <section id="fit-the-model" class="slide level2 table-slide">
 <h2>Fit the model</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a aria-label="1"></a>mod_flower_1 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(petal_length <span class="sc">~</span> temp_centered <span class="sc">*</span> rain_centered,</span>
 <span id="cb27-2"><a aria-label="2"></a>                         <span class="at">data =</span> flower_measurements_1)</span>
 <span id="cb27-3"><a aria-label="3"></a><span class="fu">summary</span>(mod_flower_1)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>                              Estimate Std. Error   z value     Pr(&gt;|z|)
 (Intercept)                 24.7315526 0.34191019 72.333477 0.000000e+00
@@ -713,9 +737,12 @@ attr(,"ddf")
 <section id="slope-of-one-predictor-at-a-single-value-of-the-other" class="slide level2 table-slide">
 <h2>Slope of one predictor at a single value of the other</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a aria-label="1"></a><span class="co"># Effect of temperature when rain_centered = 0 (i.e., average rain)</span></span>
 <span id="cb29-2"><a aria-label="2"></a><span class="fu">slopes</span>(mod_flower_1, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">rain_centered =</span> <span class="dv">0</span>),</span>
 <span id="cb29-3"><a aria-label="3"></a>       <span class="at">variables =</span> <span class="st">"temp_centered"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  rain_centered Estimate Std. Error    z Pr(&gt;|z|)     S 2.5 % 97.5 %
@@ -1022,8 +1049,11 @@ Comparison: dY/dX</code></pre>
 <section id="fit-the-model-1" class="slide level2 table-slide">
 <h2>Fit the model</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a aria-label="1"></a>mod_1 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(occurence <span class="sc">~</span> tree_cov <span class="sc">+</span> rain <span class="sc">+</span> temp, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>), <span class="at">data =</span> occ_data)</span>
 <span id="cb41-2"><a aria-label="2"></a><span class="fu">summary</span>(mod_1)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>               Estimate Std. Error    z value     Pr(&gt;|z|)
 (Intercept) -1.69327695 0.50024494 -3.3848957 7.120530e-04
@@ -1034,7 +1064,7 @@ attr(,"ddf")
 [1] "asymptotic"</code></pre>
 </div>
 </div>
-<p>We simulated the effect of tree cover to be <strong>0.45</strong> on the probability scale, but the model reports <strong>~1.87</strong>. Did the model get it wrong?</p>
+<p>We simulated the effect of tree cover to be <strong>0.45</strong> on the probability scale, but the model reports <strong>~1.98</strong>. Did the model get it wrong?</p>
 </section>
 <section id="no-its-reporting-a-different-scale" class="slide level2">
 <h2>No — it’s reporting a different scale</h2>
@@ -1082,13 +1112,16 @@ attr(,"ddf")
 <section id="reading-the-s-curve" class="slide level2">
 <h2>Reading the S-curve</h2>
 <p>Near the middle (p ≈ 0.5) the curve is steep: a small log-odds push moves probability a lot. Near the ends (p ≈ 0 or 1) the curve flattens: the same push barely moves probability.</p>
-<p>No manual derivative needed — <code>marginaleffects</code> converts automatically to the scale we actually care about.</p>
+<p>No manual derivative needed — <code>marginaleffects</code> converts to the scale we want.</p>
 </section>
 <section id="marginaleffects-does-this-for-us" class="slide level2 table-slide">
 <h2><code>marginaleffects</code> does this for us</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a aria-label="1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree_cov"</span>,</span>
 <span id="cb44-2"><a aria-label="2"></a>       <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>temp), <span class="at">rain =</span> <span class="fu">mean</span>(occ_data<span class="sc">$</span>rain)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
  temp rain Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
@@ -1111,7 +1144,7 @@ Comparison: dY/dX</code></pre>
 <span id="cb46-3"><a aria-label="3"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">xmin =</span> conf.low, <span class="at">xmax =</span> conf.high, <span class="at">y =</span> <span class="dv">1</span>), <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
 <span id="cb46-4"><a aria-label="4"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> occurence_tree_effect, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> .<span class="dv">8</span>) <span class="sc">+</span></span>
 <span id="cb46-5"><a aria-label="5"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp) <span class="sc">+</span></span>
-<span id="cb46-6"><a aria-label="6"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.line.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">4</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb46-6"><a aria-label="6"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.line.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
@@ -1163,10 +1196,10 @@ Comparison: dY/dX</code></pre>
 <span id="cb47-26"><a aria-label="26"></a>    <span class="fu">labs</span>(<span class="at">y =</span> y_lab, <span class="at">x =</span> x, <span class="at">title =</span> scale_title)</span>
 <span id="cb47-27"><a aria-label="27"></a>}</span>
 <span id="cb47-28"><a aria-label="28"></a></span>
-<span id="cb47-29"><a aria-label="29"></a>(<span class="fu">plot_slope</span>(slopes_by_temp_response, <span class="st">"temp"</span>, <span class="st">"Slope of tree_cov</span><span class="sc">\n</span><span class="st">(probability scale)"</span>, <span class="st">"Response scale"</span>) <span class="sc">+</span></span>
-<span id="cb47-30"><a aria-label="30"></a> <span class="fu">plot_slope</span>(slopes_by_temp_link, <span class="st">"temp"</span>, <span class="st">"Slope of tree_cov</span><span class="sc">\n</span><span class="st">(log-odds scale)"</span>, <span class="st">"Link scale"</span>)) <span class="sc">/</span></span>
-<span id="cb47-31"><a aria-label="31"></a>(<span class="fu">plot_slope</span>(slopes_by_rain_response, <span class="st">"rain"</span>, <span class="st">"Slope of tree_cov</span><span class="sc">\n</span><span class="st">(probability scale)"</span>, <span class="st">"Response scale"</span>) <span class="sc">+</span></span>
-<span id="cb47-32"><a aria-label="32"></a> <span class="fu">plot_slope</span>(slopes_by_rain_link, <span class="st">"rain"</span>, <span class="st">"Slope of tree_cov</span><span class="sc">\n</span><span class="st">(log-odds scale)"</span>, <span class="st">"Link scale"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb47-29"><a aria-label="29"></a>(<span class="fu">plot_slope</span>(slopes_by_temp_response, <span class="st">"temp"</span>, <span class="st">"Slope of tree_cov"</span>, <span class="st">"Response scale"</span>) <span class="sc">+</span></span>
+<span id="cb47-30"><a aria-label="30"></a> <span class="fu">plot_slope</span>(slopes_by_temp_link, <span class="st">"temp"</span>, <span class="st">"Slope of tree_cov"</span>, <span class="st">"Link scale"</span>)) <span class="sc">/</span></span>
+<span id="cb47-31"><a aria-label="31"></a>(<span class="fu">plot_slope</span>(slopes_by_rain_response, <span class="st">"rain"</span>, <span class="st">"Slope of tree_cov"</span>, <span class="st">"Response scale"</span>) <span class="sc">+</span></span>
+<span id="cb47-32"><a aria-label="32"></a> <span class="fu">plot_slope</span>(slopes_by_rain_link, <span class="st">"rain"</span>, <span class="st">"Slope of tree_cov"</span>, <span class="st">"Link scale"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
@@ -1174,7 +1207,7 @@ Comparison: dY/dX</code></pre>
 <section id="reading-these-panels" class="slide level2">
 <h2>Reading these panels</h2>
 <ul>
-<li><strong>Link (log-odds) scale</strong>: the slope of <code>tree_cov</code> is flat (~1.87) across both moderators — exactly as it should be, since <code>mod_1</code>’s formula has no interaction term at all.</li>
+<li><strong>Link (log-odds) scale</strong>: the slope of <code>tree_cov</code> is flat (~1.98) across both moderators — exactly as it should be, since <code>mod_1</code>’s formula has no interaction term at all.</li>
 <li><strong>Response (probability) scale</strong>: the slope visibly curves with temp (and more weakly with rain) — the implicit interaction made concrete, purely from the logit link’s curvature.</li>
 <li>With three predictors, a focal variable’s slope can no longer be shown across “the” moderator in one 2D plot — each panel above holds the <em>other</em> remaining predictor fixed at its mean. Alternatives: facet by the third variable, use small multiples at representative (e.g.&nbsp;five-number-summary) values, or report a single <code>avg_slopes()</code> that integrates over the observed distribution instead of fixing it.</li>
 </ul>
@@ -1194,8 +1227,8 @@ Comparison: dY/dX</code></pre>
 </div>
 <img data-src="index_files/figure-revealjs/unnamed-chunk-35-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Predicted probability of occurrence across tree_cov, averaged over the observed rain and temp values (counterfactual averaging).</p><p><code>avg_predictions()</code>/<code>avg_slopes()</code> give one number (or curve) per focal value, integrating over rain and temp as observed in the sample — a marginal, “average effect” alternative to picking a single moderator value to condition on.</p>
 </section>
-<section id="exercise-5" class="slide level2 scrollable">
-<h2>Exercise 5</h2>
+<section id="exercise-4" class="slide level2 scrollable">
+<h2>Exercise 4</h2>
 <p>Using <code>mod_1</code>:</p>
 <ol type="1">
 <li>Plot the predicted trend of occurence as a function of tree cover for the unique combinations of the five number summary of rain and temperature. Hint: use the predictions() function.</li>
@@ -1203,8 +1236,8 @@ Comparison: dY/dX</code></pre>
 </ol>
 <p><em>(~20 minutes)</em></p>
 </section>
-<section id="exercise-5-answer-task-1" class="slide level2 fig-slide">
-<h2>Exercise 5: answer (task 1)</h2>
+<section id="exercise-4-answer-task-1" class="slide level2 fig-slide">
+<h2>Exercise 4: answer (task 1)</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1218,8 +1251,8 @@ Comparison: dY/dX</code></pre>
 
 </div>
 <img data-src="index_files/figure-revealjs/unnamed-chunk-36-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Predicted probability of occurrence across tree_cov, at each combination of the five-number summary of rain and temp.</p></section>
-<section id="exercise-5-answer-task-2" class="slide level2 fig-slide">
-<h2>Exercise 5: answer (task 2)</h2>
+<section id="exercise-4-answer-task-2" class="slide level2 fig-slide">
+<h2>Exercise 4: answer (task 2)</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1235,6 +1268,8 @@ Comparison: dY/dX</code></pre>
 <section id="reviewer-2-wants-a-table" class="slide level2 table-slide">
 <h2>Reviewer 2 wants a table</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a aria-label="1"></a><span class="co"># Average slopes on the probability scale for all three predictors</span></span>
 <span id="cb51-2"><a aria-label="2"></a>slopes_tbl_mod1 <span class="ot">&lt;-</span> <span class="fu">avg_slopes</span>(mod_1, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"tree_cov"</span>, <span class="st">"rain"</span>, <span class="st">"temp"</span>), <span class="at">type =</span> <span class="st">"response"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb51-3"><a aria-label="3"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
@@ -1262,6 +1297,7 @@ Comparison: dY/dX</code></pre>
 <span id="cb51-25"><a aria-label="25"></a>mod1_tbl <span class="sc">|&gt;</span></span>
 <span id="cb51-26"><a aria-label="26"></a>  <span class="fu">tt</span>(<span class="at">caption =</span> <span class="st">"Average slopes of occurrence on the probability scale, and Tjur's R2 for mod_1"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb51-27"><a aria-label="27"></a>  <span class="fu">style_tt</span>(<span class="at">i =</span> <span class="fu">nrow</span>(slopes_tbl_mod1) <span class="sc">+</span> <span class="dv">1</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>, <span class="at">line =</span> <span class="st">"t"</span>, <span class="at">line_color =</span> <span class="st">"black"</span>, <span class="at">line_width =</span> <span class="fl">0.1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <!-- preamble start -->
 
@@ -1413,7 +1449,10 @@ Comparison: dY/dX</code></pre>
 <section id="computing-the-rate-ratio" class="slide level2 table-slide">
 <h2>Computing the rate ratio</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a aria-label="1"></a><span class="fu">exp</span>(<span class="fu">fixef</span>(mod_2)<span class="sc">$</span>cond[<span class="st">"tree_cov"</span>])  <span class="co"># rate ratio: ~2.08, i.e. a ~108% increase per unit tree cover</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>tree_cov 
 1.976689 </code></pre>
@@ -1421,8 +1460,8 @@ Comparison: dY/dX</code></pre>
 </div>
 <p>Both describe the same underlying model — pick the one that matches your audience (percent change vs.&nbsp;a concrete headcount).</p>
 </section>
-<section id="exercise-6" class="slide level2 scrollable">
-<h2>🧪 Exercise 6</h2>
+<section id="exercise-5" class="slide level2 scrollable">
+<h2>Exercise 5</h2>
 <p>Using <code>mod_2</code>:</p>
 <ol type="1">
 <li>Compute the rate ratio and the local count-scale slope for <code>temp</code>, holding <code>rain</code> at its minimum (a “drought” scenario) and <code>tree_cov</code> at its mean.</li>
@@ -1431,9 +1470,11 @@ Comparison: dY/dX</code></pre>
 </ol>
 <p><em>(~7 minutes)</em></p>
 </section>
-<section id="exercise-6-answer-task-1" class="slide level2 table-slide">
-<h2>Exercise 6: answer (task 1)</h2>
+<section id="exercise-5-answer-task-1" class="slide level2 table-slide">
+<h2>Exercise 5: answer (task 1)</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a aria-label="1"></a><span class="co"># Count-scale (additive) slope of temp under drought (rain = min), tree_cov at its mean</span></span>
 <span id="cb56-2"><a aria-label="2"></a>temp_count_drought <span class="ot">&lt;-</span> <span class="fu">avg_slopes</span>(</span>
 <span id="cb56-3"><a aria-label="3"></a>  mod_2,</span>
@@ -1468,6 +1509,7 @@ Comparison: dY/dX</code></pre>
 <span id="cb56-32"><a aria-label="32"></a></span>
 <span id="cb56-33"><a aria-label="33"></a>temp_drought_tbl_ex6 <span class="sc">|&gt;</span></span>
 <span id="cb56-34"><a aria-label="34"></a>  <span class="fu">tt</span>(<span class="at">caption =</span> <span class="st">"Effect of temperature on abundance under drought (rain at its minimum), at mean tree cover"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <!-- preamble start -->
 
@@ -1527,9 +1569,11 @@ Comparison: dY/dX</code></pre>
 </div>
 </div>
 </section>
-<section id="exercise-6-answer-task-2" class="slide level2 table-slide">
-<h2>Exercise 6: answer (task 2)</h2>
+<section id="exercise-5-answer-task-2" class="slide level2 table-slide">
+<h2>Exercise 5: answer (task 2)</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a aria-label="1"></a><span class="co"># Low vs. high tree cover: 10th and 90th percentiles</span></span>
 <span id="cb57-2"><a aria-label="2"></a>low_tree_q <span class="ot">&lt;-</span> <span class="fu">quantile</span>(abund_data<span class="sc">$</span>tree_cov, <span class="fl">0.1</span>)</span>
 <span id="cb57-3"><a aria-label="3"></a>high_tree_q <span class="ot">&lt;-</span> <span class="fu">quantile</span>(abund_data<span class="sc">$</span>tree_cov, <span class="fl">0.9</span>)</span>
@@ -1572,6 +1616,7 @@ Comparison: dY/dX</code></pre>
 <span id="cb57-40"><a aria-label="40"></a></span>
 <span id="cb57-41"><a aria-label="41"></a>temp_tree_tbl_ex6 <span class="sc">|&gt;</span></span>
 <span id="cb57-42"><a aria-label="42"></a>  <span class="fu">tt</span>(<span class="at">caption =</span> <span class="st">"Effect of temperature on abundance under drought (rain at its minimum), at low vs. high tree cover"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <!-- preamble start -->
 
@@ -1736,12 +1781,15 @@ Comparison: dY/dX</code></pre>
 <section id="fitting-the-hurdle-model" class="slide level2 table-slide">
 <h2>Fitting the hurdle model</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a aria-label="1"></a>mod_hu <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(</span>
 <span id="cb61-2"><a aria-label="2"></a>  abundance_pop <span class="sc">~</span> scl_prey <span class="sc">*</span> scl_competitors,</span>
 <span id="cb61-3"><a aria-label="3"></a>  <span class="at">zi =</span> <span class="sc">~</span> scl_tree_cov,</span>
 <span id="cb61-4"><a aria-label="4"></a>  <span class="at">family =</span> truncated_poisson,</span>
 <span id="cb61-5"><a aria-label="5"></a>  <span class="at">data =</span> pop_data</span>
 <span id="cb61-6"><a aria-label="6"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 </div>
 <p><code>zi = ~ scl_tree_cov</code>: the zero-inflation (occurrence) part. The conditional formula’s <code>scl_prey * scl_competitors</code> is an <strong>explicit</strong> interaction, layered on top of the log link’s <em>implicit</em> one.</p>
 </section>
@@ -1760,8 +1808,8 @@ Comparison: dY/dX</code></pre>
 <span id="cb62-8"><a aria-label="8"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
 <span id="cb62-9"><a aria-label="9"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">fill =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
 <span id="cb62-10"><a aria-label="10"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb62-11"><a aria-label="11"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Slope of scl_prey</span><span class="sc">\n</span><span class="st">(count scale, individuals present)"</span>, <span class="at">x =</span> <span class="st">"Competitors"</span>,</span>
-<span id="cb62-12"><a aria-label="12"></a>       <span class="at">title =</span> <span class="st">"Count-scale effect of prey availability weakens as competitors increase"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb62-11"><a aria-label="11"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Slope of scl_prey"</span>, <span class="at">x =</span> <span class="st">"Competitors"</span>,</span>
+<span id="cb62-12"><a aria-label="12"></a>       <span class="at">title =</span> <span class="st">"Count-scale effect of prey availability"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
@@ -1781,8 +1829,8 @@ Comparison: dY/dX</code></pre>
 <span id="cb63-8"><a aria-label="8"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
 <span id="cb63-9"><a aria-label="9"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">fill =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
 <span id="cb63-10"><a aria-label="10"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb63-11"><a aria-label="11"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Slope of scl_prey</span><span class="sc">\n</span><span class="st">(log scale)"</span>, <span class="at">x =</span> <span class="st">"Competitors"</span>,</span>
-<span id="cb63-12"><a aria-label="12"></a>       <span class="at">title =</span> <span class="st">"Link-scale effect of prey declines linearly with competitors"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb63-11"><a aria-label="11"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Slope of scl_prey"</span>, <span class="at">x =</span> <span class="st">"Competitors"</span>,</span>
+<span id="cb63-12"><a aria-label="12"></a>       <span class="at">title =</span> <span class="st">"Link-scale effect of prey"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
@@ -1792,6 +1840,8 @@ Comparison: dY/dX</code></pre>
 <h2>Isolating the interaction: rate ratios</h2>
 <p>To isolate something closer to “the interaction itself,” we move to the rate-ratio scale: for each one-SD increase in competitors, by what <em>factor</em> does the effect of one extra SD of prey get multiplied? That’s <code>exp()</code> of the interaction coefficient, and because it lives on the model’s own additive (log) scale, it doesn’t depend on where competitors are evaluated — unlike the count-scale slope.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a aria-label="1"></a>rate_ratio_interaction_tbl <span class="ot">&lt;-</span> <span class="fu">avg_slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_prey"</span>,</span>
 <span id="cb64-2"><a aria-label="2"></a>                                          <span class="at">by =</span> <span class="st">"scl_competitors"</span>,</span>
 <span id="cb64-3"><a aria-label="3"></a>                                          <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_competitors =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)),</span>
@@ -1808,6 +1858,7 @@ Comparison: dY/dX</code></pre>
 <span id="cb64-14"><a aria-label="14"></a></span>
 <span id="cb64-15"><a aria-label="15"></a>rate_ratio_interaction_tbl <span class="sc">|&gt;</span></span>
 <span id="cb64-16"><a aria-label="16"></a>  <span class="fu">tt</span>(<span class="at">caption =</span> <span class="st">"Rate ratio of scl_prey's effect on abundance, evaluated at three levels of scl_competitors"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <!-- preamble start -->
 
@@ -1995,7 +2046,7 @@ Comparison: dY/dX</code></pre>
 </details>
 
 </div>
-<img data-src="index_files/figure-revealjs/unnamed-chunk-54-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Abundance-when-present, averaged over the full observed range of the other predictor.</p><p><code>datagrid(..., grid_type = "counterfactual")</code> pairs each focal value with every observed row, then averages — a true average over the sample rather than a slope evaluated at the other predictors’ means. Averaged over all observed competitor density, prey still shows a positive effect; averaged over all observed prey, competitors show a diminishing-harm shape.</p>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-54-1.png" width="768" class="r-stretch quarto-figure-center"><p class="caption">Abundance-when-present, averaged over the full observed range of the other predictor.</p><p><code>datagrid(..., grid_type = "counterfactual")</code> pairs each focal value with every observed row, then averages — a true average over the sample rather than a slope evaluated at the other predictors’ means. Averaged over all observed competitor density, prey still shows a positive effect; averaged over all observed prey, competitors show a diminishing shape.</p>
 </section>
 <section id="population-scale-average-by-tree-cover" class="slide level2 fig-slide">
 <h2>Population-scale average, by tree cover</h2>
@@ -2043,6 +2094,8 @@ Comparison: dY/dX</code></pre>
 <section id="a-full-rate-ratio-table-by-model-component" class="slide level2 table-slide">
 <h2>A full rate-ratio table, by model component</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a aria-label="1"></a><span class="co"># Conditional-model rate ratio for scl_prey, at three levels of scl_competitors</span></span>
 <span id="cb70-2"><a aria-label="2"></a>prey_rr_tbl <span class="ot">&lt;-</span> <span class="fu">avg_slopes</span>(mod_hu, <span class="at">variables =</span> <span class="st">"scl_prey"</span>, <span class="at">by =</span> <span class="st">"scl_competitors"</span>,</span>
 <span id="cb70-3"><a aria-label="3"></a>                           <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">scl_competitors =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>)),</span>
@@ -2099,6 +2152,7 @@ Comparison: dY/dX</code></pre>
 <span id="cb70-54"><a aria-label="54"></a>  <span class="fu">tt</span>(<span class="at">caption =</span> <span class="st">"Standardized rate ratios (conditional model) and odds ratio (zero-inflation model) for mod_hu"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb70-55"><a aria-label="55"></a>  <span class="fu">style_tt</span>(<span class="at">i =</span> <span class="fu">which</span>(hu_rr_tbl<span class="sc">$</span>Component <span class="sc">!=</span> dplyr<span class="sc">::</span><span class="fu">lag</span>(hu_rr_tbl<span class="sc">$</span>Component, <span class="at">default =</span> <span class="st">""</span>)) <span class="sc">-</span> <span class="dv">1</span>,</span>
 <span id="cb70-56"><a aria-label="56"></a>           <span class="at">j =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">line =</span> <span class="st">"b"</span>, <span class="at">line_color =</span> <span class="st">"black"</span>, <span class="at">line_width =</span> <span class="fl">0.05</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
 <!-- preamble start -->
 
@@ -2210,10 +2264,6 @@ Comparison: dY/dX</code></pre>
 </div>
 <p>Prey’s rate ratio crosses 1 somewhere around average competitor density (why its raw <code>summary()</code> estimate looked like noise); competitors suppress abundance more as prey increases; the interaction row (~0.81) is the single number behind both patterns, and it’s the <em>same</em> number whichever predictor you treat as the moderator — the symmetry point from a few slides back, visible directly in the table. Tree cover’s odds ratio in the zero-inflation part tells a simpler, interaction-free story about occupancy alone.</p>
 </section>
-<section id="exercise-7-homework" class="slide level2">
-<h2>Exercise 7 / Homework</h2>
-<p>Now apply what we learned today to your data!</p>
-</section>
 <section id="part-3-takeaways" class="slide level2 scrollable">
 <h2>Part 3 takeaways</h2>
 <ol type="1">
@@ -2224,6 +2274,10 @@ Comparison: dY/dX</code></pre>
 <li><strong>Hurdle/zero-inflated models</strong> separate “does it occur” from “how much, given it occurs” — interpret each part separately, or combine them (<code>type = "response"</code>) for a population-scale answer</li>
 <li>Interactions are mathematically <strong>symmetric</strong>: report (or at least check) both “A moderated by B” and “B moderated by A”</li>
 </ol>
+</section>
+<section id="exercise-6-homework" class="slide level2">
+<h2>Exercise 6 / Homework</h2>
+<p>Now apply what we learned today to your data!</p>
 </section>
 <section id="wrap-up-and-further-reading" class="slide level2">
 <h2>Wrap-up and further reading</h2>
