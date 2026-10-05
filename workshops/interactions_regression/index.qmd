@@ -691,8 +691,8 @@ avg_yearly_temp <- dist_normal(mu = 20, sd = 10)
 
 occurence_intercept <- 0.047
 occurence_tree_effect <- 0.45
-occurence_rain_effect <- 0.01
-occurence_temp_effect <- 0.01
+occurence_rain_effect <- 0.02
+occurence_temp_effect <- 0.03
 
 occ_data <- tibble(
   tree_cov = generate(tree_cover, n_plots),
@@ -780,6 +780,7 @@ slopes(mod_1, variables = "tree_cov",
 #| code-fold: true
 #| fig-cap: "The tree-cover slope on the probability scale changes across rain × temp, though no interaction term exists in the model."
 slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = fivenum)) |>
+  mutate(temp = round(temp), rain = round(rain)) |>
   ggplot() +
   geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1), color = "white") +
   geom_vline(xintercept = occurence_tree_effect, color = "white", alpha = .8) +
@@ -876,6 +877,7 @@ Using `mod_1`:
 #| code-fold: true
 #| fig-cap: "Predicted probability of occurrence across tree_cov, at each combination of the five-number summary of rain and temp."
 predictions(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = fivenum)) |>
+  mutate(temp = round(temp), rain = round(rain)) |>
   ggplot() +
   geom_ribbon(aes(x = tree_cov, ymin = conf.low, ymax = conf.high), fill = "white", alpha = 0.2) +
   geom_line(aes(x = tree_cov, y = estimate), color = "white", linewidth = 1.5, lineend = "round") +

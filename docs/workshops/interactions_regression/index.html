@@ -1030,8 +1030,8 @@ Comparison: dY/dX</code></pre>
 <span id="cb40-5"><a aria-label="5"></a></span>
 <span id="cb40-6"><a aria-label="6"></a>occurence_intercept <span class="ot">&lt;-</span> <span class="fl">0.047</span></span>
 <span id="cb40-7"><a aria-label="7"></a>occurence_tree_effect <span class="ot">&lt;-</span> <span class="fl">0.45</span></span>
-<span id="cb40-8"><a aria-label="8"></a>occurence_rain_effect <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
-<span id="cb40-9"><a aria-label="9"></a>occurence_temp_effect <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb40-8"><a aria-label="8"></a>occurence_rain_effect <span class="ot">&lt;-</span> <span class="fl">0.02</span></span>
+<span id="cb40-9"><a aria-label="9"></a>occurence_temp_effect <span class="ot">&lt;-</span> <span class="fl">0.03</span></span>
 <span id="cb40-10"><a aria-label="10"></a></span>
 <span id="cb40-11"><a aria-label="11"></a>occ_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
 <span id="cb40-12"><a aria-label="12"></a>  <span class="at">tree_cov =</span> <span class="fu">generate</span>(tree_cover, n_plots),</span>
@@ -1056,10 +1056,10 @@ Comparison: dY/dX</code></pre>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>               Estimate Std. Error    z value     Pr(&gt;|z|)
-(Intercept) -1.69327695 0.50024494 -3.3848957 7.120530e-04
-tree_cov     1.98151874 0.43421560  4.5634443 5.032116e-06
-rain        -0.02254920 0.06512181 -0.3462619 7.291459e-01
-temp         0.04989717 0.01677791  2.9739804 2.939638e-03
+(Intercept) -2.17374411  0.8385507 -2.5922632 9.534679e-03
+tree_cov     3.76005897  0.9372601  4.0117561 6.026875e-05
+rain        -0.05046963  0.1077608 -0.4683488 6.395352e-01
+temp         0.15045030  0.0371749  4.0470932 5.185760e-05
 attr(,"ddf")
 [1] "asymptotic"</code></pre>
 </div>
@@ -1125,7 +1125,7 @@ attr(,"ddf")
 <div class="cell-output cell-output-stdout">
 <pre><code>
  temp rain Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
- 19.5 4.22    0.491      0.107 4.57   &lt;0.001 17.6  0.28  0.702
+ 19.5 4.22    0.426      0.104 4.09   &lt;0.001 14.5 0.221   0.63
 
 Term: tree_cov
 Type: response
@@ -1140,11 +1140,12 @@ Comparison: dY/dX</code></pre>
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a aria-label="1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree_cov"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> fivenum, <span class="at">rain =</span> fivenum)) <span class="sc">|&gt;</span></span>
-<span id="cb46-2"><a aria-label="2"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb46-3"><a aria-label="3"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">xmin =</span> conf.low, <span class="at">xmax =</span> conf.high, <span class="at">y =</span> <span class="dv">1</span>), <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb46-4"><a aria-label="4"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> occurence_tree_effect, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> .<span class="dv">8</span>) <span class="sc">+</span></span>
-<span id="cb46-5"><a aria-label="5"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp) <span class="sc">+</span></span>
-<span id="cb46-6"><a aria-label="6"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.line.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb46-2"><a aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">temp =</span> <span class="fu">round</span>(temp), <span class="at">rain =</span> <span class="fu">round</span>(rain)) <span class="sc">|&gt;</span></span>
+<span id="cb46-3"><a aria-label="3"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb46-4"><a aria-label="4"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">xmin =</span> conf.low, <span class="at">xmax =</span> conf.high, <span class="at">y =</span> <span class="dv">1</span>), <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb46-5"><a aria-label="5"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> occurence_tree_effect, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> .<span class="dv">8</span>) <span class="sc">+</span></span>
+<span id="cb46-6"><a aria-label="6"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp) <span class="sc">+</span></span>
+<span id="cb46-7"><a aria-label="7"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.line.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
@@ -1242,11 +1243,12 @@ Comparison: dY/dX</code></pre>
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a aria-label="1"></a><span class="fu">predictions</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree_cov"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> fivenum, <span class="at">rain =</span> fivenum)) <span class="sc">|&gt;</span></span>
-<span id="cb49-2"><a aria-label="2"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb49-3"><a aria-label="3"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree_cov, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">fill =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb49-4"><a aria-label="4"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree_cov, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
-<span id="cb49-5"><a aria-label="5"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp) <span class="sc">+</span></span>
-<span id="cb49-6"><a aria-label="6"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted occurence"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb49-2"><a aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">temp =</span> <span class="fu">round</span>(temp), <span class="at">rain =</span> <span class="fu">round</span>(rain)) <span class="sc">|&gt;</span></span>
+<span id="cb49-3"><a aria-label="3"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb49-4"><a aria-label="4"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree_cov, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high), <span class="at">fill =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb49-5"><a aria-label="5"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> tree_cov, <span class="at">y =</span> estimate), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">lineend =</span> <span class="st">"round"</span>) <span class="sc">+</span></span>
+<span id="cb49-6"><a aria-label="6"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp) <span class="sc">+</span></span>
+<span id="cb49-7"><a aria-label="7"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted occurence"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 
 </div>
@@ -1305,19 +1307,19 @@ Comparison: dY/dX</code></pre>
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_swdqw6cy2eddc5ox8nzi = TinyTable.createTableFunctions("tinytable_swdqw6cy2eddc5ox8nzi");
+      const tableFns_7gynogwz68mo45j6mtdu = TinyTable.createTableFunctions("tinytable_7gynogwz68mo45j6mtdu");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 } ], css_id: 'tinytable_css_f4rm0lo516a3kx4kmqd8',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_cnxqb9iuor4c8u5nmw53',}, 
+          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 } ], css_id: 'tinytable_css_28mp3bcz0nyw6butswdq',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_9bcvygf4dyrj6mqtrhwv',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_swdqw6cy2eddc5ox8nzi.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_7gynogwz68mo45j6mtdu.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -1326,11 +1328,11 @@ Comparison: dY/dX</code></pre>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_swdqw6cy2eddc5ox8nzi td.tinytable_css_f4rm0lo516a3kx4kmqd8, #tinytable_swdqw6cy2eddc5ox8nzi th.tinytable_css_f4rm0lo516a3kx4kmqd8 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: black; --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-weight: bold }
-    #tinytable_swdqw6cy2eddc5ox8nzi td.tinytable_css_cnxqb9iuor4c8u5nmw53, #tinytable_swdqw6cy2eddc5ox8nzi th.tinytable_css_cnxqb9iuor4c8u5nmw53 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_7gynogwz68mo45j6mtdu td.tinytable_css_28mp3bcz0nyw6butswdq, #tinytable_7gynogwz68mo45j6mtdu th.tinytable_css_28mp3bcz0nyw6butswdq {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: black; --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-weight: bold }
+    #tinytable_7gynogwz68mo45j6mtdu td.tinytable_css_9bcvygf4dyrj6mqtrhwv, #tinytable_7gynogwz68mo45j6mtdu th.tinytable_css_9bcvygf4dyrj6mqtrhwv {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_swdqw6cy2eddc5ox8nzi" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_7gynogwz68mo45j6mtdu" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <caption>Average slopes of occurrence on the probability scale, and Tjur's R2 for mod_1</caption>
         <thead>
               <tr>
@@ -1344,25 +1346,25 @@ Comparison: dY/dX</code></pre>
         <tbody>
                 <tr>
                   <td data-row="1" data-col="1">rain</td>
-                  <td data-row="1" data-col="2">-0.005</td>
-                  <td data-row="1" data-col="3">[-0.031, 0.022]</td>
-                  <td data-row="1" data-col="4">0.729</td>
+                  <td data-row="1" data-col="2">-0.008</td>
+                  <td data-row="1" data-col="3">[-0.04, 0.025]</td>
+                  <td data-row="1" data-col="4">0.639</td>
                 </tr>
                 <tr>
                   <td data-row="2" data-col="1">temp</td>
-                  <td data-row="2" data-col="2">0.01</td>
-                  <td data-row="2" data-col="3">[0.004, 0.017]</td>
-                  <td data-row="2" data-col="4">0.001</td>
+                  <td data-row="2" data-col="2">0.023</td>
+                  <td data-row="2" data-col="3">[0.015, 0.031]</td>
+                  <td data-row="2" data-col="4">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="3" data-col="1">tree_cov</td>
-                  <td data-row="3" data-col="2">0.415</td>
-                  <td data-row="3" data-col="3">[0.275, 0.555]</td>
+                  <td data-row="3" data-col="2">0.583</td>
+                  <td data-row="3" data-col="3">[0.371, 0.795]</td>
                   <td data-row="3" data-col="4">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="4" data-col="1">Tjur's R²</td>
-                  <td data-row="4" data-col="2">0.155</td>
+                  <td data-row="4" data-col="2">0.272</td>
                   <td data-row="4" data-col="3"></td>
                   <td data-row="4" data-col="4"></td>
                 </tr>
@@ -1455,7 +1457,7 @@ Comparison: dY/dX</code></pre>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>tree_cov 
-1.976689 </code></pre>
+2.010566 </code></pre>
 </div>
 </div>
 <p>Both describe the same underlying model — pick the one that matches your audience (percent change vs.&nbsp;a concrete headcount).</p>
@@ -1517,19 +1519,19 @@ Comparison: dY/dX</code></pre>
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_ahqiq92zv9c58nol4zwp = TinyTable.createTableFunctions("tinytable_ahqiq92zv9c58nol4zwp");
+      const tableFns_mpe3fe30co5x5b3kz2n6 = TinyTable.createTableFunctions("tinytable_mpe3fe30co5x5b3kz2n6");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '1', j: 1 }, { i: '1', j: 2 }, { i: '1', j: 3 }, { i: '1', j: 4 }, { i: '1', j: 5 } ], css_id: 'tinytable_css_npc4hp5pjc2n54pkfkrz',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_hq6g4nnf33dmtwkuec1w',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '1', j: 2 }, { i: '1', j: 3 }, { i: '1', j: 4 }, { i: '1', j: 5 } ], css_id: 'tinytable_css_0tuzx62hmgjmpbeahqiq',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_moluma44of1i19c7cwt6',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_ahqiq92zv9c58nol4zwp.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_mpe3fe30co5x5b3kz2n6.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -1538,11 +1540,11 @@ Comparison: dY/dX</code></pre>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_ahqiq92zv9c58nol4zwp td.tinytable_css_npc4hp5pjc2n54pkfkrz, #tinytable_ahqiq92zv9c58nol4zwp th.tinytable_css_npc4hp5pjc2n54pkfkrz {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_ahqiq92zv9c58nol4zwp td.tinytable_css_hq6g4nnf33dmtwkuec1w, #tinytable_ahqiq92zv9c58nol4zwp th.tinytable_css_hq6g4nnf33dmtwkuec1w {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_mpe3fe30co5x5b3kz2n6 td.tinytable_css_0tuzx62hmgjmpbeahqiq, #tinytable_mpe3fe30co5x5b3kz2n6 th.tinytable_css_0tuzx62hmgjmpbeahqiq {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_mpe3fe30co5x5b3kz2n6 td.tinytable_css_moluma44of1i19c7cwt6, #tinytable_mpe3fe30co5x5b3kz2n6 th.tinytable_css_moluma44of1i19c7cwt6 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_ahqiq92zv9c58nol4zwp" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_mpe3fe30co5x5b3kz2n6" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <caption>Effect of temperature on abundance under drought (rain at its minimum), at mean tree cover</caption>
         <thead>
               <tr>
@@ -1556,10 +1558,10 @@ Comparison: dY/dX</code></pre>
         
         <tbody>
                 <tr>
-                  <td data-row="1" data-col="1">0.089</td>
-                  <td data-row="1" data-col="2">[0.054, 0.125]</td>
-                  <td data-row="1" data-col="3">1.013</td>
-                  <td data-row="1" data-col="4">[1.008, 1.018]</td>
+                  <td data-row="1" data-col="1">0.121</td>
+                  <td data-row="1" data-col="2">[0.082, 0.159]</td>
+                  <td data-row="1" data-col="3">1.018</td>
+                  <td data-row="1" data-col="4">[1.012, 1.024]</td>
                   <td data-row="1" data-col="5">&lt;0.001</td>
                 </tr>
         </tbody>
@@ -1624,19 +1626,19 @@ Comparison: dY/dX</code></pre>
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_kvhev3yam8rt4651r84b = TinyTable.createTableFunctions("tinytable_kvhev3yam8rt4651r84b");
+      const tableFns_nnf33dmtwkuec1wnpc4h = TinyTable.createTableFunctions("tinytable_nnf33dmtwkuec1wnpc4h");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '2', j: 1 }, { i: '2', j: 2 }, { i: '2', j: 3 }, { i: '2', j: 4 }, { i: '2', j: 5 }, { i: '2', j: 6 } ], css_id: 'tinytable_css_tsivloh619yd6qere3hc',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 } ], css_id: 'tinytable_css_n0wys6iixbybepq48r3u',}, 
+          { positions: [ { i: '2', j: 1 }, { i: '2', j: 2 }, { i: '2', j: 3 }, { i: '2', j: 4 }, { i: '2', j: 5 }, { i: '2', j: 6 } ], css_id: 'tinytable_css_9q5tqq2sfhquzxvkvhev',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 } ], css_id: 'tinytable_css_p5pjc2n54pkfkrz893ms',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_kvhev3yam8rt4651r84b.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_nnf33dmtwkuec1wnpc4h.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -1645,11 +1647,11 @@ Comparison: dY/dX</code></pre>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_kvhev3yam8rt4651r84b td.tinytable_css_tsivloh619yd6qere3hc, #tinytable_kvhev3yam8rt4651r84b th.tinytable_css_tsivloh619yd6qere3hc {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_kvhev3yam8rt4651r84b td.tinytable_css_n0wys6iixbybepq48r3u, #tinytable_kvhev3yam8rt4651r84b th.tinytable_css_n0wys6iixbybepq48r3u {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_nnf33dmtwkuec1wnpc4h td.tinytable_css_9q5tqq2sfhquzxvkvhev, #tinytable_nnf33dmtwkuec1wnpc4h th.tinytable_css_9q5tqq2sfhquzxvkvhev {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_nnf33dmtwkuec1wnpc4h td.tinytable_css_p5pjc2n54pkfkrz893ms, #tinytable_nnf33dmtwkuec1wnpc4h th.tinytable_css_p5pjc2n54pkfkrz893ms {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_kvhev3yam8rt4651r84b" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_nnf33dmtwkuec1wnpc4h" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <caption>Effect of temperature on abundance under drought (rain at its minimum), at low vs. high tree cover</caption>
         <thead>
               <tr>
@@ -1665,18 +1667,18 @@ Comparison: dY/dX</code></pre>
         <tbody>
                 <tr>
                   <td data-row="1" data-col="1">Low tree cover (p10)</td>
-                  <td data-row="1" data-col="2">0.065</td>
-                  <td data-row="1" data-col="3">[0.039, 0.092]</td>
-                  <td data-row="1" data-col="4">1.013</td>
-                  <td data-row="1" data-col="5">[1.008, 1.018]</td>
+                  <td data-row="1" data-col="2">0.087</td>
+                  <td data-row="1" data-col="3">[0.058, 0.115]</td>
+                  <td data-row="1" data-col="4">1.018</td>
+                  <td data-row="1" data-col="5">[1.012, 1.024]</td>
                   <td data-row="1" data-col="6">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="2" data-col="1">High tree cover (p90)</td>
-                  <td data-row="2" data-col="2">0.123</td>
-                  <td data-row="2" data-col="3">[0.073, 0.173]</td>
-                  <td data-row="2" data-col="4">1.013</td>
-                  <td data-row="2" data-col="5">[1.008, 1.018]</td>
+                  <td data-row="2" data-col="2">0.166</td>
+                  <td data-row="2" data-col="3">[0.113, 0.22]</td>
+                  <td data-row="2" data-col="4">1.018</td>
+                  <td data-row="2" data-col="5">[1.012, 1.024]</td>
                   <td data-row="2" data-col="6">&lt;0.001</td>
                 </tr>
         </tbody>
@@ -1866,19 +1868,19 @@ Comparison: dY/dX</code></pre>
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_lzht3p8nwotuhf2aagb0 = TinyTable.createTableFunctions("tinytable_lzht3p8nwotuhf2aagb0");
+      const tableFns_ypchsgsf4fpzfhxs6c4e = TinyTable.createTableFunctions("tinytable_ypchsgsf4fpzfhxs6c4e");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '3', j: 1 }, { i: '3', j: 2 }, { i: '3', j: 3 }, { i: '3', j: 4 } ], css_id: 'tinytable_css_1fiaadsihltsx6w6byv3',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_30kgvha715ns6t22g3kf',}, 
+          { positions: [ { i: '3', j: 1 }, { i: '3', j: 2 }, { i: '3', j: 3 }, { i: '3', j: 4 } ], css_id: 'tinytable_css_nx4eskvewmylm9klzht3',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_lrgm45tpi2y1plg6ixcv',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_lzht3p8nwotuhf2aagb0.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_ypchsgsf4fpzfhxs6c4e.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -1887,11 +1889,11 @@ Comparison: dY/dX</code></pre>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_lzht3p8nwotuhf2aagb0 td.tinytable_css_1fiaadsihltsx6w6byv3, #tinytable_lzht3p8nwotuhf2aagb0 th.tinytable_css_1fiaadsihltsx6w6byv3 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_lzht3p8nwotuhf2aagb0 td.tinytable_css_30kgvha715ns6t22g3kf, #tinytable_lzht3p8nwotuhf2aagb0 th.tinytable_css_30kgvha715ns6t22g3kf {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_ypchsgsf4fpzfhxs6c4e td.tinytable_css_nx4eskvewmylm9klzht3, #tinytable_ypchsgsf4fpzfhxs6c4e th.tinytable_css_nx4eskvewmylm9klzht3 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_ypchsgsf4fpzfhxs6c4e td.tinytable_css_lrgm45tpi2y1plg6ixcv, #tinytable_ypchsgsf4fpzfhxs6c4e th.tinytable_css_lrgm45tpi2y1plg6ixcv {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_lzht3p8nwotuhf2aagb0" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_ypchsgsf4fpzfhxs6c4e" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <caption>Rate ratio of scl_prey's effect on abundance, evaluated at three levels of scl_competitors</caption>
         <thead>
               <tr>
@@ -1905,21 +1907,21 @@ Comparison: dY/dX</code></pre>
         <tbody>
                 <tr>
                   <td data-row="1" data-col="1">-1</td>
-                  <td data-row="1" data-col="2">1.249</td>
-                  <td data-row="1" data-col="3">[1.162, 1.343]</td>
+                  <td data-row="1" data-col="2">1.227</td>
+                  <td data-row="1" data-col="3">[1.143, 1.318]</td>
                   <td data-row="1" data-col="4">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="2" data-col="1">0</td>
-                  <td data-row="2" data-col="2">0.951</td>
-                  <td data-row="2" data-col="3">[0.861, 1.051]</td>
-                  <td data-row="2" data-col="4">0.329</td>
+                  <td data-row="2" data-col="2">0.953</td>
+                  <td data-row="2" data-col="3">[0.861, 1.055]</td>
+                  <td data-row="2" data-col="4">0.349</td>
                 </tr>
                 <tr>
                   <td data-row="3" data-col="1">1</td>
-                  <td data-row="3" data-col="2">0.725</td>
-                  <td data-row="3" data-col="3">[0.604, 0.869]</td>
-                  <td data-row="3" data-col="4">&lt;0.001</td>
+                  <td data-row="3" data-col="2">0.740</td>
+                  <td data-row="3" data-col="3">[0.615, 0.89]</td>
+                  <td data-row="3" data-col="4">0.001</td>
                 </tr>
         </tbody>
       </table>
@@ -2160,20 +2162,20 @@ Comparison: dY/dX</code></pre>
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_6fmn5wxht0f592yueqky = TinyTable.createTableFunctions("tinytable_6fmn5wxht0f592yueqky");
+      const tableFns_ha715ns6t22g3kf1fiaa = TinyTable.createTableFunctions("tinytable_ha715ns6t22g3kf1fiaa");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '8', j: 1 }, { i: '8', j: 2 }, { i: '8', j: 3 }, { i: '8', j: 4 }, { i: '8', j: 5 } ], css_id: 'tinytable_css_bhho0ihvctw6fhrw26l0',}, 
-          { positions: [ { i: '7', j: 1 }, { i: '7', j: 2 }, { i: '7', j: 3 }, { i: '7', j: 4 }, { i: '7', j: 5 } ], css_id: 'tinytable_css_xapkuni56h3ar8qdp89w',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_mf1lsk9g4phq4ar4nxce',}, 
+          { positions: [ { i: '8', j: 1 }, { i: '8', j: 2 }, { i: '8', j: 3 }, { i: '8', j: 4 }, { i: '8', j: 5 } ], css_id: 'tinytable_css_wxht0f592yueqkymf1ls',}, 
+          { positions: [ { i: '7', j: 1 }, { i: '7', j: 2 }, { i: '7', j: 3 }, { i: '7', j: 4 }, { i: '7', j: 5 } ], css_id: 'tinytable_css_eayfge7by3npfzz6fmn5',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_dsihltsx6w6byv3u81zd',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_6fmn5wxht0f592yueqky.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_ha715ns6t22g3kf1fiaa.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -2182,12 +2184,12 @@ Comparison: dY/dX</code></pre>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_6fmn5wxht0f592yueqky td.tinytable_css_bhho0ihvctw6fhrw26l0, #tinytable_6fmn5wxht0f592yueqky th.tinytable_css_bhho0ihvctw6fhrw26l0 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_6fmn5wxht0f592yueqky td.tinytable_css_xapkuni56h3ar8qdp89w, #tinytable_6fmn5wxht0f592yueqky th.tinytable_css_xapkuni56h3ar8qdp89w {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_6fmn5wxht0f592yueqky td.tinytable_css_mf1lsk9g4phq4ar4nxce, #tinytable_6fmn5wxht0f592yueqky th.tinytable_css_mf1lsk9g4phq4ar4nxce {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_ha715ns6t22g3kf1fiaa td.tinytable_css_wxht0f592yueqkymf1ls, #tinytable_ha715ns6t22g3kf1fiaa th.tinytable_css_wxht0f592yueqkymf1ls {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_ha715ns6t22g3kf1fiaa td.tinytable_css_eayfge7by3npfzz6fmn5, #tinytable_ha715ns6t22g3kf1fiaa th.tinytable_css_eayfge7by3npfzz6fmn5 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_ha715ns6t22g3kf1fiaa td.tinytable_css_dsihltsx6w6byv3u81zd, #tinytable_ha715ns6t22g3kf1fiaa th.tinytable_css_dsihltsx6w6byv3u81zd {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_6fmn5wxht0f592yueqky" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_ha715ns6t22g3kf1fiaa" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <caption>Standardized rate ratios (conditional model) and odds ratio (zero-inflation model) for mod_hu</caption>
         <thead>
               <tr>
@@ -2203,58 +2205,58 @@ Comparison: dY/dX</code></pre>
                 <tr>
                   <td data-row="1" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="1" data-col="2">scl_prey (at scl_competitors = -1 SD)</td>
-                  <td data-row="1" data-col="3">1.249</td>
-                  <td data-row="1" data-col="4">[1.162, 1.343]</td>
+                  <td data-row="1" data-col="3">1.227</td>
+                  <td data-row="1" data-col="4">[1.143, 1.318]</td>
                   <td data-row="1" data-col="5">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="2" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="2" data-col="2">scl_prey (at scl_competitors = 0 SD)</td>
-                  <td data-row="2" data-col="3">0.951</td>
-                  <td data-row="2" data-col="4">[0.861, 1.051]</td>
-                  <td data-row="2" data-col="5">0.329</td>
+                  <td data-row="2" data-col="3">0.953</td>
+                  <td data-row="2" data-col="4">[0.861, 1.055]</td>
+                  <td data-row="2" data-col="5">0.349</td>
                 </tr>
                 <tr>
                   <td data-row="3" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="3" data-col="2">scl_prey (at scl_competitors = 1 SD)</td>
-                  <td data-row="3" data-col="3">0.725</td>
-                  <td data-row="3" data-col="4">[0.604, 0.869]</td>
-                  <td data-row="3" data-col="5">&lt;0.001</td>
+                  <td data-row="3" data-col="3">0.740</td>
+                  <td data-row="3" data-col="4">[0.615, 0.89]</td>
+                  <td data-row="3" data-col="5">0.001</td>
                 </tr>
                 <tr>
                   <td data-row="4" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="4" data-col="2">scl_competitors (at scl_prey = -1 SD)</td>
-                  <td data-row="4" data-col="3">0.666</td>
-                  <td data-row="4" data-col="4">[0.576, 0.77]</td>
+                  <td data-row="4" data-col="3">0.650</td>
+                  <td data-row="4" data-col="4">[0.565, 0.748]</td>
                   <td data-row="4" data-col="5">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="5" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="5" data-col="2">scl_competitors (at scl_prey = 0 SD)</td>
-                  <td data-row="5" data-col="3">0.507</td>
-                  <td data-row="5" data-col="4">[0.458, 0.562]</td>
+                  <td data-row="5" data-col="3">0.505</td>
+                  <td data-row="5" data-col="4">[0.456, 0.559]</td>
                   <td data-row="5" data-col="5">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="6" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="6" data-col="2">scl_competitors (at scl_prey = 1 SD)</td>
-                  <td data-row="6" data-col="3">0.387</td>
-                  <td data-row="6" data-col="4">[0.338, 0.442]</td>
+                  <td data-row="6" data-col="3">0.392</td>
+                  <td data-row="6" data-col="4">[0.341, 0.45]</td>
                   <td data-row="6" data-col="5">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="7" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="7" data-col="2">scl_prey:scl_competitors (interaction)</td>
-                  <td data-row="7" data-col="3">0.762</td>
-                  <td data-row="7" data-col="4">[0.692, 0.838]</td>
+                  <td data-row="7" data-col="3">0.776</td>
+                  <td data-row="7" data-col="4">[0.705, 0.855]</td>
                   <td data-row="7" data-col="5">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="8" data-col="1">Zero-inflation (occupancy, as an odds ratio)</td>
                   <td data-row="8" data-col="2">scl_tree_cov (zero-inflation)</td>
-                  <td data-row="8" data-col="3">0.846</td>
-                  <td data-row="8" data-col="4">[0.763, 0.938]</td>
-                  <td data-row="8" data-col="5">0.001</td>
+                  <td data-row="8" data-col="3">0.898</td>
+                  <td data-row="8" data-col="4">[0.81, 0.996]</td>
+                  <td data-row="8" data-col="5">0.041</td>
                 </tr>
         </tbody>
       </table>
