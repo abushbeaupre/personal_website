@@ -755,7 +755,8 @@ ggplot(logistic_curve, aes(x = log_odds, y = probability)) +
     x = "log-odds scale (what the model's coefficient describes)",
     y = "probability scale",
     title = "The logit link bends a straight line into an S-shape"
-  )
+  )+
+  theme(plot.title = element_text(size = 18, face = "bold", color = "white"))
 ```
 
 ## Reading the S-curve
@@ -836,7 +837,7 @@ plot_slope <- function(data, x, y_lab, scale_title) {
     labs(y = y_lab, x = x, title = scale_title)
 }
 
-(plot_slope(slopes_by_temp_response, "temp", "Slope of tree_cov", "Response scale") +
+(plot_slope(slopes_by_temp_response, "temp",NULL , "Response scale") +
  plot_slope(slopes_by_temp_link, "temp", NULL, "Link scale")) /
 (plot_slope(slopes_by_rain_response, "rain", "Slope of tree_cov", "Response scale") +
  plot_slope(slopes_by_rain_link, "rain", NULL, "Link scale"))
@@ -883,7 +884,7 @@ predictions(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, ra
   geom_line(aes(x = tree_cov, y = estimate), color = "white", linewidth = 1.5, lineend = "round") +
   facet_grid(rain ~ temp) +
   labs(y = "Predicted occurence") +
-  theme(axis.text = element_text(size = 5))
+  theme(axis.text = element_text(size = 8))
 ```
 
 ## Exercise 4: answer (task 2) {.fig-slide}
@@ -988,7 +989,8 @@ ggplot(exp_curve, aes(x = log_count, y = count)) +
     x = "log scale (what the model's coefficient describes)",
     y = "count scale",
     title = "The log link bends a straight line into an exponential curve"
-  )
+  ) +
+  theme(plot.title = element_text(size = 18, face = "bold", color = "white"))
 ```
 
 ## From log scale to counts

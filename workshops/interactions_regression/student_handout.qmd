@@ -83,7 +83,26 @@ library(ggdist)          # stat_slab() for predicted-distribution plots (Part 2)
 library(tinytable)       # tt(): simple, nice-looking results tables
 library(performance)     # r2(), r2_tjur(): model R-squared measures
 
-theme_set(theme_minimal(base_size = 14))
+# Set ggplot2 theme
+black_theme <- theme(
+  axis.line = element_line(linewidth = 2, lineend = "round", color = "white"),
+  panel.grid = element_blank(),
+  panel.background = element_rect(fill = "black", color = NA),
+  axis.ticks = element_blank(),
+  axis.text = element_text(size = 21, face = "bold", color = "white"),
+  axis.title = element_text(size = 21, face = "bold", color = "white"),
+  plot.title = element_text(size = 25, face = "bold", color = "white"),
+  plot.background = element_rect(fill = "black", color = NA),
+  legend.background = element_rect(fill = "black", color = NA),
+  legend.text = element_text(size = 21, color = "white"),
+  legend.title = element_text(size = 21, face = "bold", color = "white"),
+  legend.position = "bottom"
+)
+
+theme_set(black_theme)
+
+# Set global default for geom_point shape
+update_geom_defaults("point", list(shape = 1, size = 3, alpha = 0.8))
 
 # silence marginaleffects warnings about glmmTMB
 options(marginaleffects_safe = FALSE)
@@ -420,12 +439,15 @@ trend_slope_temp <- coef(lm(estimate ~ temp_centered, data = slopes_by_temp))[["
 
 slopes_by_temp |>
   ggplot() +
-  geom_hline(yintercept = 0, color = "blue", linetype = 2) +
+  geom_hline(yintercept = 0, color = "blue", linewidth = 1.5, linetype = 2) +
   geom_ribbon(aes(x = temp_centered + mean(temperature), ymin = conf.low, ymax = conf.high),
     alpha = 0.4, fill = "lightgrey") +
-  geom_line(aes(x = temp_centered + mean(temperature), y = estimate)) +
+  geom_line(aes(x = temp_centered + mean(temperature), y = estimate),
+    lineend = "round", linewidth = 2, color = "white") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.2, vjust = 1.5,
-    label = paste0("slope = ", round(trend_slope_temp, 3))) +
+    label = paste0("slope = ", round(trend_slope_temp, 3)),
+    color = "white", size = 6, fontface = "bold") +
+  scale_x_continuous(breaks = seq(-25, 50, by = 5)) +
   labs(y = "Effect of rain on petal length", x = "Temperature values")
 ```
 
@@ -447,10 +469,12 @@ predictions(mod_flower_1,
   as_tibble() |>
   mutate(rain = round(rain_centered + mean(rain), 2)) |>
   ggplot() +
-  geom_line(aes(y = estimate, x = temp_centered + mean(temperature), color = as.factor(rain))) +
+  geom_line(aes(y = estimate, x = temp_centered + mean(temperature), color = as.factor(rain)),
+            lineend = "round", linewidth = 1.5) +
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high,
                   x = temp_centered + mean(temperature), fill = as.factor(rain)), alpha = 0.2) +
-  labs(y = "Predicted petal length", x = "Temperature", color = "Rain", fill = "Rain")
+  labs(y = "Predicted petal length", x = "Temperature", color = "Rain", fill = "Rain") +
+  coord_cartesian(ylim = c(0, 50))
 ```
 
 ## Response surfaces — use with caution
@@ -616,7 +640,10 @@ ggplot(predicted_observations, aes(xdist = pred_obs, color = as.factor(rain_cent
   scale_color_brewer(palette = "Accent") +
   facet_wrap(~ as.factor(temp_centered), scales = "free", labeller = as_labeller(temp_labels)) +
   labs(x = "Predicted petal length", color = "Rain (centered)") +
-  theme(axis.text.y = element_blank(), axis.title.y = element_blank())
+  theme(axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        strip.text = element_text(color = "black", face = "bold", size = 12))
 ```
 
 ## Part 2 takeaways
@@ -644,8 +671,8 @@ avg_yearly_temp <- dist_normal(mu = 20, sd = 10)
 
 occurence_intercept <- 0.047
 occurence_tree_effect <- 0.45
-occurence_rain_effect <- 0.01
-occurence_temp_effect <- 0.01
+occurence_rain_effect <- 0.02
+occurence_temp_effect <- 0.03
 
 occ_data <- tibble(
   tree_cov = generate(tree_cover, n_plots),
@@ -668,7 +695,7 @@ mod_1 <- glmmTMB(occurence ~ tree_cov + rain + temp, family = binomial(link = "l
 summary(mod_1)$coefficients$cond
 ```
 
-We simulated the effect of tree cover to be **0.45** on the probability scale, but the model reports **\~1.87**. That's not an error — it's reporting the coefficient on the **log-odds** scale, not the probability scale.
+We simulated the effect of tree cover to be **0.45** on the probability scale, but the model reports **\~3.76**. That's not an error — it's reporting the coefficient on the **log-odds** scale, not the probability scale.
 
 ## The logit link bends a line into an S-shape
 
@@ -701,6 +728,7 @@ slopes(mod_1, variables = "tree_cov",
 #| label: implicit-interaction-plot
 #| fig-cap: "The tree-cover slope on the probability scale changes across rain x temp, though no interaction term exists in the model."
 slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = fivenum)) |>
+  mutate(temp = round(temp), rain = round(rain)) |>
   ggplot() +
   geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1)) +
   geom_vline(xintercept = occurence_tree_effect, alpha = .8) +
@@ -749,7 +777,7 @@ plot_slope <- function(data, x, y_lab, scale_title) {
  plot_slope(slopes_by_rain_link, "rain", "Slope of tree_cov\n(log-odds scale)", "Link scale"))
 ```
 
-**Link (log-odds) scale**: the slope of `tree_cov` is flat (\~1.87) across both moderators — exactly as it should be, since `mod_1`'s formula has no interaction term at all. **Response (probability) scale**: the slope visibly curves with temp (and more weakly with rain) — the implicit interaction made concrete, purely from the logit link's curvature. With three predictors, a focal variable's slope can no longer be shown across "the" moderator in one 2D plot — each panel above holds the *other* remaining predictor fixed at its mean. Alternatives: facet by the third variable, use small multiples at representative (e.g. five-number-summary) values, or report a single `avg_slopes()` that integrates over the observed distribution instead of fixing it.
+**Link (log-odds) scale**: the slope of `tree_cov` is flat (\~3.76) across both moderators — exactly as it should be, since `mod_1`'s formula has no interaction term at all. **Response (probability) scale**: the slope visibly curves with temp (and more weakly with rain) — the implicit interaction made concrete, purely from the logit link's curvature. With three predictors, a focal variable's slope can no longer be shown across "the" moderator in one 2D plot — each panel above holds the *other* remaining predictor fixed at its mean. Alternatives: facet by the third variable, use small multiples at representative (e.g. five-number-summary) values, or report a single `avg_slopes()` that integrates over the observed distribution instead of fixing it.
 
 ## The "overall" effect of tree cover
 

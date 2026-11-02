@@ -232,7 +232,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#case-study-bighorn-sheep" id="toc-case-study-bighorn-sheep" class="nav-link" data-scroll-target="#case-study-bighorn-sheep">Case study: Bighorn sheep</a></li>
   <li><a href="#simpsons-paradox" id="toc-simpsons-paradox" class="nav-link" data-scroll-target="#simpsons-paradox">Simpson’s Paradox</a></li>
   <li><a href="#why-sex-is-a-confounder" id="toc-why-sex-is-a-confounder" class="nav-link" data-scroll-target="#why-sex-is-a-confounder">Why? Sex is a confounder</a></li>
-  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1">🧪 Exercise 1</a></li>
+  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1">Exercise 1</a></li>
   <li><a href="#sampling-from-the-population" id="toc-sampling-from-the-population" class="nav-link" data-scroll-target="#sampling-from-the-population">Sampling from the population</a></li>
   <li><a href="#q1-do-sexes-differ-in-spring-mass" id="toc-q1-do-sexes-differ-in-spring-mass" class="nav-link" data-scroll-target="#q1-do-sexes-differ-in-spring-mass">Q1: Do sexes differ in spring mass?</a></li>
   <li><a href="#q2-does-snow-depth-affect-mass-equally-by-sex" id="toc-q2-does-snow-depth-affect-mass-equally-by-sex" class="nav-link" data-scroll-target="#q2-does-snow-depth-affect-mass-equally-by-sex">Q2: Does snow depth affect mass equally by sex?</a></li>
@@ -240,7 +240,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#marginal-vs-conditional-visualized" id="toc-marginal-vs-conditional-visualized" class="nav-link" data-scroll-target="#marginal-vs-conditional-visualized">Marginal vs conditional, visualized</a></li>
   <li><a href="#scenario-2-biased-sampling-80-male" id="toc-scenario-2-biased-sampling-80-male" class="nav-link" data-scroll-target="#scenario-2-biased-sampling-80-male">Scenario 2: biased sampling (80% male)</a></li>
   <li><a href="#correcting-for-known-sampling-bias" id="toc-correcting-for-known-sampling-bias" class="nav-link" data-scroll-target="#correcting-for-known-sampling-bias">Correcting for known sampling bias</a></li>
-  <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2">🧪 Exercise 2</a></li>
+  <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2">Exercise 2</a></li>
   <li><a href="#part-1-takeaways" id="toc-part-1-takeaways" class="nav-link" data-scroll-target="#part-1-takeaways">Part 1 takeaways</a></li>
   </ul></li>
   <li><a href="#part-2-numerical-numerical-interactions" id="toc-part-2-numerical-numerical-interactions" class="nav-link" data-scroll-target="#part-2-numerical-numerical-interactions">Part 2 — Numerical × Numerical Interactions</a>
@@ -251,7 +251,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#slope-across-the-range-of-the-moderator" id="toc-slope-across-the-range-of-the-moderator" class="nav-link" data-scroll-target="#slope-across-the-range-of-the-moderator">Slope across the <em>range</em> of the moderator</a></li>
   <li><a href="#visualizing-predictions-at-chosen-moderator-values" id="toc-visualizing-predictions-at-chosen-moderator-values" class="nav-link" data-scroll-target="#visualizing-predictions-at-chosen-moderator-values">Visualizing predictions at chosen moderator values</a></li>
   <li><a href="#response-surfaces-use-with-caution" id="toc-response-surfaces-use-with-caution" class="nav-link" data-scroll-target="#response-surfaces-use-with-caution">Response surfaces — use with caution</a></li>
-  <li><a href="#exercise-3" id="toc-exercise-3" class="nav-link" data-scroll-target="#exercise-3">🧪 Exercise 3</a></li>
+  <li><a href="#exercise-3" id="toc-exercise-3" class="nav-link" data-scroll-target="#exercise-3">Exercise 3</a></li>
   <li><a href="#interactions-beyond-the-mean-distributional-regression" id="toc-interactions-beyond-the-mean-distributional-regression" class="nav-link" data-scroll-target="#interactions-beyond-the-mean-distributional-regression">Interactions beyond the mean: distributional regression</a></li>
   <li><a href="#checking-the-dispersion-model" id="toc-checking-the-dispersion-model" class="nav-link" data-scroll-target="#checking-the-dispersion-model">Checking the dispersion model</a></li>
   <li><a href="#simulating-and-fitting-interactions-on-the-standard-deviation" id="toc-simulating-and-fitting-interactions-on-the-standard-deviation" class="nav-link" data-scroll-target="#simulating-and-fitting-interactions-on-the-standard-deviation">Simulating and fitting interactions on the standard deviation</a></li>
@@ -368,12 +368,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tinytable)       <span class="co"># tt(): simple, nice-looking results tables</span></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(performance)     <span class="co"># r2(), r2_tjur(): model R-squared measures</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>))</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># silence marginaleffects warnings about glmmTMB</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">marginaleffects_safe =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">333</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Set ggplot2 theme</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>black_theme <span class="ot">&lt;-</span> <span class="fu">theme</span>(</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">axis.line =</span> <span class="fu">element_line</span>(<span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">color =</span> <span class="st">"white"</span>),</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.grid =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"black"</span>, <span class="at">color =</span> <span class="cn">NA</span>),</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">21</span>, <span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">color =</span> <span class="st">"white"</span>),</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">21</span>, <span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">color =</span> <span class="st">"white"</span>),</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">25</span>, <span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">color =</span> <span class="st">"white"</span>),</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">plot.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"black"</span>, <span class="at">color =</span> <span class="cn">NA</span>),</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"black"</span>, <span class="at">color =</span> <span class="cn">NA</span>),</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">21</span>, <span class="at">color =</span> <span class="st">"white"</span>),</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">21</span>, <span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">color =</span> <span class="st">"white"</span>),</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend.position =</span> <span class="st">"bottom"</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(black_theme)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Set global default for geom_point shape</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="fu">update_geom_defaults</span>(<span class="st">"point"</span>, <span class="fu">list</span>(<span class="at">shape =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>))</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co"># silence marginaleffects warnings about glmmTMB</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">marginaleffects_safe =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">333</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="coding-style-functions-used-throughout" class="level2">
@@ -496,7 +515,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 <section id="exercise-1" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-1">🧪 Exercise 1</h2>
+<h2 class="anchored" data-anchor-id="exercise-1">Exercise 1</h2>
 <p>Using <code>bighorn_population</code>:</p>
 <ol type="1">
 <li>Fit <code>weight ~ sex * snow_depth</code> with <code>glmmTMB()</code>. Call it <code>mod_mass_true</code>.</li>
@@ -692,7 +711,7 @@ Comparison: dY/dX</code></pre>
 </div>
 </section>
 <section id="exercise-2" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-2">🧪 Exercise 2</h2>
+<h2 class="anchored" data-anchor-id="exercise-2">Exercise 2</h2>
 <p>Using the model that was fit to the entire population and the one with a biased sample, use the <code>avg_predictions()</code> function along with a balanced and an unbalanced prediction grid to create a plot comparing the marginal predictions between the true population, biased population predictions, and corrected population predictions. There should be three trend lines.</p>
 <p><em>(~15 minutes)</em></p>
 </section>
@@ -780,13 +799,16 @@ Comparison: dY/dX</code></pre>
 <span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>slopes_by_temp <span class="sc">|&gt;</span></span>
 <span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">linetype =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
 <span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high),</span>
 <span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">fill =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.2</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>,</span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"slope = "</span>, <span class="fu">round</span>(trend_slope_temp, <span class="dv">3</span>))) <span class="sc">+</span></span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Effect of rain on petal length"</span>, <span class="at">x =</span> <span class="st">"Temperature values"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">y =</span> estimate),</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.2</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>,</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"slope = "</span>, <span class="fu">round</span>(trend_slope_temp, <span class="dv">3</span>)),</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>) <span class="sc">+</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">25</span>, <span class="dv">50</span>, <span class="at">by =</span> <span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Effect of rain on petal length"</span>, <span class="at">x =</span> <span class="st">"Temperature values"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -811,10 +833,12 @@ Comparison: dY/dX</code></pre>
 <span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
 <span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rain =</span> <span class="fu">round</span>(rain_centered <span class="sc">+</span> <span class="fu">mean</span>(rain), <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> estimate, <span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">color =</span> <span class="fu">as.factor</span>(rain))) <span class="sc">+</span></span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high,</span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">fill =</span> <span class="fu">as.factor</span>(rain)), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted petal length"</span>, <span class="at">x =</span> <span class="st">"Temperature"</span>, <span class="at">color =</span> <span class="st">"Rain"</span>, <span class="at">fill =</span> <span class="st">"Rain"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> estimate, <span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">color =</span> <span class="fu">as.factor</span>(rain)),</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">lineend =</span> <span class="st">"round"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high,</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">x =</span> temp_centered <span class="sc">+</span> <span class="fu">mean</span>(temperature), <span class="at">fill =</span> <span class="fu">as.factor</span>(rain)), <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"Predicted petal length"</span>, <span class="at">x =</span> <span class="st">"Temperature"</span>, <span class="at">color =</span> <span class="st">"Rain"</span>, <span class="at">fill =</span> <span class="st">"Rain"</span>) <span class="sc">+</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">50</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -851,7 +875,7 @@ Comparison: dY/dX</code></pre>
 <p>Contour bins are arbitrary and hide uncertainty — good for exploration, risky for publication-quality inference. Prefer line-and-ribbon plots when you can.</p>
 </section>
 <section id="exercise-3" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-3">🧪 Exercise 3</h2>
+<h2 class="anchored" data-anchor-id="exercise-3">Exercise 3</h2>
 <p>Using <code>mod_flower_1</code>:</p>
 <ol type="1">
 <li>Compute the slope of <strong>temperature</strong> across the observed range of <strong>rain</strong> (mirror the rain-across-temperature plot above).</li>
@@ -990,7 +1014,10 @@ Comparison: dY/dX</code></pre>
 <span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">"Accent"</span>) <span class="sc">+</span></span>
 <span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> <span class="fu">as.factor</span>(temp_centered), <span class="at">scales =</span> <span class="st">"free"</span>, <span class="at">labeller =</span> <span class="fu">as_labeller</span>(temp_labels)) <span class="sc">+</span></span>
 <span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Predicted petal length"</span>, <span class="at">color =</span> <span class="st">"Rain (centered)"</span>) <span class="sc">+</span></span>
-<span id="cb37-36"><a href="#cb37-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.title.y =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb37-36"><a href="#cb37-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.line.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb37-37"><a href="#cb37-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb37-38"><a href="#cb37-38" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb37-39"><a href="#cb37-39" aria-hidden="true" tabindex="-1"></a>        <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1026,8 +1053,8 @@ Comparison: dY/dX</code></pre>
 <span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>occurence_intercept <span class="ot">&lt;-</span> <span class="fl">0.047</span></span>
 <span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>occurence_tree_effect <span class="ot">&lt;-</span> <span class="fl">0.45</span></span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>occurence_rain_effect <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>occurence_temp_effect <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>occurence_rain_effect <span class="ot">&lt;-</span> <span class="fl">0.02</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>occurence_temp_effect <span class="ot">&lt;-</span> <span class="fl">0.03</span></span>
 <span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>occ_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
 <span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">tree_cov =</span> <span class="fu">generate</span>(tree_cover, n_plots),</span>
@@ -1049,15 +1076,15 @@ Comparison: dY/dX</code></pre>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod_1)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>               Estimate Std. Error    z value     Pr(&gt;|z|)
-(Intercept) -1.69327695 0.50024494 -3.3848957 7.120530e-04
-tree_cov     1.98151874 0.43421560  4.5634443 5.032116e-06
-rain        -0.02254920 0.06512181 -0.3462619 7.291459e-01
-temp         0.04989717 0.01677791  2.9739804 2.939638e-03
+(Intercept) -2.17374411  0.8385507 -2.5922632 9.534679e-03
+tree_cov     3.76005897  0.9372601  4.0117561 6.026875e-05
+rain        -0.05046963  0.1077608 -0.4683488 6.395352e-01
+temp         0.15045030  0.0371749  4.0470932 5.185760e-05
 attr(,"ddf")
 [1] "asymptotic"</code></pre>
 </div>
 </div>
-<p>We simulated the effect of tree cover to be <strong>0.45</strong> on the probability scale, but the model reports <strong>~1.87</strong>. That’s not an error — it’s reporting the coefficient on the <strong>log-odds</strong> scale, not the probability scale.</p>
+<p>We simulated the effect of tree cover to be <strong>0.45</strong> on the probability scale, but the model reports <strong>~3.76</strong>. That’s not an error — it’s reporting the coefficient on the <strong>log-odds</strong> scale, not the probability scale.</p>
 </section>
 <section id="the-logit-link-bends-a-line-into-an-s-shape" class="level2">
 <h2 class="anchored" data-anchor-id="the-logit-link-bends-a-line-into-an-s-shape">The logit link bends a line into an S-shape</h2>
@@ -1087,7 +1114,7 @@ attr(,"ddf")
 <div class="cell-output cell-output-stdout">
 <pre><code>
  temp rain Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
- 19.5 4.22    0.491      0.107 4.57   &lt;0.001 17.6  0.28  0.702
+ 19.5 4.22    0.426      0.104 4.09   &lt;0.001 14.5 0.221   0.63
 
 Term: tree_cov
 Type: response
@@ -1100,11 +1127,12 @@ Comparison: dY/dX</code></pre>
 <h2 class="anchored" data-anchor-id="the-implicit-interaction-visualized">The implicit interaction, visualized</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">slopes</span>(mod_1, <span class="at">variables =</span> <span class="st">"tree_cov"</span>, <span class="at">newdata =</span> <span class="fu">datagrid</span>(<span class="at">temp =</span> fivenum, <span class="at">rain =</span> fivenum)) <span class="sc">|&gt;</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">xmin =</span> conf.low, <span class="at">xmax =</span> conf.high, <span class="at">y =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> occurence_tree_effect, <span class="at">alpha =</span> .<span class="dv">8</span>) <span class="sc">+</span></span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp) <span class="sc">+</span></span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">temp =</span> <span class="fu">round</span>(temp), <span class="at">rain =</span> <span class="fu">round</span>(rain)) <span class="sc">|&gt;</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">xmin =</span> conf.low, <span class="at">xmax =</span> conf.high, <span class="at">y =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> occurence_tree_effect, <span class="at">alpha =</span> .<span class="dv">8</span>) <span class="sc">+</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(rain <span class="sc">~</span> temp) <span class="sc">+</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1227,19 +1255,19 @@ Comparison: dY/dX</code></pre>
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_swdqw6cy2eddc5ox8nzi = TinyTable.createTableFunctions("tinytable_swdqw6cy2eddc5ox8nzi");
+      const tableFns_7gynogwz68mo45j6mtdu = TinyTable.createTableFunctions("tinytable_7gynogwz68mo45j6mtdu");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 } ], css_id: 'tinytable_css_f4rm0lo516a3kx4kmqd8',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_cnxqb9iuor4c8u5nmw53',}, 
+          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 } ], css_id: 'tinytable_css_28mp3bcz0nyw6butswdq',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_9bcvygf4dyrj6mqtrhwv',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_swdqw6cy2eddc5ox8nzi.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_7gynogwz68mo45j6mtdu.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -1248,11 +1276,11 @@ Comparison: dY/dX</code></pre>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_swdqw6cy2eddc5ox8nzi td.tinytable_css_f4rm0lo516a3kx4kmqd8, #tinytable_swdqw6cy2eddc5ox8nzi th.tinytable_css_f4rm0lo516a3kx4kmqd8 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: black; --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-weight: bold }
-    #tinytable_swdqw6cy2eddc5ox8nzi td.tinytable_css_cnxqb9iuor4c8u5nmw53, #tinytable_swdqw6cy2eddc5ox8nzi th.tinytable_css_cnxqb9iuor4c8u5nmw53 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_7gynogwz68mo45j6mtdu td.tinytable_css_28mp3bcz0nyw6butswdq, #tinytable_7gynogwz68mo45j6mtdu th.tinytable_css_28mp3bcz0nyw6butswdq {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: black; --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-weight: bold }
+    #tinytable_7gynogwz68mo45j6mtdu td.tinytable_css_9bcvygf4dyrj6mqtrhwv, #tinytable_7gynogwz68mo45j6mtdu th.tinytable_css_9bcvygf4dyrj6mqtrhwv {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_swdqw6cy2eddc5ox8nzi" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_7gynogwz68mo45j6mtdu" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <caption>Average slopes of occurrence on the probability scale, and Tjur's R2 for mod_1</caption>
         <thead>
               <tr>
@@ -1266,25 +1294,25 @@ Comparison: dY/dX</code></pre>
         <tbody>
                 <tr>
                   <td data-row="1" data-col="1">rain</td>
-                  <td data-row="1" data-col="2">-0.005</td>
-                  <td data-row="1" data-col="3">[-0.031, 0.022]</td>
-                  <td data-row="1" data-col="4">0.729</td>
+                  <td data-row="1" data-col="2">-0.008</td>
+                  <td data-row="1" data-col="3">[-0.04, 0.025]</td>
+                  <td data-row="1" data-col="4">0.639</td>
                 </tr>
                 <tr>
                   <td data-row="2" data-col="1">temp</td>
-                  <td data-row="2" data-col="2">0.01</td>
-                  <td data-row="2" data-col="3">[0.004, 0.017]</td>
-                  <td data-row="2" data-col="4">0.001</td>
+                  <td data-row="2" data-col="2">0.023</td>
+                  <td data-row="2" data-col="3">[0.015, 0.031]</td>
+                  <td data-row="2" data-col="4">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="3" data-col="1">tree_cov</td>
-                  <td data-row="3" data-col="2">0.415</td>
-                  <td data-row="3" data-col="3">[0.275, 0.555]</td>
+                  <td data-row="3" data-col="2">0.583</td>
+                  <td data-row="3" data-col="3">[0.371, 0.795]</td>
                   <td data-row="3" data-col="4">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="4" data-col="1">Tjur's R²</td>
-                  <td data-row="4" data-col="2">0.155</td>
+                  <td data-row="4" data-col="2">0.272</td>
                   <td data-row="4" data-col="3"></td>
                   <td data-row="4" data-col="4"></td>
                 </tr>
@@ -1319,11 +1347,11 @@ Comparison: dY/dX</code></pre>
 <span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>mod_2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(abundance <span class="sc">~</span> tree_cov <span class="sc">+</span> rain <span class="sc">+</span> temp, <span class="at">family =</span> <span class="fu">poisson</span>(<span class="at">link =</span> <span class="st">"log"</span>), <span class="at">data =</span> abund_data)</span>
 <span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod_2)<span class="sc">$</span>coefficients<span class="sc">$</span>cond</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>               Estimate  Std. Error    z value     Pr(&gt;|z|)
-(Intercept) 1.351588876 0.094920416 14.2391799 5.233765e-46
-tree_cov    0.681423047 0.072048327  9.4578608 3.143074e-21
-rain        0.008439223 0.010828644  0.7793426 4.357779e-01
-temp        0.012663937 0.002590972  4.8877156 1.020127e-06
+<pre><code>              Estimate  Std. Error   z value     Pr(&gt;|z|)
+(Intercept) 1.18837023 0.096421929 12.324688 6.670081e-35
+tree_cov    0.69841642 0.073099908  9.554272 1.244556e-21
+rain        0.01651775 0.010934451  1.510616 1.308864e-01
+temp        0.01791748 0.002822861  6.347276 2.191609e-10
 attr(,"ddf")
 [1] "asymptotic"</code></pre>
 </div>
@@ -1361,7 +1389,7 @@ attr(,"ddf")
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">fixef</span>(mod_2)<span class="sc">$</span>cond[<span class="st">"tree_cov"</span>])  <span class="co"># rate ratio: ~2.08, i.e. a ~108% increase per unit tree cover</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tree_cov 
-1.976689 </code></pre>
+2.010566 </code></pre>
 </div>
 </div>
 <p>Both describe the same underlying model — pick the one that matches your audience (percent change vs.&nbsp;a concrete headcount).</p>
@@ -1561,19 +1589,19 @@ attr(,"ddf")
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_qiczizh78flhbu73zlf9 = TinyTable.createTableFunctions("tinytable_qiczizh78flhbu73zlf9");
+      const tableFns_rl2bk28usn3cf7r0ol90 = TinyTable.createTableFunctions("tinytable_rl2bk28usn3cf7r0ol90");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '3', j: 1 }, { i: '3', j: 2 }, { i: '3', j: 3 }, { i: '3', j: 4 } ], css_id: 'tinytable_css_babw0dk37mrxwccuz8hm',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_tya0fugpyz5abff64rr6',}, 
+          { positions: [ { i: '3', j: 1 }, { i: '3', j: 2 }, { i: '3', j: 3 }, { i: '3', j: 4 } ], css_id: 'tinytable_css_evzoygz6cow8y4qicziz',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_9dp3seiyy2e5wxlls1x5',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_qiczizh78flhbu73zlf9.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_rl2bk28usn3cf7r0ol90.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -1582,11 +1610,11 @@ attr(,"ddf")
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_qiczizh78flhbu73zlf9 td.tinytable_css_babw0dk37mrxwccuz8hm, #tinytable_qiczizh78flhbu73zlf9 th.tinytable_css_babw0dk37mrxwccuz8hm {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_qiczizh78flhbu73zlf9 td.tinytable_css_tya0fugpyz5abff64rr6, #tinytable_qiczizh78flhbu73zlf9 th.tinytable_css_tya0fugpyz5abff64rr6 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_rl2bk28usn3cf7r0ol90 td.tinytable_css_evzoygz6cow8y4qicziz, #tinytable_rl2bk28usn3cf7r0ol90 th.tinytable_css_evzoygz6cow8y4qicziz {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_rl2bk28usn3cf7r0ol90 td.tinytable_css_9dp3seiyy2e5wxlls1x5, #tinytable_rl2bk28usn3cf7r0ol90 th.tinytable_css_9dp3seiyy2e5wxlls1x5 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_qiczizh78flhbu73zlf9" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_rl2bk28usn3cf7r0ol90" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <caption>Rate ratio of scl_prey's effect on abundance, evaluated at three levels of scl_competitors</caption>
         <thead>
               <tr>
@@ -1600,21 +1628,21 @@ attr(,"ddf")
         <tbody>
                 <tr>
                   <td data-row="1" data-col="1">-1</td>
-                  <td data-row="1" data-col="2">1.194</td>
-                  <td data-row="1" data-col="3">[1.111, 1.283]</td>
-                  <td data-row="1" data-col="4">&lt;0.001</td>
+                  <td data-row="1" data-col="2">1.114</td>
+                  <td data-row="1" data-col="3">[1.04, 1.192]</td>
+                  <td data-row="1" data-col="4">0.002</td>
                 </tr>
                 <tr>
                   <td data-row="2" data-col="1">0</td>
-                  <td data-row="2" data-col="2">0.952</td>
-                  <td data-row="2" data-col="3">[0.86, 1.054]</td>
-                  <td data-row="2" data-col="4">0.346</td>
+                  <td data-row="2" data-col="2">0.956</td>
+                  <td data-row="2" data-col="3">[0.865, 1.057]</td>
+                  <td data-row="2" data-col="4">0.379</td>
                 </tr>
                 <tr>
                   <td data-row="3" data-col="1">1</td>
-                  <td data-row="3" data-col="2">0.760</td>
-                  <td data-row="3" data-col="3">[0.631, 0.914]</td>
-                  <td data-row="3" data-col="4">0.004</td>
+                  <td data-row="3" data-col="2">0.820</td>
+                  <td data-row="3" data-col="3">[0.683, 0.986]</td>
+                  <td data-row="3" data-col="4">0.035</td>
                 </tr>
         </tbody>
       </table>
@@ -1872,20 +1900,20 @@ attr(,"ddf")
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_98av69dpq8mkn6ckwzur = TinyTable.createTableFunctions("tinytable_98av69dpq8mkn6ckwzur");
+      const tableFns_gpyz5abff64rr6babw0d = TinyTable.createTableFunctions("tinytable_gpyz5abff64rr6babw0d");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '8', j: 1 }, { i: '8', j: 2 }, { i: '8', j: 3 }, { i: '8', j: 4 }, { i: '8', j: 5 } ], css_id: 'tinytable_css_xcvnx4eskvewmylm9klz',}, 
-          { positions: [ { i: '7', j: 1 }, { i: '7', j: 2 }, { i: '7', j: 3 }, { i: '7', j: 4 }, { i: '7', j: 5 } ], css_id: 'tinytable_css_c4elrgm45tpi2y1plg6i',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_6ryypchsgsf4fpzfhxs6',}, 
+          { positions: [ { i: '8', j: 1 }, { i: '8', j: 2 }, { i: '8', j: 3 }, { i: '8', j: 4 }, { i: '8', j: 5 } ], css_id: 'tinytable_css_dpq8mkn6ckwzur6ryypc',}, 
+          { positions: [ { i: '7', j: 1 }, { i: '7', j: 2 }, { i: '7', j: 3 }, { i: '7', j: 4 }, { i: '7', j: 5 } ], css_id: 'tinytable_css_ysi4t6h4rowlig98av69',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_k37mrxwccuz8hm3nh13g',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_98av69dpq8mkn6ckwzur.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_gpyz5abff64rr6babw0d.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -1894,12 +1922,12 @@ attr(,"ddf")
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_98av69dpq8mkn6ckwzur td.tinytable_css_xcvnx4eskvewmylm9klz, #tinytable_98av69dpq8mkn6ckwzur th.tinytable_css_xcvnx4eskvewmylm9klz {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_98av69dpq8mkn6ckwzur td.tinytable_css_c4elrgm45tpi2y1plg6i, #tinytable_98av69dpq8mkn6ckwzur th.tinytable_css_c4elrgm45tpi2y1plg6i {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_98av69dpq8mkn6ckwzur td.tinytable_css_6ryypchsgsf4fpzfhxs6, #tinytable_98av69dpq8mkn6ckwzur th.tinytable_css_6ryypchsgsf4fpzfhxs6 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_gpyz5abff64rr6babw0d td.tinytable_css_dpq8mkn6ckwzur6ryypc, #tinytable_gpyz5abff64rr6babw0d th.tinytable_css_dpq8mkn6ckwzur6ryypc {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_gpyz5abff64rr6babw0d td.tinytable_css_ysi4t6h4rowlig98av69, #tinytable_gpyz5abff64rr6babw0d th.tinytable_css_ysi4t6h4rowlig98av69 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_gpyz5abff64rr6babw0d td.tinytable_css_k37mrxwccuz8hm3nh13g, #tinytable_gpyz5abff64rr6babw0d th.tinytable_css_k37mrxwccuz8hm3nh13g {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_98av69dpq8mkn6ckwzur" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_gpyz5abff64rr6babw0d" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <caption>Standardized rate ratios (conditional model) and odds ratio (zero-inflation model) for mod_hu</caption>
         <thead>
               <tr>
@@ -1915,57 +1943,57 @@ attr(,"ddf")
                 <tr>
                   <td data-row="1" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="1" data-col="2">scl_prey (at scl_competitors = -1 SD)</td>
-                  <td data-row="1" data-col="3">1.194</td>
-                  <td data-row="1" data-col="4">[1.111, 1.283]</td>
-                  <td data-row="1" data-col="5">&lt;0.001</td>
+                  <td data-row="1" data-col="3">1.114</td>
+                  <td data-row="1" data-col="4">[1.04, 1.192]</td>
+                  <td data-row="1" data-col="5">0.002</td>
                 </tr>
                 <tr>
                   <td data-row="2" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="2" data-col="2">scl_prey (at scl_competitors = 0 SD)</td>
-                  <td data-row="2" data-col="3">0.952</td>
-                  <td data-row="2" data-col="4">[0.86, 1.054]</td>
-                  <td data-row="2" data-col="5">0.346</td>
+                  <td data-row="2" data-col="3">0.956</td>
+                  <td data-row="2" data-col="4">[0.865, 1.057]</td>
+                  <td data-row="2" data-col="5">0.379</td>
                 </tr>
                 <tr>
                   <td data-row="3" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="3" data-col="2">scl_prey (at scl_competitors = 1 SD)</td>
-                  <td data-row="3" data-col="3">0.760</td>
-                  <td data-row="3" data-col="4">[0.631, 0.914]</td>
-                  <td data-row="3" data-col="5">0.004</td>
+                  <td data-row="3" data-col="3">0.820</td>
+                  <td data-row="3" data-col="4">[0.683, 0.986]</td>
+                  <td data-row="3" data-col="5">0.035</td>
                 </tr>
                 <tr>
                   <td data-row="4" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="4" data-col="2">scl_competitors (at scl_prey = -1 SD)</td>
-                  <td data-row="4" data-col="3">0.611</td>
-                  <td data-row="4" data-col="4">[0.533, 0.702]</td>
+                  <td data-row="4" data-col="3">0.539</td>
+                  <td data-row="4" data-col="4">[0.468, 0.622]</td>
                   <td data-row="4" data-col="5">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="5" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="5" data-col="2">scl_competitors (at scl_prey = 0 SD)</td>
-                  <td data-row="5" data-col="3">0.488</td>
-                  <td data-row="5" data-col="4">[0.441, 0.54]</td>
+                  <td data-row="5" data-col="3">0.463</td>
+                  <td data-row="5" data-col="4">[0.419, 0.511]</td>
                   <td data-row="5" data-col="5">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="6" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="6" data-col="2">scl_competitors (at scl_prey = 1 SD)</td>
-                  <td data-row="6" data-col="3">0.389</td>
-                  <td data-row="6" data-col="4">[0.337, 0.449]</td>
+                  <td data-row="6" data-col="3">0.397</td>
+                  <td data-row="6" data-col="4">[0.348, 0.454]</td>
                   <td data-row="6" data-col="5">&lt;0.001</td>
                 </tr>
                 <tr>
                   <td data-row="7" data-col="1">Conditional (abundance, when present)</td>
                   <td data-row="7" data-col="2">scl_prey:scl_competitors (interaction)</td>
-                  <td data-row="7" data-col="3">0.798</td>
-                  <td data-row="7" data-col="4">[0.724, 0.879]</td>
-                  <td data-row="7" data-col="5">&lt;0.001</td>
+                  <td data-row="7" data-col="3">0.858</td>
+                  <td data-row="7" data-col="4">[0.78, 0.944]</td>
+                  <td data-row="7" data-col="5">0.002</td>
                 </tr>
                 <tr>
                   <td data-row="8" data-col="1">Zero-inflation (occupancy, as an odds ratio)</td>
                   <td data-row="8" data-col="2">scl_tree_cov (zero-inflation)</td>
-                  <td data-row="8" data-col="3">0.842</td>
-                  <td data-row="8" data-col="4">[0.76, 0.932]</td>
+                  <td data-row="8" data-col="3">0.837</td>
+                  <td data-row="8" data-col="4">[0.756, 0.926]</td>
                   <td data-row="8" data-col="5">&lt;0.001</td>
                 </tr>
         </tbody>
