@@ -534,9 +534,14 @@ flower_measurements_2 <- tibble(
 #| label: spread-increases-with-temp
 #| fig-cap: "The spread around the trend increases with temperature."
 ggplot(flower_measurements_2, aes(x = temp_centered + mean(temperature), y = petal_length)) +
-  geom_smooth(method = "lm", color = "red", se = FALSE) +
-  geom_point() +
-  labs(x = "Temperature", y = "Observed petal length")
+  geom_smooth(method = 'lm',     
+              lineend = "round",
+              linewidth = 2,
+              color = "white",
+              se = F) + 
+  geom_point(color = "white") +
+  labs(x = "Temperature",
+       y = "Observed petal length")
 ```
 
 ```{r}
@@ -551,8 +556,8 @@ mod_flower_2 <- glmmTMB(petal_length ~ temp_centered,
 ```{r}
 #| label: check-dispersion-model
 #| fig-cap: "Recovered vs. simulated standard deviation of petal length."
-pred_sd_temp <- predictions(mod_flower_2, newdata = flower_measurements_2, type = "disp") |>
-  as_tibble()
+predictions(mod_flower_2, newdata = flower_measurements_2, type = "disp") |>
+  as_tibble() -> pred_sd_temp
 
 true_sd_temp <- flower_measurements_2 |>
   mutate(true_sd = exp(log_sd_intercept + log_sd_temp_slope * temp_centered))
@@ -560,13 +565,14 @@ true_sd_temp <- flower_measurements_2 |>
 ggplot() +
   geom_line(data = true_sd_temp,
             aes(x = temp_centered + mean(temperature), y = true_sd, color = "Simulated"),
-            linetype = "dashed") +
+            linewidth = 2, linetype = "dashed") +
   geom_ribbon(data = pred_sd_temp,
               aes(ymin = conf.low, ymax = conf.high, x = temp_centered + mean(temperature)),
-              fill = "red", alpha = 0.3) +
+              fill = "red", alpha = 0.2) +
   geom_line(data = pred_sd_temp,
-            aes(x = temp_centered + mean(temperature), y = estimate, color = "Estimated")) +
-  scale_color_manual(values = c("Simulated" = "darkgreen", "Estimated" = "red"), name = "Standard deviation") +
+            aes(x = temp_centered + mean(temperature), y = estimate, color = "Estimated"),
+            linewidth = 2, lineend = "round") +
+  scale_color_manual(values = c("Simulated" = "green", "Estimated" = "red"), name = "Standard deviation") +
   labs(x = "Temperature", y = "Standard deviation")
 ```
 
@@ -703,11 +709,36 @@ We simulated the effect of tree cover to be **0.45** on the probability scale, b
 #| label: logistic-curve
 #| fig-cap: "The logit link bends a straight line into an S-shape."
 tibble(log_odds = seq(-6, 6, length.out = 400)) |>
-  mutate(probability = plogis(log_odds)) |>
-  ggplot(aes(x = log_odds, y = probability)) +
-  geom_line() +
-  labs(x = "log-odds scale (what the coefficient describes)",
-       y = "probability scale (what we care about)")
+  mutate(probability = plogis(log_odds)) -> logistic_curve
+
+tibble(
+  log_odds = c(0, -4.2, 4.2),
+  probability = plogis(log_odds),
+  label = c("steep middle:\na small push here\nmoves probability a lot",
+            "flat end:\na push here barely\nmoves probability",
+            "flat end:\na push here barely\nmoves probability")
+) -> annot
+
+ggplot(logistic_curve, aes(x = log_odds, y = probability)) +
+  geom_line(color = "white", linewidth = 1.5, lineend = "round") +
+  geom_point(data = annot, color = "white", size = 3) +
+  geom_text(
+    data = annot,
+    aes(label = label),
+    color = "white",
+    size = 4.5,
+    fontface = "bold",
+    lineheight = 0.9,
+    vjust = c(-0.4, -0.6, 1.6),
+    hjust = c(0.5, 0.5, 0.5)
+  ) +
+  scale_y_continuous(limits = c(-0.1, 1.05)) +
+  labs(
+    x = "log-odds scale (what the model's coefficient describes)",
+    y = "probability scale",
+    title = "The logit link bends a straight line into an S-shape"
+  )+
+  theme(plot.title = element_text(size = 18, face = "bold", color = "white"))
 ```
 
 Near the middle (p ≈ 0.5) the curve is steep: a small log-odds push moves probability a lot. Near the ends (p ≈ 0 or 1) the curve flattens: the same push barely moves probability. No manual derivative needed — `marginaleffects` converts automatically to the scale we actually care about.
@@ -730,10 +761,10 @@ slopes(mod_1, variables = "tree_cov",
 slopes(mod_1, variables = "tree_cov", newdata = datagrid(temp = fivenum, rain = fivenum)) |>
   mutate(temp = round(temp), rain = round(rain)) |>
   ggplot() +
-  geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1)) +
-  geom_vline(xintercept = occurence_tree_effect, alpha = .8) +
+  geom_pointrange(aes(x = estimate, xmin = conf.low, xmax = conf.high, y = 1), color = "white") +
+  geom_vline(xintercept = occurence_tree_effect, color = "white", alpha = .8) +
   facet_grid(rain ~ temp) +
-  theme(axis.title.y = element_blank(), axis.text.y = element_blank())
+  theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.line.y = element_blank(), axis.text.x = element_text(size = 10))
 ```
 
 Because the amount of "bending" depends on where you are on the S-curve, tree cover's probability-scale effect depends on rain and temp too — even though we never told the model to include that interaction. Whether an interaction "exists" can depend on which scale you look at (additive/probability vs. multiplicative/log-odds) — see Spake et al. (2023) for more on this "Type-D" error.
@@ -880,10 +911,35 @@ The log-scale `tree_cov` coefficient is **\~0.73**, not 4.5 — the same phenome
 #| label: exponential-curve
 #| fig-cap: "The log link bends a straight line into an exponential curve."
 tibble(log_count = seq(-2, 6, length.out = 400)) |>
-  mutate(count = exp(log_count)) |>
-  ggplot(aes(x = log_count, y = count)) +
-  geom_line() +
-  labs(x = "log scale (what the coefficient describes)", y = "count scale (what we care about)")
+  mutate(count = exp(log_count)) -> exp_curve
+
+tibble(
+  log_count = c(-1.5, 2, 4.5),
+  count = exp(log_count),
+  label = c("flat end:\na push here barely\nmoves the expected count",
+            "moderate slope:\na push here moves\nthe expected count some",
+            "steep end:\na push here moves\nthe expected count a lot")
+) -> annot_exp
+
+ggplot(exp_curve, aes(x = log_count, y = count)) +
+  geom_line(color = "white", linewidth = 1.5, lineend = "round") +
+  geom_point(data = annot_exp, color = "white", size = 3) +
+  geom_text(
+    data = annot_exp,
+    aes(label = label),
+    color = "white",
+    size = 4.5,
+    fontface = "bold",
+    lineheight = 0.9,
+    vjust = c(-0.4, -0.6, 1.6),
+    hjust = c(0.5, 0.5, 0.5)
+  ) +
+  labs(
+    x = "log scale (what the model's coefficient describes)",
+    y = "count scale",
+    title = "The log link bends a straight line into an exponential curve"
+  ) +
+  theme(plot.title = element_text(size = 18, face = "bold", color = "white"))
 ```
 
 ## Two ways to report a log-link coefficient
