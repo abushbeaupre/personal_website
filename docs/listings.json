@@ -2,10 +2,12 @@
   {
     "listing": "/posts.html",
     "items": [
+      "/posts/interactions_hurdle_zero_inflated/index.html",
       "/posts/interactions_numerical_numerical/index.html",
       "/posts/interactions_link_functions/index.html",
       "/posts/intro_causal/index.html",
-      "/posts/interactions_categorical_numerical/index.html"
+      "/posts/interactions_categorical_numerical/index.html",
+      "/posts/indirect_effects/index.html"
     ]
   },
   {

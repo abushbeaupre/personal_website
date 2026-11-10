@@ -216,6 +216,8 @@ ggplot(sensitivity_results, aes(x = cor_x_z, y = vif)) +
 
 As the correlation between X and Z increases, the point estimate of the effect of X on Y stays close to the true simulated value (red line), but the confidence interval widens noticeably once the correlation exceeds roughly 0.7–0.8 — consistent with the earlier observation that multicollinearity inflates uncertainty without necessarily biasing the estimate. The VIF for X increases sharply as the correlation grows, reflecting the standard relationship $$\text{VIF} = \frac{1}{1 - R^2}$$ between a predictor and the other covariates in the model.
 
+It's worth being explicit about why this VIF simulation matters for causal inference specifically, rather than being a general regression caveat. In these examples, Z is a confounder: a common cause of both X and Y. Omitting Z from the model biases the estimated effect of X on Y, so Z must be included to recover the causal effect — but a confounder, almost by definition, shares variance with the treatment X, since it causes both X and Y. That means conditioning on a confounder strongly correlated with the treatment is exactly the situation that produces high VIF. The two consequences of this are distinct and call for different responses: omitting Z introduces *bias* (and no amount of data fixes a biased estimate), while including a highly collinear Z costs *precision* (wider confidence intervals, but the estimate remains correct on average). High VIF is therefore not a reason to drop a confounder from the model; it is a signal that the resulting effect estimate, while unbiased, will be noisier, and that more data, better measurement, or additional precision covariates (as in the next example) may be needed to estimate it tightly.
+
 
 Collinearity between X and Z is not the only thing that affects the precision of our estimate of the effect of X on Y — so does how much of the residual variance in Y we can explain. Let's simulate a scenario where X and Z are highly correlated (as before), but we also have two additional predictors, W1 and W2, that affect Y but are unrelated to X and Z (and so are not confounders of the X–Y relationship, and are not required to be included for unbiasedness). Including these predictors in the model does not change the true causal effect of X on Y, but it does soak up residual variance in Y that would otherwise show up as noise, which should narrow the confidence interval for the slope of X.
 
@@ -250,4 +252,82 @@ slopes(model8, variables = "X", newdata = "mean") |> as_tibble() |> mutate(model
   theme(legend.position = "none")
 ```
 
-Both models give estimates consistent with the true simulated effect, but the confidence interval for model 8, which includes W1 and W2, is noticeably narrower than that of model 7. This illustrates that improving the precision of a causal effect estimate is not only about addressing confounding (which requires including Z): adding predictors of Y that are unrelated to the treatment of interest, sometimes called "precision covariates," can meaningfully tighten the confidence interval around the effect of interest without introducing bias, because they absorb residual variance in Y that would otherwise be attributed to nois
+Both models give estimates consistent with the true simulated effect, but the confidence interval for model 8, which includes W1 and W2, is noticeably narrower than that of model 7. This illustrates that improving the precision of a causal effect estimate is not only about addressing confounding (which requires including Z): adding predictors of Y that are unrelated to the treatment of interest, sometimes called "precision covariates," can meaningfully tighten the confidence interval around the effect of interest without introducing bias, because they absorb residual variance in Y that would otherwise be attributed to noise.
+
+A natural next question is how many precision covariates to add. Including every candidate predictor of Y risks overfitting, especially as the number of candidates grows relative to the sample size, which can produce unstable coefficient estimates and (for the effect of interest) a confidence interval that is too narrow or an estimate that does not generalize beyond the sample. The usual solution in a regularized regression framework (e.g. ridge or lasso) is to shrink the coefficients of weakly-supported covariates toward zero. `glmmTMB` does not have a built-in regularization method, so instead we use a simple forward stepwise selection based on AICc (the small-sample-corrected version of AIC, more appropriate here given the number of candidate covariates relative to n): starting from a model with only X and Z (always retained), we repeatedly add whichever candidate precision covariate improves AICc the most, stopping once no addition improves it further.
+
+It is important to be precise about what this kind of model selection is, and is not, for. Z is a confounder, identified from our causal assumptions about the data-generating process (as represented, for example, by a DAG), not from a model-fit statistic — it must stay in every candidate model regardless of whether it improves AICc, or we reintroduce the omitted-confounder bias from the very first simulation in this post. The W's, by contrast, are precision covariates: by construction they do not cause X and are not caused by X or Y, so excluding any of them from the model does not bias the estimated effect of X, only its precision. Model selection is therefore only applied to the candidate set of precision covariates, and is never used to decide whether a variable identified as a confounder belongs in the model. More generally, any model comparison or selection procedure should operate only over variables whose inclusion or exclusion is already justified as compatible with the causal question being asked; it should not be used to choose between models that imply different causal assumptions (e.g. with and without a known confounder).
+
+```{r}
+forward_select_glmmTMB <- function(data, y, force_in, candidates, max_steps = Inf) {
+  selected <- force_in
+  remaining <- candidates
+  form <- as.formula(paste(y, "~", paste(selected, collapse = " + ")))
+  best_aicc <- AICcmodavg::AICc(glmmTMB(form, family = gaussian, data = data))
+
+  step <- 0
+  repeat {
+    step <- step + 1
+    if (length(remaining) == 0 || step > max_steps) break
+
+    aiccs <- map_dbl(remaining, function(v) {
+      form_v <- as.formula(paste(y, "~", paste(c(selected, v), collapse = " + ")))
+      AICcmodavg::AICc(glmmTMB(form_v, family = gaussian, data = data))
+    })
+
+    if (min(aiccs) < best_aicc) {
+      best_var <- remaining[which.min(aiccs)]
+      selected <- c(selected, best_var)
+      remaining <- setdiff(remaining, best_var)
+      best_aicc <- min(aiccs)
+    } else {
+      break
+    }
+  }
+  selected
+}
+```
+
+Let's simulate a dataset in which Z is a confounder of X and Y, as before, and we additionally have 30 candidate precision covariates (W1-W30), only 5 of which actually affect Y, and all of which are unrelated to X and Z (so none of them are confounders, and none are required for unbiasedness). We will compare three models, all of which retain Z as a confounder: one with X and Z alone, one with X, Z, and all 30 candidate covariates, and one with X, Z, and only the covariates selected by forward AICc selection (with X and Z always forced in).
+
+```{r}
+n <- 200
+k <- 30
+n_true <- 5
+
+Z <- rnorm(n)
+X <- 0.5 * Z + rnorm(n)
+W <- matrix(rnorm(n * k), nrow = n, ncol = k)
+colnames(W) <- paste0("W", seq_len(k))
+# only the first 5 W's truly affect Y; the remaining 25 are noise candidates
+gamma <- c(rep(1.5, n_true), rep(0, k - n_true))
+Y <- effect_x_y * X + 0.5 * Z + as.numeric(W %*% gamma) + rnorm(n)
+dat_wide <- as_tibble(cbind(X = X, Y = Y, Z = Z, W))
+
+modA <- glmmTMB(Y ~ X + Z, family = gaussian, data = dat_wide)
+
+form_all <- as.formula(paste("Y ~ X + Z +", paste(colnames(W), collapse = " + ")))
+modB <- glmmTMB(form_all, family = gaussian, data = dat_wide)
+
+selected_vars <- forward_select_glmmTMB(dat_wide, "Y", force_in = c("X", "Z"), candidates = colnames(W))
+form_sel <- as.formula(paste("Y ~", paste(selected_vars, collapse = " + ")))
+modC <- glmmTMB(form_sel, family = gaussian, data = dat_wide)
+
+# extract the slopes of X from all three models using marginaleffects
+bind_rows(
+  slopes(modA, variables = "X", newdata = "mean") |> as_tibble() |> mutate(model = "A: X + Z only (no precision covariates)"),
+  slopes(modB, variables = "X", newdata = "mean") |> as_tibble() |> mutate(model = paste0("B: X + Z + all ", k, " candidate W's")),
+  slopes(modC, variables = "X", newdata = "mean") |> as_tibble() |> mutate(model = paste0("C: X + Z + AICc-selected (", length(selected_vars) - 2, " of ", k, ")"))
+) |>
+  ggplot(aes(x = estimate, xmax = conf.high, xmin = conf.low, y = model, color = model)) +
+  geom_pointrange(size = 1.5,
+                  lineend = "round",
+                  linewidth = 2,
+                  pch = 21,
+                  stroke = 4) +
+  geom_vline(xintercept = effect_x_y, color = "red") +
+  labs(x = "Estimated effect of X on Y", y = NULL) +
+  theme(legend.position = "none")
+```
+
+All three models retain Z and give estimates consistent with the true effect, but model A (no precision covariates) has the widest confidence interval, since it leaves all the variance due to W1-W5 unexplained in the residual. Model B, with all 30 candidate covariates, narrows the interval substantially, but does so by estimating 30 additional coefficients from only `r n` observations — a considerable overfitting risk in general, even where it happens to work out here. Model C, using only the covariates selected by forward AICc selection (which, in this simulation, recovers most of the 5 true covariates along with a few spurious ones, with Z and X forced in at every step), achieves comparable precision to model B while estimating far fewer parameters. This illustrates the tradeoff at the center of adding precision covariates: including candidates indiscriminately risks overfitting, while a principled, even if simple, selection step can recover most of the available precision gain with a considerably more parsimonious model — so long as that selection step is restricted to covariates whose inclusion does not depend on our causal assumptions, leaving variables like Z, whose role is determined by the DAG rather than by model fit, untouched.
