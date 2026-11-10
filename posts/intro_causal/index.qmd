@@ -1,0 +1,253 @@
+---
+title: "Introduction to causal inference in ecology"
+description: "Second in a series on interactions: exploring numerical × numerical interactions, marginal effects, conditional effects, and distributional regression in R"
+author:
+  - name: Allen Bush-Beaupré
+    url: https://abushbeaupre.github.io/
+    orcid: 0000-0001-6989-9278
+date: 07-27-2026
+categories: [tutorial, causal inference, marginaleffects, glmm, statistics, R]
+draft: false
+editor: source
+format:
+  html:
+    fig-width: 10
+    fig-height: 7
+    out-width: "100%"
+---
+types of effects
+DAGs
+model selection vs DAGS
+confounding
+g-computation
+counterfactuals
+propensity scores
+
+
+```{r}
+#| output: false
+#| warning: false
+library(tidyverse)       # Data manipulation and plotting
+library(tidylog)         # Print a log of data manipulations done with tidyverse
+library(glmmTMB)         # Generalized linear (mixed) models
+library(marginaleffects) # Compute marginal/condition effects
+library(patchwork)       # Combine multiple plots
+library(performance)
+
+# Set ggplot2 theme
+black_theme <- theme(
+  axis.line = element_line(linewidth = 2, lineend = "round", color = "white"),
+  panel.grid = element_blank(),
+  panel.background = element_rect(fill = "black", color = NA),
+  axis.ticks = element_blank(),
+  axis.text = element_text(size = 21, face = "bold", color = "white"),
+  axis.title = element_text(size = 21, face = "bold", color = "white"),
+  plot.title = element_text(size = 25, face = "bold", color = "white"),
+  plot.background = element_rect(fill = "black", color = NA),
+  legend.background = element_rect(fill = "black", color = NA),
+  legend.text = element_text(size = 21, color = "white"),
+  legend.title = element_text(size = 21, face = "bold", color = "white"),
+  legend.position = "bottom"
+)
+
+theme_set(black_theme)
+
+# Set global default for geom_point shape
+update_geom_defaults("point", list(shape = 1, size = 3, alpha = 0.8, color = "white"))
+
+# silence marginaleffects warnings about glmmTMB
+options(marginaleffects_safe = FALSE)
+
+set.seed(333)
+```
+
+In this post, I will cover the basics of causal inference in ecology, including the use of directed acyclic graphs (DAGs) to represent causal relationships, common issues regarding model selection, and the role of confounding variables. I will also discuss g-computation, counterfactuals, and propensity scores as methods for estimating causal effects. We will also cover effect types such as direct, indirect, total, and average causal effects. The intention is to help develop causal thinking into our quantitative analyses. 
+
+First off, let's define different research objectives. One objective may be to explore a dataset to understand the relationships between variables. One may be interested in looking at how certain variables affect a certain response variable in order to generate new hypotheses about a given phenomenon. This kind of objective is often termed "exploratory analyses" and is often thought of as not needing causal thinking about the mechanisms of a given system which I would argue is completely wrong; how can we generate hypotheses from observed relationships without thinking about causes and their effects? Another objective may be to predict a response variable based on a set of predictor variables. For example, we may want to predict the distribution of a given species for a given set of predictor variable. In this case, it may not be necessary to understand the causal relationships leading to how a species is distributed across a landscape but thinking causally about what affects a species distribution may help us in determining what predictor variables to include in our model. Finally, we may be interested in estimating the causal effect of a given variable on a response variable. In this case, we are interested in understanding how a change in a given variable affects a response variable while holding all other variables constant. This is often the most difficult objective to achieve and requires careful consideration of the causal relationships between variables. In all cases, thinking causally about the relationships between variables is beneficial.
+
+A causal effect is often thought of as the effect of a treatment on an outcome in the context of a randomized trial. For example, we may be interested in the effect of a given fertilizer on plant growth. In this case, the fertilizer is the treatment and plant growth is the outcome. If our study is well designed, we can estimate the causal effect of the fertilizer on plant growth by comparing the growth of plants that received the fertilizer to those that did not. However, in many cases, we are interested in estimating causal effects from observational data where we do not have control over the treatment assignment. In these cases, we need to be careful about confounding variables that may affect both the treatment and the outcome. For example, if we are interested in the effect of a given fertilizer on plant growth but we do not control for soil quality, we may find that plants that received the fertilizer grew better than those that did not, but this may be due to differences in soil quality rather than the effect of the fertilizer. In this case, soil quality is a confounding variable that needs to be accounted for in our analysis.
+
+TBC
+
+Example of confounding:
+```{r}
+data1 <- tibble(
+    Z = rnorm(1000, mean = 0, sd = 1),
+    X = 0.5 * Z + rnorm(1000, mean = 0, sd = 1),
+    Y = 0.5 * Z + rnorm(1000, mean = 0, sd = 1)
+)
+
+model1 <- glmmTMB(Y ~ X, family = gaussian, data = data1)
+model2 <- glmmTMB(Y ~ X + Z, family = gaussian, data = data1)
+
+summary(model1)
+summary(model2)
+```
+
+We can see that in model 1, the effect of X on Y is different from zero, but in model 2, when we include Z as a covariate, the effect of X on Y is no longer considered significant. This is an example of confounding, where Z is a confounding variable that affects both X and Y and thus creates a spurious association between X and Y. In this case, we need to account for Z in our analysis in order to accurately estimate the causal effect of X on Y. 
+
+Let's now simulate a dataset in which Z causes both X and Y and X has an effect on Y. In this case, we will see that when we include Z as a covariate in our model, the effect of X on Y is still different from zero, indicating that X has a causal effect on Y. 
+
+A note on how X and Z are simulated below: rather than generating X as `b * Z + rnorm(...)` for some coefficient `b`, we fix `Var(X) = 1` and set the correlation between X and Z directly, i.e. `X = rho * Z + sqrt(1 - rho^2) * rnorm(...)`. This matters because the precision of the estimated slope of X depends on both the correlation between X and Z (captured by the VIF) and the raw variance of X itself; increasing `b` increases both at once, so a comparison across different values of `b` confounds "more collinear" with "more variable X" and the confidence interval widths don't cleanly track VIF. Fixing Var(X) = 1 isolates the effect of correlation alone, so differences in confidence interval width below can be attributed to collinearity rather than to a side effect of how X happened to be generated.
+
+```{r}
+effect_x_y <- 0.8
+
+rho_high <- 0.95
+
+data2 <- tibble(
+    Z = rnorm(1000, mean = 0, sd = 1),
+    X = rho_high * Z + sqrt(1 - rho_high^2) * rnorm(1000, mean = 0, sd = 1),
+    Y = effect_x_y * X + 0.5 * Z + rnorm(1000, mean = 0, sd = 1)
+)
+
+model3 <- glmmTMB(Y ~ X, family = gaussian, data = data2)
+model4 <- glmmTMB(Y ~ X + Z, family = gaussian, data = data2)
+
+# extract the slopes of X from both models using marginaleffects
+bind_rows(
+slopes(model3, variables = "X", newdata = "mean") |> as_tibble() |> mutate(model = "model3"),
+slopes(model4, variables = "X", newdata = "mean") |> as_tibble() |> mutate(model = "model4")
+) |>
+  ggplot(aes(x = estimate, xmax = conf.high, xmin = conf.low, y = model, color = model)) +
+  geom_pointrange(size = 1.5,
+                  lineend = "round",
+                  linewidth = 2,
+                  pch = 21,
+                  stroke = 4) +
+  geom_vline(xintercept = effect_x_y, color = "red") +
+  labs(x = "Estimated effect of X on Y", y = NULL) +
+  coord_cartesian(xlim = c(0.6, 1.5)) +
+  theme(legend.position = "none")
+```
+
+We can see here that adding Z as a covariate helps in estimating the true effect of X on Y. Excluding Z from the model because it is not a variable that interests us leads to erroneous conclusions.
+
+Multicolinearity:
+In the simulation above, X and Z are highly correlated. Let's check our model using the check_model function from the performance package to see if there are any issues with multicolinearity.
+```{r}
+check_model(model4)
+```
+
+I often get questions regarding multicolinearity and if this causes issues with estimating causal effects. Multicolinearity is a statistical phenomenon in which two or more predictor variables in a multiple regression model are highly correlated. This can lead to issues with estimating the coefficients of the predictor variables, as it becomes difficult to determine the individual effect of each predictor on the response variable. However, multicolinearity does not affect the ability to estimate causal effects, as long as the model is correctly specified and all relevant confounding variables are included. From the plot above, we can see that the effect of X on Y is estimated with more uncertainty (wider confidence intervals) in model 4 compared to model 3 but at least the confidence intervals cover the true simulated value compared to the confidence intervals in model 3.
+
+Let's look at the width of the confidence intervals if we simulate a dataset in which X and Z are correlated but to a lesser degree.
+
+```{r}
+rho_low <- 0.5
+
+data3 <- tibble(
+    Z = rnorm(1000, mean = 0, sd = 1),
+    X = rho_low * Z + sqrt(1 - rho_low^2) * rnorm(1000, mean = 0, sd = 1),
+    Y = effect_x_y * X + 0.5 * Z + rnorm(1000, mean = 0, sd = 1)
+)
+
+model5 <- glmmTMB(Y ~ X, family = gaussian, data = data3)
+model6 <- glmmTMB(Y ~ X + Z, family = gaussian, data = data3)
+
+# extract the slopes of X from both models using marginaleffects
+bind_rows(
+slopes(model5, variables = "X", newdata = "mean") |> as_tibble() |> mutate(model = "model5"),
+slopes(model6, variables = "X", newdata = "mean") |> as_tibble() |> mutate(model = "model6")
+) |>
+  ggplot(aes(x = estimate, xmax = conf.high, xmin = conf.low, y = model, color = model)) +
+  geom_pointrange(size = 1.5,
+                  lineend = "round",
+                  linewidth = 2,
+                  pch = 21,
+                  stroke = 4) +
+  geom_vline(xintercept = effect_x_y, color = "red") +
+  labs(x = "Estimated effect of X on Y", y = NULL) +
+  coord_cartesian(xlim = c(0.6, 1.5)) +
+  theme(legend.position = "none")
+```
+
+We can see here that the confidence interval for model 6 is narrower than that of model 4 and still covers the true value.
+
+```{r}
+check_model(model6)
+```
+
+For fun, let's run a quick sensitivity analysis to see how the effect of X on Y changes as we vary the correlation between X and Z. We will simulate datasets with different levels of correlation between X and Z and estimate the effect of X on Y in each case. We will also look at the VIF values for each model to see how they change as we vary the correlation between X and Z.
+
+```{r}
+rhos <- seq(0, 0.95, by = 0.05)
+
+sensitivity_results <- map_dfr(rhos, function(rho) {
+
+  set.seed(333)
+  Z <- rnorm(1000, mean = 0, sd = 1)
+  X <- rho * Z +  sqrt(1 - rho^2) * rnorm(1000, mean = 0, sd = 1)
+  Y <- effect_x_y * X + 0.5 * Z + rnorm(1000, mean = 0, sd = 1)
+  dat <- tibble(X = X, Y = Y, Z = Z)
+
+  mod <- glmmTMB(Y ~ X + Z, family = gaussian, data = dat)
+
+  slope <- slopes(mod, variables = "X", newdata = "mean") |> as_tibble()
+  vif_val <- performance::check_collinearity(mod) |>
+    as_tibble() |>
+    filter(Term == "X") |>
+    pull(VIF)
+
+  tibble(
+    rho = rho,
+    cor_x_z = cor(dat$X, dat$Z),
+    estimate = slope$estimate,
+    conf.low = slope$conf.low,
+    conf.high = slope$conf.high,
+    vif = vif_val
+  )
+})
+```
+
+```{r}
+ggplot(sensitivity_results, aes(x = cor_x_z, y = estimate, ymin = conf.low, ymax = conf.high)) +
+  geom_pointrange(color = "white") +
+  geom_hline(yintercept = effect_x_y, color = "red") +
+  labs(x = "Correlation between X and Z", y = "Estimated effect of X on Y")
+```
+
+```{r}
+ggplot(sensitivity_results, aes(x = cor_x_z, y = vif)) +
+  geom_point(size = 2) +
+  geom_line(color = "white") +
+  labs(x = "Correlation between X and Z", y = "VIF for X")
+```
+
+As the correlation between X and Z increases, the point estimate of the effect of X on Y stays close to the true simulated value (red line), but the confidence interval widens noticeably once the correlation exceeds roughly 0.7–0.8 — consistent with the earlier observation that multicollinearity inflates uncertainty without necessarily biasing the estimate. The VIF for X increases sharply as the correlation grows, reflecting the standard relationship $$\text{VIF} = \frac{1}{1 - R^2}$$ between a predictor and the other covariates in the model.
+
+
+Collinearity between X and Z is not the only thing that affects the precision of our estimate of the effect of X on Y — so does how much of the residual variance in Y we can explain. Let's simulate a scenario where X and Z are highly correlated (as before), but we also have two additional predictors, W1 and W2, that affect Y but are unrelated to X and Z (and so are not confounders of the X–Y relationship, and are not required to be included for unbiasedness). Including these predictors in the model does not change the true causal effect of X on Y, but it does soak up residual variance in Y that would otherwise show up as noise, which should narrow the confidence interval for the slope of X.
+
+```{r}
+rho_high <- 0.95
+n <- 1000
+
+data4 <- tibble(
+    Z = rnorm(n, mean = 0, sd = 1),
+    X = rho_high * Z + sqrt(1 - rho_high^2) * rnorm(n, mean = 0, sd = 1),
+    W1 = rnorm(n, mean = 0, sd = 1),
+    W2 = rnorm(n, mean = 0, sd = 1),
+    Y = effect_x_y * X + 0.5 * Z + 2 * W1 + 2 * W2 + rnorm(n, mean = 0, sd = 1)
+)
+
+model7 <- glmmTMB(Y ~ X + Z, family = gaussian, data = data4)
+model8 <- glmmTMB(Y ~ X + Z + W1 + W2, family = gaussian, data = data4)
+
+# extract the slopes of X from both models using marginaleffects
+bind_rows(
+slopes(model7, variables = "X", newdata = "mean") |> as_tibble() |> mutate(model = "model7 (without W1, W2)"),
+slopes(model8, variables = "X", newdata = "mean") |> as_tibble() |> mutate(model = "model8 (with W1, W2)")
+) |>
+  ggplot(aes(x = estimate, xmax = conf.high, xmin = conf.low, y = model, color = model)) +
+  geom_pointrange(size = 1.5,
+                  lineend = "round",
+                  linewidth = 2,
+                  pch = 21,
+                  stroke = 4) +
+  geom_vline(xintercept = effect_x_y, color = "red") +
+  labs(x = "Estimated effect of X on Y", y = NULL) +
+  theme(legend.position = "none")
+```
+
+Both models give estimates consistent with the true simulated effect, but the confidence interval for model 8, which includes W1 and W2, is noticeably narrower than that of model 7. This illustrates that improving the precision of a causal effect estimate is not only about addressing confounding (which requires including Z): adding predictors of Y that are unrelated to the treatment of interest, sometimes called "precision covariates," can meaningfully tighten the confidence interval around the effect of interest without introducing bias, because they absorb residual variance in Y that would otherwise be attributed to noise.
