@@ -33,6 +33,23 @@ library(glmmTMB)         # Generalized linear (mixed) models
 library(marginaleffects) # Compute marginal/condition effects
 library(patchwork)       # Combine multiple plots
 library(performance)
+library(ggdag)        # Draw DAGs
+library(dagitty)      # Represent DAGs
+
+# Helper to draw a DAG styled to match the post's black theme
+plot_dag <- function(dag) {
+  dag |>
+    tidy_dagitty() |>
+    ggplot(aes(x = x, y = y, xend = xend, yend = yend)) +
+    geom_dag_edges(edge_color = "white") +
+    geom_dag_point(color = "white", size = 16) +
+    geom_dag_text(color = "black", size = 5, fontface = "bold") +
+    theme_dag() +
+    theme(
+      panel.background = element_rect(fill = "black", color = NA),
+      plot.background = element_rect(fill = "black", color = NA)
+    )
+}
 
 # Set ggplot2 theme
 black_theme <- theme(
@@ -70,6 +87,20 @@ A causal effect is often thought of as the effect of a treatment on an outcome i
 TBC
 
 Example of confounding:
+
+The DAG below represents the data-generating process we are about to simulate: Z is a common cause of both X and Y, but X has no causal effect on Y at all. Any association we observe between X and Y is therefore entirely attributable to confounding by Z.
+
+```{r}
+dag_pure_confound <- dagify(
+  Y ~ Z,
+  X ~ Z,
+  exposure = "X",
+  outcome = "Y"
+)
+
+plot_dag(dag_pure_confound)
+```
+
 ```{r}
 data1 <- tibble(
     Z = rnorm(1000, mean = 0, sd = 1),
@@ -87,6 +118,19 @@ summary(model2)
 We can see that in model 1, the effect of X on Y is different from zero, but in model 2, when we include Z as a covariate, the effect of X on Y is no longer considered significant. This is an example of confounding, where Z is a confounding variable that affects both X and Y and thus creates a spurious association between X and Y. In this case, we need to account for Z in our analysis in order to accurately estimate the causal effect of X on Y. 
 
 Let's now simulate a dataset in which Z causes both X and Y and X has an effect on Y. In this case, we will see that when we include Z as a covariate in our model, the effect of X on Y is still different from zero, indicating that X has a causal effect on Y. 
+
+The DAG below represents this data-generating process: Z remains a confounder of X and Y, but now X also has a genuine causal effect on Y. This is the DAG underlying all of the remaining simulations in this post (including the multicollinearity, sensitivity, and precision-covariate examples below), unless noted otherwise.
+
+```{r}
+dag_confound <- dagify(
+  Y ~ X + Z,
+  X ~ Z,
+  exposure = "X",
+  outcome = "Y"
+)
+
+plot_dag(dag_confound)
+```
 
 A note on how X and Z are simulated below: rather than generating X as `b * Z + rnorm(...)` for some coefficient `b`, we fix `Var(X) = 1` and set the correlation between X and Z directly, i.e. `X = rho * Z + sqrt(1 - rho^2) * rnorm(...)`. This matters because the precision of the estimated slope of X depends on both the correlation between X and Z (captured by the VIF) and the raw variance of X itself; increasing `b` increases both at once, so a comparison across different values of `b` confounds "more collinear" with "more variable X" and the confidence interval widths don't cleanly track VIF. Fixing Var(X) = 1 isolates the effect of correlation alone, so differences in confidence interval width below can be attributed to collinearity rather than to a side effect of how X happened to be generated.
 
@@ -221,6 +265,19 @@ It's worth being explicit about why this VIF simulation matters for causal infer
 
 Collinearity between X and Z is not the only thing that affects the precision of our estimate of the effect of X on Y — so does how much of the residual variance in Y we can explain. Let's simulate a scenario where X and Z are highly correlated (as before), but we also have two additional predictors, W1 and W2, that affect Y but are unrelated to X and Z (and so are not confounders of the X–Y relationship, and are not required to be included for unbiasedness). Including these predictors in the model does not change the true causal effect of X on Y, but it does soak up residual variance in Y that would otherwise show up as noise, which should narrow the confidence interval for the slope of X.
 
+The DAG for this scenario extends the one above by adding W1 and W2 as additional, independent causes of Y. Note that W1 and W2 point only into Y: they share no arrows with X or Z, which is precisely what makes them precision covariates rather than confounders.
+
+```{r}
+dag_precision <- dagify(
+  Y ~ X + Z + W1 + W2,
+  X ~ Z,
+  exposure = "X",
+  outcome = "Y"
+)
+
+plot_dag(dag_precision)
+```
+
 ```{r}
 rho_high <- 0.95
 n <- 1000
@@ -288,7 +345,7 @@ forward_select_glmmTMB <- function(data, y, force_in, candidates, max_steps = In
 }
 ```
 
-Let's simulate a dataset in which Z is a confounder of X and Y, as before, and we additionally have 30 candidate precision covariates (W1-W30), only 5 of which actually affect Y, and all of which are unrelated to X and Z (so none of them are confounders, and none are required for unbiasedness). We will compare three models, all of which retain Z as a confounder: one with X and Z alone, one with X, Z, and all 30 candidate covariates, and one with X, Z, and only the covariates selected by forward AICc selection (with X and Z always forced in).
+Let's simulate a dataset in which Z is a confounder of X and Y, as before, and we additionally have 30 candidate precision covariates (W1-W30), only 5 of which actually affect Y, and all of which are unrelated to X and Z (so none of them are confounders, and none are required for unbiasedness). This follows the same DAG structure as the W1/W2 example above, just with 30 candidate precision covariates in place of 2. We will compare three models, all of which retain Z as a confounder: one with X and Z alone, one with X, Z, and all 30 candidate covariates, and one with X, Z, and only the covariates selected by forward AICc selection (with X and Z always forced in).
 
 ```{r}
 n <- 200
